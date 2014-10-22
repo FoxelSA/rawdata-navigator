@@ -1,0 +1,64 @@
+
+## Copyright
+
+rawdata-navigator - Human-understandable raw data navigator<br />
+This program is part of the FOXEL project <[http://foxel.ch](http://foxel.ch)>.
+
+Copyright (c) 2014 FOXEL SA - [http://foxel.ch](http://foxel.ch)<br />
+Please read <[http://foxel.ch/license](http://foxel.ch/license)> for more
+information.
+
+
+## License
+
+This program is licensed under the terms of the
+[GNU Affero General Public License v3](http://www.gnu.org/licenses/agpl.html)
+(GNU AGPL).
+
+In addition to the common terms of the GNU AGPL v3 license, you are required to:
+
+*   preserve legal notices and author attributions in that material<br />
+    or in the Appropriate Legal Notices displayed by works containing it.
+
+*   attribute the work as explained in the Usage and Attribution section of
+    <[http://foxel.ch/license](http://foxel.ch/license)>.
+
+The content is licensed under the terms of the
+[Creative Commons Attribution-ShareAlike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/)
+(CC BY-SA) license.
+
+You must read <[http://foxel.ch/license](http://foxel.ch/license)> for more
+information about our Licensing terms and our Usage and Attribution guidelines.
+
+
+## Included Software and Libraries
+
+This program includes works distributed under the terms of the GNU General
+Public License and/or a compatible license and other copyright notices.
+
+
+*   __Leaflet 0.7.3__<br />
+    <[http://leafletjs.com](http://leafletjs.com)><br />
+    Copyright (c) 2010-2014, Vladimir Agafonkin<br />
+    Copyright (c) 2010-2011, CloudMade<br />
+    Leaflet is licensed under the [BSD 2-Clause license](http://opensource.org/licenses/BSD-2-Clause).
+
+*   __jQuery 2.1.1__<br />
+    <[http://jquery.com](http://jquery.com)><br />
+    Copyright (c) 2005, 2014 jQuery Foundation, Inc. and other contributors<br />
+    jQuery is licensed under the [MIT license](http://opensource.org/licenses/MIT).
+
+*   __Underscore.js 1.7.0__<br />
+    <[http://underscorejs.org](http://underscorejs.org)><br />
+    Copyright (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors<br />
+    Underscore.js is licensed under the [MIT license](http://opensource.org/licenses/MIT).
+
+*   __Select2 3.5.1__<br />
+    <[http://ivaynberg.github.io/select2/](http://ivaynberg.github.io/select2/)><br />
+    Copyright (c) 2014 Igor Vaynberg<br />
+    Select2 is dual licensed under the [Apache License 2.0](http://opensource.org/licenses/Apache-2.0) and the [GNU GPL license v2](http://www.gnu.org/licenses/gpl-2.0.html).
+
+*   __vis.js 3.5.0__<br />
+    <[http://visjs.org](http://visjs.org)><br />
+    Copyright (c) 2010-2014 Almende B.V.<br />
+    vis.js is licensed under the [Apache License 2.0](http://opensource.org/licenses/Apache-2.0).
