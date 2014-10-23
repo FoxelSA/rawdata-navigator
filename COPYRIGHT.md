@@ -43,6 +43,11 @@ Public License and/or a compatible license and other copyright notices.
     Copyright (c) 2010-2011, CloudMade<br />
     Leaflet is licensed under the [BSD 2-Clause license](http://opensource.org/licenses/BSD-2-Clause).
 
+*   __Leaflet.markercluster__<br />
+    <[https://github.com/Leaflet/Leaflet.markercluster](https://github.com/Leaflet/Leaflet.markercluster)><br />
+    Copyright (c) 2012-2013, Dave Leaver, smartrak<br />
+    Leaflet.markercluster is licensed under the [MIT license](http://opensource.org/licenses/MIT).
+
 *   __jQuery 2.1.1__<br />
     <[http://jquery.com](http://jquery.com)><br />
     Copyright (c) 2005, 2014 jQuery Foundation, Inc. and other contributors<br />
