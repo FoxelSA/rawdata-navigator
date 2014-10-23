@@ -302,6 +302,18 @@ $(document).ready(function() {
     };
 
     /**
+     * leaflet_fitbounds()
+     */
+    var leaflet_fitbounds = function() {
+        if (_.isNull(leaflet.bounds))
+            return;
+        leaflet.map.fitBounds(leaflet.bounds);
+        if (leaflet.map.getZoom() > leaflet.zoom.bounds)
+            leaflet.map.setZoom(leaflet.zoom.bounds);
+        leaflet.map.panTo(leaflet.bounds.getCenter());
+    };
+
+    /**
      * timeline_init()
      */
     var timeline_init = function() {
@@ -325,19 +337,39 @@ $(document).ready(function() {
      */
     var timeline_select = function(items) {
 
+        // bounds
+        leaflet.bounds = null;
+
         // remove overlays
         $.each(leaflet.overlays, function(i,layer) {
+            if (layer.foxel.type!='trace')
+                return;
             layer.foxel.displayed = false;
             leaflet.map.removeLayer(layer);
         });
 
         // add overlays
         $.each(leaflet.overlays, function(i,layer) {
+
+            if (layer.foxel.type!='trace')
+                return;
             if (items.length > 0 && !_.contains(items,layer.foxel.segment)) // limit if needed
                 return;
+
+            // display
             layer.foxel.displayed = true;
             leaflet.map.addLayer(layer);
+
+            // extract bounds
+            if (_.isNull(leaflet.bounds))
+                leaflet.bounds = layer.getBounds();
+            else
+                leaflet.bounds.extend(layer.getBounds());
+
         });
+
+        // fit and center map on bounds
+        leaflet_fitbounds();
 
     };
 
@@ -500,8 +532,8 @@ $(document).ready(function() {
             var trace = [];
             var latlngbuffer = null;
 
-            // segment layer group [trace,cluster]
-            var segmentlayer = new L.layerGroup();
+            // segment feature group [trace,cluster]
+            var segmentlayer = new L.featureGroup();
 
             // cluster
             var cluster = new L.MarkerClusterGroup({
@@ -548,7 +580,7 @@ $(document).ready(function() {
                     closeButton: false
             });
 
-            // add polyline to segmentlayer
+            // add to segmentlayer [trace,cluster]
             segmentlayer.addLayer(polyline);
             segmentlayer.addLayer(cluster);
 
@@ -587,12 +619,7 @@ $(document).ready(function() {
             timeline.vis.fit();
 
             // fit and center map on bounds
-            if (!_.isNull(leaflet.bounds)) {
-                leaflet.map.fitBounds(leaflet.bounds);
-                if (leaflet.map.getZoom() > leaflet.zoom.bounds)
-                    leaflet.map.setZoom(leaflet.zoom.bounds);
-                leaflet.map.panTo(leaflet.bounds.getCenter());
-            }
+            leaflet_fitbounds();
 
             // display
             overlay_hide();
