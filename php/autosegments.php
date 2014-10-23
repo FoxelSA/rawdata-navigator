@@ -45,8 +45,12 @@ $csps = array();
 if (!isset($_GET['storage']) || empty($_GET['storage']) || !is_dir($_GET['storage']))
     exit();
 
-// scan
+// path
 $camera_path = $_GET['storage'].'/camera';
+if (!is_dir($camera_path))
+    exit();
+
+// scan
 $camera_lsdir = scandir($camera_path);
 
 // loop over mac addresses
