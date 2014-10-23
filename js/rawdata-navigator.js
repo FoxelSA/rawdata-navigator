@@ -59,9 +59,8 @@ $(document).ready(function() {
         },
         bounds: null,
         overlays: [],
-        icons: {
-            types: ['valid','unknown','trashed','guess','active'],
-            markers: {}
+        colors: {
+            segments: ['#f00','#0c0','#00f']
         }
     };
 
@@ -80,11 +79,6 @@ $(document).ready(function() {
             keys: [],
             remaining: 0
         }
-    };
-
-    // colors
-    var colors = {
-        segments: ['#f00','#0f0','#00f','#5e19a1']
     };
 
     /**
@@ -208,9 +202,6 @@ $(document).ready(function() {
             layers: [_.first(_.values(base_maps))]
         });
 
-        // marker icons
-        leaflet_icons();
-
         // layers
         leaflet.layers = L.control.layers(base_maps,{});
         leaflet.layers.addTo(leaflet.map);
@@ -249,19 +240,45 @@ $(document).ready(function() {
     };
 
     /**
-     * leaflet_icons()
+     * leaflet_cluster_icon()
      */
-    var leaflet_icons = function() {
-        $.each(leaflet.icons.types,function(i,type) {
-            _.extend(leaflet.icons.markers,_.object([type],[
-                L.icon({
-                    iconUrl: 'img/markers/'+type+'-marker-icon.png',
-                    iconRetinaUrl: 'img/markers/'+type+'-marker-icon-2x.png',
-                    iconSize: [25, 41],
-                    iconAnchor: [12, 41]
-                })
-            ]));
+    var leaflet_cluster_icon = function(cluster,color) {
+
+        var count = cluster.getChildCount();
+
+        var css = ' marker-cluster-';
+        if (count < 50)
+            css += 'small';
+        else if (count < 100)
+            css += 'medium';
+        else
+            css += 'large';
+
+        css += ' '+color.replace('#','seg-');
+
+        return new L.divIcon({
+            html: '<div><span>'+count+'</span></div>',
+            className: 'marker-cluster'+css,
+            iconSize: new L.point(40,40)
         });
+
+    };
+
+    /**
+     * leaflet_marker_icon()
+     */
+    var leaflet_marker_icon = function(pose,color) {
+
+        var type = pose.guess ? 'guess' : 'unknown';
+
+        var css = 'marker-pnt '+color.replace('#','seg-')+' type-'+type;
+
+        return new L.divIcon({
+            html: '<div><span></span></div>',
+            className: css,
+            iconSize: new L.point(30,30)
+        });
+
     };
 
     /**
@@ -472,7 +489,7 @@ $(document).ready(function() {
         };
 
         // color
-        var color = colors.segments[sid % colors.segments.length];
+        var color = leaflet.colors.segments[sid % leaflet.colors.segments.length];
 
         // timeline range
         timeline.items.push({id:segment,content:''+segment,start:range.start,end:range.end});
@@ -493,7 +510,9 @@ $(document).ready(function() {
                 singleMarkerMode: false,
                 spiderfyOnMaxZoom: true,
                 animateAddingMarkers: false,
-                //disableClusteringAtZoom: leaflet.zoom.cluster
+                iconCreateFunction: function(cluster) {
+                    return leaflet_cluster_icon(cluster,color);
+                }
             });
 
             // parse poses
@@ -508,8 +527,7 @@ $(document).ready(function() {
                 latlngbuffer = latlng;
 
                 // cluster marker
-                var icon = pose.guess ? leaflet.icons.markers.guess : leaflet.icons.markers.unknown;
-                var clustermarker = new L.marker(latlng,{icon:icon})
+                var clustermarker = new L.marker(latlng,{icon:leaflet_marker_icon(pose,color)})
                     .on('mouseover', function() {
                         console.log('marker '+this); // todo
                 });
@@ -554,7 +572,7 @@ $(document).ready(function() {
 
             // add to map
             leaflet.map.addLayer(segmentlayer);
-            leaflet.layers.addOverlay(segmentlayer,segment+' ('+data.pose.length+' poses)');
+            //leaflet.layers.addOverlay(segmentlayer,segment+' ('+data.pose.length+' poses)');
 
         }
 

@@ -36,6 +36,14 @@
  *      Attribution" section of <http://foxel.ch/license>.
  */
 
+@font-face {
+    font-family:'FontAwesome';
+    font-style:normal;
+    font-weight:normal;
+    src:url('fonts/FontAwesome/fontawesome-webfont.eot?v=4.0.3');
+    src:url('fonts/FontAwesome/fontawesome-webfont.eot?#iefix&v=4.0.3') format('embedded-opentype'), url('fonts/FontAwesome/fontawesome-webfont.woff?v=4.0.3') format('woff'), url('fonts/FontAwesome/fontawesome-webfont.ttf?v=4.0.3') format('truetype'), url('fonts/FontAwesome/fontawesome-webfont.svg?v=4.0.3#fontawesomeregular') format('svg');
+}
+
 html,body {
     margin:0;
     padding:0;
@@ -50,6 +58,71 @@ html,body {
     .leaflet-popup-content-wrapper {
         border-radius:0;
     }
+
+    .marker-cluster {
+        color:#222;
+        background-color:transparent !important;
+    }
+
+        .marker-cluster span {
+            font-weight:700 !important;
+        }
+
+        .marker-cluster-large span,
+        .marker-cluster-medium span {
+            visibility:hidden;
+        }
+
+    .seg-f00 div {
+        background-color:rgba(255,0,0,0.25);
+    }
+
+    .seg-0c0 div {
+        background-color:rgba(0,204,0,0.25);
+    }
+
+    .seg-00f div {
+        background-color:rgba(0,0,255,0.25);
+    }
+
+    .marker-pnt {
+        text-align:center;
+    }
+
+        .marker-pnt div {
+            border-radius:15px;
+        }
+
+        .marker-pnt span {
+            color:#fff;
+            font-family:'FontAwesome';
+            font-size:16px;
+            font-style:normal;
+            font-weight:normal;
+            line-height:30px;
+        }
+
+            .marker-pnt.type-trashed span,
+            .marker-pnt.type-guess span {
+                color:#000;
+            }
+
+            .marker-pnt.type-unknown span:before {
+                content:"\f0e7";
+            }
+
+            .marker-pnt.type-guess span:before {
+                content:"\f128";
+            }
+
+            .marker-pnt.type-valid span:before {
+                content:"\f00c";
+            }
+
+            .marker-pnt.type-trashed span:before {
+                content:"\f00d";
+            }
+
 
 #overlay {
     z-index:1000;
