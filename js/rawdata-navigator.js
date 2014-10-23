@@ -562,7 +562,8 @@ $(document).ready(function() {
                 var clustermarker = new L.marker(latlng,{icon:leaflet_marker_icon(pose,color)})
                     .on('mouseover', function() {
                         console.log('marker '+this); // todo
-                });
+                    }
+                );
 
                 // add cluster marker to cluster
                 cluster.addLayer(clustermarker);
@@ -576,9 +577,11 @@ $(document).ready(function() {
                 smoothFactor: 1,
                 opacity: 1
             })
-                .bindPopup('Segment '+segment,{
-                    closeButton: false
-            });
+                .on('click', function() {
+                    timeline_select([segment]);
+                    timeline.vis.setSelection(segment);
+                }
+            );
 
             // add to segmentlayer [trace,cluster]
             segmentlayer.addLayer(polyline);
