@@ -102,8 +102,7 @@ html,body {
             line-height:30px;
         }
 
-            .marker-pnt.type-trashed span,
-            .marker-pnt.type-guess span {
+            .marker-pnt.type-trashed span {
                 color:#000;
             }
 
@@ -112,7 +111,7 @@ html,body {
             }
 
             .marker-pnt.type-guess span:before {
-                content:"\f128";
+                content:"\f0c3";
             }
 
             .marker-pnt.type-valid span:before {
