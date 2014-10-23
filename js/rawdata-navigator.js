@@ -526,7 +526,7 @@ $(document).ready(function() {
         // timeline range
         timeline.items.push({
             id: segment,
-            content: ''+segment+' ('+length+' poses)',
+            content: ''+segment+' ('+length+' poses'+(data.gps?'':', no GPS fix')+')',
             start: range.start,
             end: range.end,
             className: 'timeline'+color.replace('#','-')
