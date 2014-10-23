@@ -269,7 +269,7 @@ $(document).ready(function() {
      */
     var leaflet_marker_icon = function(pose,color) {
 
-        var type = pose.guess ? 'guess' : 'unknown';
+        var type = pose.guess ? 'guess' : pose.status;
 
         var css = 'marker-pnt '+color.replace('#','seg-')+' type-'+type;
 
