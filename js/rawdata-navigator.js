@@ -524,7 +524,7 @@ $(document).ready(function() {
         var color = leaflet.colors.segments[sid % leaflet.colors.segments.length];
 
         // timeline range
-        timeline.items.push({id:segment,content:''+segment,start:range.start,end:range.end});
+        timeline.items.push({id:segment,content:''+segment,start:range.start,end:range.end,className:'timeline'+color.replace('#','-')});
 
         // gps known, draw on map
         if (data.gps) {

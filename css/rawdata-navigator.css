@@ -73,16 +73,38 @@ html,body {
             visibility:hidden;
         }
 
-    .seg-f00 div {
+    .seg-f00 div,
+    .vis.timeline .item.timeline-f00 {
         background-color:rgba(255,0,0,0.25);
     }
 
-    .seg-0c0 div {
+        .vis.timeline .item.timeline-f00 {
+            color:#f00;
+            border-color:rgba(255,0,0,0.25);
+        }
+
+    .seg-0c0 div,
+    .vis.timeline .item.timeline-0c0 {
         background-color:rgba(0,204,0,0.25);
     }
 
-    .seg-00f div {
+        .vis.timeline .item.timeline-0c0 {
+            color:#060;
+            border-color:rgba(0,204,0,0.25);
+        }
+
+    .seg-00f div,
+    .vis.timeline .item.timeline-00f {
         background-color:rgba(0,0,255,0.25);
+    }
+
+        .vis.timeline .item.timeline-00f {
+            color:#00f;
+            border-color:rgba(0,0,255,0.25);
+        }
+
+    .vis.timeline .item.selected {
+        background-color:#fff785;
     }
 
     .marker-pnt {
