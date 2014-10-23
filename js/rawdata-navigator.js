@@ -54,13 +54,15 @@ $(document).ready(function() {
             min: 3,
             max: 25,
             native: 18,
-            cluster: 21,
-            bounds: 17,
-            markers: 20
+            cluster: 20,
+            bounds: 17
         },
         bounds: null,
         overlays: [],
-        markers: []
+        icons: {
+            types: ['valid','unknown','trashed','guess','active'],
+            markers: {}
+        }
     };
 
     // storage
@@ -82,7 +84,6 @@ $(document).ready(function() {
 
     // colors
     var colors = {
-        guess: '#000',
         segments: ['#f00','#0f0','#00f','#5e19a1']
     };
 
@@ -174,6 +175,11 @@ $(document).ready(function() {
             attribution:    '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
                             '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
         }, {
+            name:           'OpenStreetMap Black and White',
+            url:            'http://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png',
+            attribution:    '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                            '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+        }, {
             name:           'Esri World Imagery',
             url:            'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
             attribution:    'Tiles &copy; Esri &mdash; ' +
@@ -202,6 +208,9 @@ $(document).ready(function() {
             layers: [_.first(_.values(base_maps))]
         });
 
+        // marker icons
+        leaflet_icons();
+
         // layers
         leaflet.layers = L.control.layers(base_maps,{});
         leaflet.layers.addTo(leaflet.map);
@@ -216,7 +225,7 @@ $(document).ready(function() {
 
         // event: leaflet map zoom end
         leaflet.map.on('zoomend',function() {
-            leaflet_zoom_end();
+            console.log('[zoom: '+leaflet.map.getZoom()+']');
         });
 
         // event: leaflet layer removed
@@ -240,39 +249,19 @@ $(document).ready(function() {
     };
 
     /**
-     * leaflet_zoom_end()
+     * leaflet_icons()
      */
-    var leaflet_zoom_end = function() {
-        console.log('[zoom: '+leaflet.map.getZoom()+']');
-        leaflet_markers();
-    };
-
-    /**
-     * leaflet_markers()
-     */
-    var leaflet_markers = function() {
-
-        var show = (leaflet.map.getZoom() >= leaflet.zoom.markers);
-
-        // parse each overlays
-        $.each(leaflet.overlays, function(index,layer) {
-
-            // get markers layer relative to segment
-            var markers = _.findWhere(leaflet.markers,{segment:layer.foxel.segment});
-
-            // display
-            if (show && layer.foxel.displayed && !markers.foxel.displayed) {
-                markers.foxel.displayed = true;
-                leaflet.map.addLayer(markers);
-
-            // hide
-            } else if (!show || (!layer.foxel.displayed && markers.foxel.displayed)) {
-                markers.foxel.displayed = false;
-                leaflet.map.removeLayer(markers);
-            }
-
+    var leaflet_icons = function() {
+        $.each(leaflet.icons.types,function(i,type) {
+            _.extend(leaflet.icons.markers,_.object([type],[
+                L.icon({
+                    iconUrl: 'img/markers/'+type+'-marker-icon.png',
+                    iconRetinaUrl: 'img/markers/'+type+'-marker-icon-2x.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41]
+                })
+            ]));
         });
-
     };
 
     /**
@@ -281,10 +270,8 @@ $(document).ready(function() {
     var leaflet_overlay_add = function(layer) {
         if (_.isUndefined(layer.foxel))
             return;
-        if (layer.foxel.type=='trace') {
+        if (layer.foxel.type=='trace')
             layer.foxel.displayed = true;
-            leaflet_markers();
-        }
     };
 
     /**
@@ -293,10 +280,8 @@ $(document).ready(function() {
     var leaflet_overlay_remove = function(layer) {
         if (_.isUndefined(layer.foxel))
             return;
-        if (layer.foxel.type=='trace') {
+        if (layer.foxel.type=='trace')
             layer.foxel.displayed = false;
-            leaflet_markers();
-        }
     };
 
     /**
@@ -336,9 +321,6 @@ $(document).ready(function() {
             layer.foxel.displayed = true;
             leaflet.map.addLayer(layer);
         });
-
-        // leaflet markers!
-        leaflet_markers();
 
     };
 
@@ -444,7 +426,6 @@ $(document).ready(function() {
             leaflet.layers.removeLayer(layer);
         });
         leaflet.bounds = null;
-        leaflet.markers = [];
         leaflet.overlays = [];
 
         // whole list
@@ -500,10 +481,20 @@ $(document).ready(function() {
         if (data.gps) {
 
             var trace = [];
-            var markers = [];
+            var latlngbuffer = null;
+
+            // segment layer group [trace,cluster]
             var segmentlayer = new L.layerGroup();
 
-            var latlngbuffer = null;
+            // cluster
+            var cluster = new L.MarkerClusterGroup({
+                showCoverageOnHover: false,
+                maxClusterRadius: 35,
+                singleMarkerMode: false,
+                spiderfyOnMaxZoom: true,
+                animateAddingMarkers: false,
+                //disableClusteringAtZoom: leaflet.zoom.cluster
+            });
 
             // parse poses
             $.each(data.pose, function(index,pose) {
@@ -511,22 +502,20 @@ $(document).ready(function() {
                 // geo point
                 var latlng = L.latLng(pose.lat,pose.lng);
 
-                // avoid still points
-                if (!_.isNull(latlngbuffer) && latlng.equals(latlngbuffer))
-                    return;
+                // trace but avoid still points
+                if (!_.isNull(latlngbuffer) && !latlng.equals(latlngbuffer))
+                    trace.push(latlng);
                 latlngbuffer = latlng;
 
-                // trace
-                trace.push(latlng);
-
-                // marker
-                var circle = L.circle(latlng,0.25, {
-                    color: pose.guess ? colors.guess : color,
-                    fillColor: pose.guess ? colors.guess : color,
-                    opacity: 1,
-                    fillOpacity: 1
+                // cluster marker
+                var icon = pose.guess ? leaflet.icons.markers.guess : leaflet.icons.markers.unknown;
+                var clustermarker = new L.marker(latlng,{icon:icon})
+                    .on('mouseover', function() {
+                        console.log('marker '+this); // todo
                 });
-                markers.push(circle);
+
+                // add cluster marker to cluster
+                cluster.addLayer(clustermarker);
 
             });
 
@@ -536,15 +525,14 @@ $(document).ready(function() {
                 weight: 2,
                 smoothFactor: 1,
                 opacity: 1
-            });
-
-            // polyline info
-            polyline.bindPopup('Segment '+segment,{
-                closeButton: false
+            })
+                .bindPopup('Segment '+segment,{
+                    closeButton: false
             });
 
             // add polyline to segmentlayer
             segmentlayer.addLayer(polyline);
+            segmentlayer.addLayer(cluster);
 
             // segmentlayer custom properties
             _.extend(segmentlayer, {
@@ -555,20 +543,7 @@ $(document).ready(function() {
                 }
             });
 
-            // markerslayergroup
-            var markerslayergroup = new L.layerGroup(markers);
-
-            // markerslayergroup custom properties
-            _.extend(markerslayergroup, {
-                segment: segment,
-                foxel: {
-                    type: 'markers',
-                    displayed: false
-                }
-            });
-
             // keep pointers to layers
-            leaflet.markers.push(markerslayergroup);
             leaflet.overlays.push(segmentlayer);
 
             // extract bounds

@@ -45,12 +45,15 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Raw data navigator</title>
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet/leaflet.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet.markercluster/MarkerCluster.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet.markercluster/MarkerCluster.Default.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/select2/select2.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/vis.js/vis.min.css" />
     <link rel="stylesheet" type="text/css" media="all" href="css/rawdata-navigator.css" />
     <script type="text/javascript" src="js/thirdparty/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/underscore.js/underscore-1.7.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/leaflet/leaflet-0.7.3.min.js"></script>
+    <script type="text/javascript" src="js/thirdparty/leaflet.markercluster/leaflet.markercluster.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/select2/select2-3.5.1.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/vis.js/vis-3.5.0.min.js"></script>
     <script type="text/javascript" src="js/rawdata-navigator.js"></script>
