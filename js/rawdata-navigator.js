@@ -270,7 +270,6 @@ $(document).ready(function() {
     var leaflet_marker_icon = function(pose,color) {
 
         var type = pose.guess ? 'guess' : pose.status;
-
         var css = 'marker-pnt '+color.replace('#','seg-')+' type-'+type;
 
         return new L.divIcon({
@@ -515,6 +514,7 @@ $(document).ready(function() {
         };
 
         // range
+        var length = data.pose.length;
         var range = {
             start: parseInt(poses.first.sec,10)*1000+parseInt(poses.first.usc,10)/1000,
             end: parseInt(poses.last.sec,10)*1000+parseInt(poses.last.usc,10)/1000
@@ -526,7 +526,7 @@ $(document).ready(function() {
         // timeline range
         timeline.items.push({
             id: segment,
-            content: ''+segment+' ('+data.pose.length+' poses)',
+            content: ''+segment+' ('+length+' poses)',
             start: range.start,
             end: range.end,
             className: 'timeline'+color.replace('#','-')
@@ -561,12 +561,29 @@ $(document).ready(function() {
                 // trace
                 trace.push(latlng);
 
+                // icon
+                var icon = leaflet_marker_icon(pose,color);
+
+                // popup
+                var popup = '<div style="font-weight:700;">'+pose.sec+' '+pose.usc+'</div>'
+                                + '<div style="font-size:10px;padding-top:3px;">Pose '+(index+1)+' of '+length+'</div>'
+                                + '<div style="font-size:10px;padding-bottom:7px;">Segment : &nbsp;'+segment+'</div>'
+                                + '<div>Latitude : &nbsp;&nbsp;'+pose.lat+'</div>'
+                                + '<div>Longitude : &nbsp;'+pose.lng+'</div>'
+                                + '<div style="padding-top:7px;padding-bottom:7px;">Altitude : &nbsp;'+pose.alt+'</div>'
+                                + '<div style="font-size:10px;">JP4 status : &nbsp;'+pose.status.charAt(0).toUpperCase()+pose.status.slice(1)+'</div>'
+                                + '<div style="font-size:10px;">GPS status : &nbsp;'+(pose.guess?'Guessed':'Validated')+'</div>';
+
                 // cluster marker
-                var clustermarker = new L.marker(latlng,{icon:leaflet_marker_icon(pose,color)})
-                    .on('mouseover', function() {
-                        console.log('marker '+this); // todo
-                    }
-                );
+                var clustermarker = new L.marker(latlng,{icon:icon})
+                    .bindPopup(popup,{
+                        minWidth: 250,
+                        closeButton: false,
+                        closeOnClick: true
+                })
+                    .on('click', function() {
+                        this.openPopup();
+                });
 
                 // add cluster marker to cluster
                 cluster.addLayer(clustermarker);
@@ -610,7 +627,7 @@ $(document).ready(function() {
 
             // add to map
             leaflet.map.addLayer(segmentlayer);
-            //leaflet.layers.addOverlay(segmentlayer,segment+' ('+data.pose.length+' poses)');
+            //leaflet.layers.addOverlay(segmentlayer,segment);
 
         }
 
@@ -629,7 +646,7 @@ $(document).ready(function() {
 
             // display
             overlay_hide();
-            console.log('[done. last segment parsed.]');
+            console.log('[done. last segment parsed]');
 
         }
 
