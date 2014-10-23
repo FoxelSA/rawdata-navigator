@@ -167,12 +167,12 @@ $(document).ready(function() {
             name:           'OpenStreetMap Mapnik',
             url:            'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             attribution:    '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-                            '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+                            '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>'
         }, {
             name:           'OpenStreetMap Black and White',
             url:            'http://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png',
             attribution:    '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-                            '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+                            '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>'
         }, {
             name:           'Esri World Imagery',
             url:            'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -536,7 +536,6 @@ $(document).ready(function() {
         if (data.gps) {
 
             var trace = [];
-            var latlngbuffer = null;
 
             // segment feature group [trace,cluster]
             var segmentlayer = new L.featureGroup();
@@ -559,10 +558,8 @@ $(document).ready(function() {
                 // geo point
                 var latlng = L.latLng(pose.lat,pose.lng);
 
-                // trace but avoid still points
-                if (!_.isNull(latlngbuffer) && !latlng.equals(latlngbuffer))
-                    trace.push(latlng);
-                latlngbuffer = latlng;
+                // trace
+                trace.push(latlng);
 
                 // cluster marker
                 var clustermarker = new L.marker(latlng,{icon:leaflet_marker_icon(pose,color)})
