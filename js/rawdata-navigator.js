@@ -69,8 +69,7 @@ $(document).ready(function() {
             only: false,
             index: 0,
             shift: {
-                lat: 0.02,
-                lng: 0.005
+                lat: -0.005
             }
         },
         tilelayers: {
@@ -205,10 +204,12 @@ $(document).ready(function() {
             leaflet_resize();
         });
 
+        /*
         // event: leaflet map zoom end
         leaflet.map.on('zoomend',function() {
             console.log('[zoom: '+leaflet.map.getZoom()+']');
         });
+        */
 
     };
 
@@ -568,13 +569,30 @@ $(document).ready(function() {
         if (!data.gps)
             leaflet.timebased.index++;
 
+        // shift
+        var shift = {
+            lat: leaflet.timebased.shift.lat,
+            lng: 0,
+            buffer: null
+        };
+
         // parse poses
         $.each(data.pose, function(index,pose) {
 
             // timebased shifting
             if (!data.gps) {
-                pose.lat += leaflet.timebased.index * leaflet.timebased.shift.lat;
-                pose.lng += index * leaflet.timebased.shift.lng;
+
+                var displace = 0;
+                var usec = parseInt(pose.sec,10)*1000000+parseInt(pose.usc,10);
+                if (!_.isNull(shift.buffer))
+                    displace = (usec-shift.buffer)/2000000000;
+                shift.lng += displace;
+                shift.buffer = usec;
+
+                // position
+                pose.lat = leaflet.timebased.index * shift.lat;
+                pose.lng = shift.lng;
+
             }
 
             // geo point
