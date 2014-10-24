@@ -48,7 +48,10 @@ $(document).ready(function() {
     // leaflet
     var leaflet = {
         map: null,
-        layers: null,
+        control: {
+            scale: null,
+            layers: null
+        },
         zoom: {
             base: 4,
             min: 3,
@@ -61,6 +64,19 @@ $(document).ready(function() {
         overlays: [],
         colors: {
             segments: ['#f00','#0c0','#00f']
+        },
+        timebased: {
+            only: false,
+            index: 0,
+            shift: {
+                lat: 0.02,
+                lng: 0.005
+            }
+        },
+        tilelayers: {
+            grey: [],
+            providers: [],
+            timebased: null
         }
     };
 
@@ -162,6 +178,53 @@ $(document).ready(function() {
         // dom
         leaflet_resize();
 
+        // tile layers
+        var basemaps = leaflet_tilelayers();
+
+        // instanciate leaflet
+        leaflet.map = L.map('map', {
+            keyboard: true,
+            scrollWheelZoom: true,
+            zoom: leaflet.zoom.base,
+            minZoom: leaflet.zoom.min,
+            maxZoom: leaflet.zoom.max,
+            center: [46.205007,6.145134],
+            layers: [_.first(_.values(basemaps))]
+        });
+
+        // layers
+        leaflet.control.layers = L.control.layers(basemaps,{});
+        leaflet.control.layers.addTo(leaflet.map);
+
+        // scaling rule
+        leaflet.control.scale = L.control.scale();
+        leaflet.control.scale.addTo(leaflet.map);
+
+        // event: window resize
+        $(window).on('resize',function() {
+            leaflet_resize();
+        });
+
+        // event: leaflet map zoom end
+        leaflet.map.on('zoomend',function() {
+            console.log('[zoom: '+leaflet.map.getZoom()+']');
+        });
+
+    };
+
+    /**
+     * leaflet_resize()
+     */
+    var leaflet_resize = function() {
+        $('#map').width($(window).width());
+        $('#map').height($(window).height()-$('#timeline').outerHeight(true));
+    };
+
+    /**
+     * leaflet_tilelayers()
+     */
+    var leaflet_tilelayers = function() {
+
         // tile providers
         var providers = [{
             name:           'OpenStreetMap Mapnik',
@@ -180,63 +243,36 @@ $(document).ready(function() {
                             'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
         }];
 
-        // base maps as tile layers
-        var base_maps = {};
+        // base maps
+        var basemaps = {};
+
+        // parse providers
         $.each(providers, function(index,provider) {
-            _.extend(base_maps,_.object([provider.name],[L.tileLayer(provider.url,{
+
+            // tilelayer
+            var tilelayer = _.object([provider.name],[L.tileLayer(provider.url, {
                 attribution: provider.attribution,
                 minZoom: leaflet.zoom.min,
                 maxZoom: leaflet.zoom.max,
                 maxNativeZoom: leaflet.zoom.native
-            })]));
+            })]);
+
+            // add to basemaps
+            _.extend(basemaps,tilelayer);
+
+            // keep pointer to tilelayer
+            leaflet.tilelayers.providers.push(tilelayer);
+
         });
 
-        // instanciate leaflet
-        leaflet.map = L.map('map', {
-            keyboard: true,
-            scrollWheelZoom: true,
-            zoom: leaflet.zoom.base,
-            minZoom: leaflet.zoom.min,
-            maxZoom: leaflet.zoom.max,
-            center: [46.205007,6.145134],
-            layers: [_.first(_.values(base_maps))]
-        });
+        // grey tilelayer
+        var greytile = _.object(['Timebased Mode'],[L.tileLayer('img/tile.png',{})]);
 
-        // layers
-        leaflet.layers = L.control.layers(base_maps,{});
-        leaflet.layers.addTo(leaflet.map);
+        // keep pointer to tilelayer
+        leaflet.tilelayers.grey.push(greytile);
 
-        // scaling rule
-        L.control.scale().addTo(leaflet.map);
+        return basemaps;
 
-        // event: window resize
-        $(window).on('resize',function() {
-            leaflet_resize();
-        });
-
-        // event: leaflet map zoom end
-        leaflet.map.on('zoomend',function() {
-            console.log('[zoom: '+leaflet.map.getZoom()+']');
-        });
-
-        // event: leaflet layer removed
-        leaflet.map.on('overlayadd',function(e) {
-            leaflet_overlay_add(e.layer);
-        });
-
-        // event: leaflet layer removed
-        leaflet.map.on('overlayremove',function(e) {
-            leaflet_overlay_remove(e.layer);
-        });
-
-    };
-
-    /**
-     * leaflet_resize()
-     */
-    var leaflet_resize = function() {
-        $('#map').width($(window).width());
-        $('#map').height($(window).height()-$('#timeline').outerHeight(true));
     };
 
     /**
@@ -253,7 +289,6 @@ $(document).ready(function() {
             css += 'medium';
         else
             css += 'large';
-
         css += ' '+color.replace('#','seg-');
 
         return new L.divIcon({
@@ -281,35 +316,34 @@ $(document).ready(function() {
     };
 
     /**
-     * leaflet_overlay_add()
-     */
-    var leaflet_overlay_add = function(layer) {
-        if (_.isUndefined(layer.foxel))
-            return;
-        if (layer.foxel.type=='trace')
-            layer.foxel.displayed = true;
-    };
-
-    /**
-     * leaflet_overlay_remove()
-     */
-    var leaflet_overlay_remove = function(layer) {
-        if (_.isUndefined(layer.foxel))
-            return;
-        if (layer.foxel.type=='trace')
-            layer.foxel.displayed = false;
-    };
-
-    /**
      * leaflet_fitbounds()
      */
     var leaflet_fitbounds = function() {
+
+        leaflet.bounds = null;
+
+        // extract bounds of displayed segments
+        $.each(segments_displayed(), function(index,layer) {
+            if (_.isNull(leaflet.bounds))
+                leaflet.bounds = layer.getBounds();
+            else
+                leaflet.bounds.extend(layer.getBounds());
+        });
+
+        // nothing displayed, nothing to do
         if (_.isNull(leaflet.bounds))
             return;
+
+        // fit
         leaflet.map.fitBounds(leaflet.bounds);
+
+        // unzoom if too close
         if (leaflet.map.getZoom() > leaflet.zoom.bounds)
             leaflet.map.setZoom(leaflet.zoom.bounds);
+
+        // center map
         leaflet.map.panTo(leaflet.bounds.getCenter());
+
     };
 
     /**
@@ -336,39 +370,19 @@ $(document).ready(function() {
      */
     var timeline_select = function(items) {
 
-        // bounds
-        leaflet.bounds = null;
-
         // remove overlays
-        $.each(leaflet.overlays, function(i,layer) {
-            if (layer.foxel.type!='trace')
-                return;
+        $.each(segments_overlays(), function(i,layer) {
             layer.foxel.displayed = false;
             leaflet.map.removeLayer(layer);
         });
 
-        // add overlays
-        $.each(leaflet.overlays, function(i,layer) {
+        // no selection, show all
+        if (items.length == 0)
+            segments_showall();
 
-            if (layer.foxel.type!='trace')
-                return;
-            if (items.length > 0 && !_.contains(items,layer.foxel.segment)) // limit if needed
-                return;
-
-            // display
-            layer.foxel.displayed = true;
-            leaflet.map.addLayer(layer);
-
-            // extract bounds
-            if (_.isNull(leaflet.bounds))
-                leaflet.bounds = layer.getBounds();
-            else
-                leaflet.bounds.extend(layer.getBounds());
-
-        });
-
-        // fit and center map on bounds
-        leaflet_fitbounds();
+        // selection (single or multiple) made, show filtered
+        else
+            segments_showselection(items);
 
     };
 
@@ -437,7 +451,7 @@ $(document).ready(function() {
             $('#master').show();
 
         }).fail(function() {
-            overlay_message('Failed to retrieve initial JSON data');
+            overlay_message('Failed to retrieve initial JSON data<br />Incorrect mount point ?');
         });
 
     };
@@ -463,6 +477,7 @@ $(document).ready(function() {
         // init json
         storage.json.keys = _.keys(storage.master.segments);
         storage.json.remaining = storage.json.keys.length;
+        storage.json.data = [];
 
         // clear timeline
         timeline.items = [];
@@ -471,10 +486,9 @@ $(document).ready(function() {
         // clear leaflet
         $.each(leaflet.overlays, function(index,layer) {
             leaflet.map.removeLayer(layer);
-            leaflet.layers.removeLayer(layer);
         });
-        leaflet.bounds = null;
         leaflet.overlays = [];
+        leaflet.tilelayers.timebased = null;
 
         // whole list
         $.each(storage.json.keys, function(sid,key) {
@@ -532,123 +546,273 @@ $(document).ready(function() {
             className: 'timeline'+color.replace('#','-')
         });
 
-        // gps known, draw on map
-        if (data.gps) {
+        // trace
+        var trace = [];
 
-            var trace = [];
+        // segment feature group [trace,cluster]
+        var segmentlayer = new L.featureGroup();
 
-            // segment feature group [trace,cluster]
-            var segmentlayer = new L.featureGroup();
+        // cluster
+        var cluster = new L.MarkerClusterGroup({
+            showCoverageOnHover: false,
+            maxClusterRadius: 35,
+            singleMarkerMode: false,
+            spiderfyOnMaxZoom: true,
+            animateAddingMarkers: false,
+            iconCreateFunction: function(cluster) {
+                return leaflet_cluster_icon(cluster,color);
+            }
+        });
 
-            // cluster
-            var cluster = new L.MarkerClusterGroup({
-                showCoverageOnHover: false,
-                maxClusterRadius: 35,
-                singleMarkerMode: false,
-                spiderfyOnMaxZoom: true,
-                animateAddingMarkers: false,
-                iconCreateFunction: function(cluster) {
-                    return leaflet_cluster_icon(cluster,color);
-                }
-            });
+        // timebased segment
+        if (!data.gps)
+            leaflet.timebased.index++;
 
-            // parse poses
-            $.each(data.pose, function(index,pose) {
+        // parse poses
+        $.each(data.pose, function(index,pose) {
 
-                // geo point
-                var latlng = L.latLng(pose.lat,pose.lng);
+            // timebased shifting
+            if (!data.gps) {
+                pose.lat += leaflet.timebased.index * leaflet.timebased.shift.lat;
+                pose.lng += index * leaflet.timebased.shift.lng;
+            }
 
-                // trace
-                trace.push(latlng);
+            // geo point
+            var latlng = L.latLng(pose.lat,pose.lng);
 
-                // icon
-                var icon = leaflet_marker_icon(pose,color);
+            // trace
+            trace.push(latlng);
 
-                // popup
-                var popup = '<div style="font-weight:700;">'+pose.sec+' '+pose.usc+'</div>'
-                                + '<div style="font-size:10px;padding-top:3px;">Pose '+(index+1)+' of '+length+'</div>'
-                                + '<div style="font-size:10px;padding-bottom:7px;">Segment : &nbsp;'+segment+'</div>'
-                                + '<div>Latitude : &nbsp;&nbsp;'+pose.lat+'</div>'
-                                + '<div>Longitude : &nbsp;'+pose.lng+'</div>'
-                                + '<div style="padding-top:7px;padding-bottom:7px;">Altitude : &nbsp;'+pose.alt+'</div>'
-                                + '<div style="font-size:10px;">JP4 status : &nbsp;'+pose.status.charAt(0).toUpperCase()+pose.status.slice(1)+'</div>'
-                                + '<div style="font-size:10px;">GPS status : &nbsp;'+(pose.guess?'Guessed':'Validated')+'</div>';
+            // icon
+            var icon = leaflet_marker_icon(pose,color);
 
-                // cluster marker
-                var clustermarker = new L.marker(latlng,{icon:icon})
-                    .bindPopup(popup,{
-                        minWidth: 250,
-                        closeButton: false,
-                        closeOnClick: true
-                })
-                    .on('click', function() {
-                        this.openPopup();
-                });
+            // popup
+            var popup = '<div style="font-weight:700;">'+pose.sec+' '+pose.usc+'</div>'
+                            + '<div style="font-size:10px;padding-top:3px;">Pose '+(index+1)+' of '+length+'</div>'
+                            + '<div style="font-size:10px;padding-bottom:7px;">Segment : &nbsp;'+segment+'</div>';
+            if (data.gps)
+                popup +=      '<div>Latitude : &nbsp;&nbsp;'+pose.lat+'</div>'
+                            + '<div>Longitude : &nbsp;'+pose.lng+'</div>'
+                            + '<div style="padding-top:7px;padding-bottom:7px;">Altitude : &nbsp;'+pose.alt+'</div>';
+            popup +=          '<div style="font-size:10px;">JP4 status : &nbsp;'+pose.status.charAt(0).toUpperCase()+pose.status.slice(1)+'</div>'
+                            + '<div style="font-size:10px;">GPS status : &nbsp;'+(pose.guess?'Guessed':'Validated')+'</div>';
 
-                // add cluster marker to cluster
-                cluster.addLayer(clustermarker);
-
-            });
-
-            // trace polyline
-            var polyline = L.polyline(trace, {
-                color: color,
-                weight: 2,
-                smoothFactor: 1,
-                opacity: 1
+            // cluster marker
+            var clustermarker = new L.marker(latlng,{icon:icon})
+                .bindPopup(popup,{
+                    minWidth: 250,
+                    closeButton: false,
+                    closeOnClick: true
             })
                 .on('click', function() {
-                    timeline_select([segment]);
-                    timeline.vis.setSelection(segment);
-                }
-            );
-
-            // add to segmentlayer [trace,cluster]
-            segmentlayer.addLayer(polyline);
-            segmentlayer.addLayer(cluster);
-
-            // segmentlayer custom properties
-            _.extend(segmentlayer, {
-                foxel: {
-                    type: 'trace',
-                    segment: segment,
-                    displayed: true
-                }
+                    this.openPopup();
             });
 
-            // keep pointers to layers
-            leaflet.overlays.push(segmentlayer);
+            // add cluster marker to cluster
+            cluster.addLayer(clustermarker);
 
-            // extract bounds
-            if (_.isNull(leaflet.bounds))
-                leaflet.bounds = polyline.getBounds();
-            else
-                leaflet.bounds.extend(polyline.getBounds());
+        });
 
-            // add to map
-            leaflet.map.addLayer(segmentlayer);
-            //leaflet.layers.addOverlay(segmentlayer,segment);
+        // trace polyline
+        var polyline = L.polyline(trace, {
+            color: color,
+            weight: 2,
+            smoothFactor: 1,
+            opacity: 1
+        })
+            .on('click', function() {
+                timeline_select([segment]);
+                timeline.vis.setSelection(segment);
+            }
+        );
 
-        }
+        // add to segmentlayer [trace,cluster]
+        segmentlayer.addLayer(polyline);
+        segmentlayer.addLayer(cluster);
+
+        // segmentlayer custom properties
+        _.extend(segmentlayer, {
+            foxel: {
+                type: 'segment',
+                segment: segment,
+                gps: data.gps,
+                displayed: false
+            }
+        });
+
+        // keep pointers to layers
+        leaflet.overlays.push(segmentlayer);
 
         // mark as done
         storage.json.remaining--;
 
         // last parsing
-        if (storage.json.remaining == 0) {
+        if (storage.json.remaining == 0)
+            segments_parsed();
 
-            // update timeline
-            timeline.vis.setItems(timeline.items);
-            timeline.vis.fit();
+    };
 
-            // fit and center map on bounds
-            leaflet_fitbounds();
+    /**
+     * segments_overlays()
+     */
+    var segments_overlays = function() {
+        return _.filter(leaflet.overlays, function(layer) {
+            return !_.isUndefined(layer.foxel) && layer.foxel.type=='segment';
+        });
+    };
 
-            // display
-            overlay_hide();
-            console.log('[done. last segment parsed]');
+    /**
+     * segments_timebased()
+     */
+    var segments_timebased = function(timebased) {
+        timebased = _.isUndefined(timebased) ? true : timebased;
+        return _.filter(segments_overlays(), function(layer) {
+            return timebased ? !layer.foxel.gps : layer.foxel.gps;
+        });
+    };
 
-        }
+    /**
+     * segments_displayed()
+     */
+    var segments_displayed = function(displayed) {
+        displayed = _.isUndefined(displayed) ? true : displayed;
+        return _.filter(segments_overlays(), function(layer) {
+            return displayed ? layer.foxel.displayed : !layer.foxel.displayed;
+        });
+    };
+
+    /**
+     * segments_parsed()
+     */
+    var segments_parsed = function() {
+
+        // timebased only
+        leaflet.timebased.only = segments_timebased().length == segments_overlays().length;
+
+        // update timeline
+        timeline.vis.setItems(timeline.items);
+        timeline.vis.fit();
+
+        // add segments to map
+        segments_showall();
+
+        // display
+        overlay_hide();
+        console.log('[done. last segment parsed]');
+
+    };
+
+    /**
+     * segments_showall()
+     */
+    var segments_showall = function() {
+
+        // add segments to map (timebased only, or every another one otherwise)
+        $.each(segments_timebased(leaflet.timebased.only), function(index,layer) {
+            layer.foxel.displayed = true;
+            leaflet.map.addLayer(layer);
+        });
+
+        // tilelayers
+        segments_tilelayers();
+
+        // fit and center map on bounds
+        leaflet_fitbounds();
+
+    };
+
+    /**
+     * segments_showselection()
+     */
+    var segments_showselection = function(items) {
+
+        var selected = [];
+        var count = {
+            gps: 0,
+            timebased: 0
+        };
+
+        // extract segments layers from selection
+        $.each(segments_overlays(), function(i,layer) {
+
+            // not in selection
+            if (!_.contains(items,layer.foxel.segment))
+                return;
+
+            // type
+            if (layer.foxel.gps)
+                count.gps++;
+            else
+                count.timebased++;
+
+            // keep
+            selected.push(layer);
+
+        });
+
+        // detected mixed (gps and timebased) selection
+        var mixed = count.gps > 0 && count.timebased > 0;
+
+        // add filtered segments to map
+        $.each(selected, function(index,layer) {
+
+            // mixed case, keep only gps based
+            if (mixed && !layer.foxel.gps)
+                return;
+
+            // add to map
+            layer.foxel.displayed = true;
+            leaflet.map.addLayer(layer);
+
+        });
+
+        // tilelayers
+        segments_tilelayers();
+
+        // fit and center map on bounds
+        leaflet_fitbounds();
+
+    };
+
+    /**
+     * segments_tilelayers()
+     */
+    var segments_tilelayers = function() {
+
+        // state
+        var timebased = !_.first(segments_displayed()).foxel.gps;
+        if (!_.isNull(leaflet.tilelayers.timebased) && timebased == leaflet.tilelayers.timebased)
+            return;
+
+        // new stage
+        leaflet.tilelayers.timebased = timebased;
+
+        // layers
+        var add = timebased ? leaflet.tilelayers.grey : leaflet.tilelayers.providers;
+        var remove = timebased ? leaflet.tilelayers.providers : leaflet.tilelayers.grey;
+
+        // remove
+        $.each(remove,function(index,obj) {
+
+            var key = _.first(_.keys(obj));
+            var layer = obj[key];
+
+            leaflet.map.removeLayer(layer);
+            leaflet.control.layers.removeLayer(layer);
+
+        });
+
+        // add
+        $.each(add,function(index,obj) {
+
+            var key = _.first(_.keys(obj));
+            var layer = obj[key];
+
+            if (index == 0)
+                leaflet.map.addLayer(layer);
+            leaflet.control.layers.addBaseLayer(layer,key);
+
+        });
 
     };
 
