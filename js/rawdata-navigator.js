@@ -613,7 +613,7 @@ $(document).ready(function() {
                             + '<div>Longitude : &nbsp;'+pose.lng+'</div>'
                             + '<div style="padding-top:7px;padding-bottom:7px;">Altitude : &nbsp;'+pose.alt+'</div>';
             popup +=          '<div style="font-size:10px;">JP4 status : &nbsp;'+pose.status.charAt(0).toUpperCase()+pose.status.slice(1)+'</div>'
-                            + '<div style="font-size:10px;">GPS status : &nbsp;'+(pose.guess?'Guessed':'Validated')+'</div>';
+                            + '<div style="font-size:10px;">GPS status : &nbsp;'+(pose.guess?'Guessed':'Received')+'</div>';
 
             // cluster marker
             var clustermarker = new L.marker(latlng,{icon:icon})

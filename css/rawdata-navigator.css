@@ -136,7 +136,7 @@ html,body {
                 content:"\f0c3";
             }
 
-            .marker-pnt.type-valid span:before {
+            .marker-pnt.type-validated span:before {
                 content:"\f00c";
             }
 
