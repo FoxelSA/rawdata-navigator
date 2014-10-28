@@ -76,6 +76,10 @@ $(document).ready(function() {
             grey: [],
             providers: [],
             timebased: null
+        },
+        validated: {
+            points: [],
+            layer: null
         }
     };
 
@@ -305,7 +309,7 @@ $(document).ready(function() {
      */
     var leaflet_marker_icon = function(pose,color) {
 
-        var type = pose.guess ? 'guess' : pose.status;
+        var type = pose.status;
         var css = 'marker-pnt '+color.replace('#','seg-')+' type-'+type;
 
         return new L.divIcon({
@@ -346,6 +350,30 @@ $(document).ready(function() {
 
         // center map
         leaflet.map.panTo(leaflet.bounds.getCenter());
+
+    };
+
+    /**
+     * leaflet_clear()
+     */
+    var leaflet_clear = function() {
+
+        // validated points
+        if (!_.isNull(leaflet.validated.layer)) {
+            leaflet.map.removeLayer(leaflet.validated.layer);
+            leaflet.control.layers.removeLayer(leaflet.validated.layer);
+        }
+
+        // overlays
+        $.each(leaflet.overlays, function(index,layer) {
+            leaflet.map.removeLayer(layer);
+        });
+
+        // pointers
+        leaflet.overlays = [];
+        leaflet.tilelayers.timebased = null;
+        leaflet.validated.points = [];
+        leaflet.validated.layer = null;
 
     };
 
@@ -487,11 +515,7 @@ $(document).ready(function() {
         timeline.vis.clear({items:true});
 
         // clear leaflet
-        $.each(leaflet.overlays, function(index,layer) {
-            leaflet.map.removeLayer(layer);
-        });
-        leaflet.overlays = [];
-        leaflet.tilelayers.timebased = null;
+        leaflet_clear();
 
         // whole list
         $.each(storage.json.keys, function(sid,key) {
@@ -634,6 +658,16 @@ $(document).ready(function() {
             // add cluster marker to cluster
             cluster.addLayer(clustermarker);
 
+            // add to validated points
+            if (pose.status == 'validated') {
+                leaflet.validated.points.push(L.circle(latlng, 0.25, {
+                    color: '#000',
+                    fillColor: '#000',
+                    opacity: 1,
+                    fillOpacity: 0.5
+                }));
+            }
+
         });
 
         // trace polyline
@@ -718,6 +752,9 @@ $(document).ready(function() {
 
         // add segments to map
         segments_showall();
+
+        // add validated points to map
+        segments_validated();
 
         // display
         overlay_hide();
@@ -837,6 +874,14 @@ $(document).ready(function() {
 
         });
 
+    };
+
+    /**
+     * segments_validated()
+     */
+    var segments_validated = function() {
+        leaflet.validated.layer = L.layerGroup(leaflet.validated.points);
+        leaflet.control.layers.addOverlay(leaflet.validated.layer,'Validated points');
     };
 
     // init
