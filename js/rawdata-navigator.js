@@ -341,6 +341,8 @@ $(document).ready(function() {
         // unzoom if too close
         if (leaflet.map.getZoom() > leaflet.zoom.bounds)
             leaflet.map.setZoom(leaflet.zoom.bounds);
+        else
+            leaflet.map.setZoom(leaflet.map.getZoom()-1); // force redraw on some browsers
 
         // center map
         leaflet.map.panTo(leaflet.bounds.getCenter());
@@ -604,8 +606,11 @@ $(document).ready(function() {
             // icon
             var icon = leaflet_marker_icon(pose,color);
 
+            // padding
+            var usc = String('000000'+pose.usc).slice(-6);
+
             // popup
-            var popup = '<div style="font-weight:700;">'+pose.sec+' '+pose.usc+'</div>'
+            var popup = '<div style="font-weight:700;">'+pose.sec+' '+usc+'</div>'
                             + '<div style="font-size:10px;padding-top:3px;">Pose '+(index+1)+' of '+length+'</div>'
                             + '<div style="font-size:10px;padding-bottom:7px;">Segment : &nbsp;'+segment+'</div>';
             if (data.gps)
