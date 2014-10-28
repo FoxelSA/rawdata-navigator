@@ -77,9 +77,15 @@ $(document).ready(function() {
             providers: [],
             timebased: null
         },
-        validated: {
-            points: [],
-            layer: null
+        bulk: {
+            trashed: {
+                points: [],
+                layer: null
+            },
+            validated: {
+                points: [],
+                layer: null
+            }
         }
     };
 
@@ -358,10 +364,16 @@ $(document).ready(function() {
      */
     var leaflet_clear = function() {
 
-        // validated points
-        if (!_.isNull(leaflet.validated.layer)) {
-            leaflet.map.removeLayer(leaflet.validated.layer);
-            leaflet.control.layers.removeLayer(leaflet.validated.layer);
+        // trashed poses
+        if (!_.isNull(leaflet.bulk.trashed.layer)) {
+            leaflet.map.removeLayer(leaflet.bulk.trashed.layer);
+            leaflet.control.layers.removeLayer(leaflet.bulk.trashed.layer);
+        }
+
+        // validated poses
+        if (!_.isNull(leaflet.bulk.validated.layer)) {
+            leaflet.map.removeLayer(leaflet.bulk.validated.layer);
+            leaflet.control.layers.removeLayer(leaflet.bulk.validated.layer);
         }
 
         // overlays
@@ -372,8 +384,11 @@ $(document).ready(function() {
         // pointers
         leaflet.overlays = [];
         leaflet.tilelayers.timebased = null;
-        leaflet.validated.points = [];
-        leaflet.validated.layer = null;
+
+        leaflet.bulk.trashed.points = [];
+        leaflet.bulk.trashed.layer = null;
+        leaflet.bulk.validated.points = [];
+        leaflet.bulk.validated.layer = null;
 
     };
 
@@ -644,6 +659,8 @@ $(document).ready(function() {
             popup +=          '<div style="font-size:10px;">JP4 status : &nbsp;'+pose.status.charAt(0).toUpperCase()+pose.status.slice(1)+'</div>'
                             + '<div style="font-size:10px;">GPS status : &nbsp;'+(pose.guess?'Guessed':'Received')+'</div>';
 
+            popup += '<div style="padding-top:7px;"><a target="_blank" href="lib/elphel_panorama_preview/fullsize_canvas.php?settings=settings.xml&width=240&height=180&path='+storage.master.path+'/'+segment+'/jp4/0/'+pose.sec+'_'+usc+'_1.jp4">Click to open Elphel JP4 preview</a></div>';
+
             // cluster marker
             var clustermarker = new L.marker(latlng,{icon:icon})
                 .bindPopup(popup,{
@@ -658,13 +675,23 @@ $(document).ready(function() {
             // add cluster marker to cluster
             cluster.addLayer(clustermarker);
 
-            // add to validated points
-            if (pose.status == 'validated') {
-                leaflet.validated.points.push(L.circle(latlng, 0.25, {
+            // add to trashed poses
+            if (pose.status == 'trashed') {
+                leaflet.bulk.trashed.points.push(L.circle(latlng, 0.25, {
                     color: '#000',
                     fillColor: '#000',
                     opacity: 1,
-                    fillOpacity: 0.5
+                    fillOpacity: 0
+                }));
+            }
+
+            // add to validated poses
+            else if (pose.status == 'validated') {
+                leaflet.bulk.validated.points.push(L.circle(latlng, 0.25, {
+                    color: '#912cee',
+                    fillColor: '#912cee',
+                    opacity: 1,
+                    fillOpacity: 0
                 }));
             }
 
@@ -753,8 +780,8 @@ $(document).ready(function() {
         // add segments to map
         segments_showall();
 
-        // add validated points to map
-        segments_validated();
+        // add trashed/validated poses to map
+        bulk_poses();
 
         // display
         overlay_hide();
@@ -877,11 +904,16 @@ $(document).ready(function() {
     };
 
     /**
-     * segments_validated()
+     * bulk_poses()
      */
-    var segments_validated = function() {
-        leaflet.validated.layer = L.layerGroup(leaflet.validated.points);
-        leaflet.control.layers.addOverlay(leaflet.validated.layer,'Validated points');
+    var bulk_poses = function() {
+
+        leaflet.bulk.trashed.layer = L.layerGroup(leaflet.bulk.trashed.points);
+        leaflet.control.layers.addOverlay(leaflet.bulk.trashed.layer,'Trashed poses (#'+leaflet.bulk.trashed.points.length+') only (all segments)');
+
+        leaflet.bulk.validated.layer = L.layerGroup(leaflet.bulk.validated.points);
+        leaflet.control.layers.addOverlay(leaflet.bulk.validated.layer,'Validated poses (#'+leaflet.bulk.validated.points.length+') only (all segments)');
+
     };
 
     // init
