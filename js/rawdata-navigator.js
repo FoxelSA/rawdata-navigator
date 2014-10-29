@@ -57,7 +57,6 @@ $(document).ready(function() {
             min: 3,
             max: 25,
             native: 18,
-            cluster: 20,
             bounds: 17
         },
         bounds: null,
@@ -332,8 +331,18 @@ $(document).ready(function() {
     var leaflet_marker_popup = function(popup,data) {
 
         var html =  '<div style="font-weight:700;">'+data.time.sec+' '+data.time.usc+'</div>'
-                        + '<div style="font-size:10px;padding-top:6px;">Pose '+data.pose.pos+' of '+data.pose.length+'</div>'
-                        + '<div style="font-size:10px;padding-bottom:15px;">Segment : &nbsp;'+data.pose.segment+'</div>';
+                        + '<div style="font-size:10px;padding-top:6px;">'
+                            + 'Pose '+data.pose.pos+' of '+data.pose.length;
+
+        if (data.pose.index > 0)
+            html +=     ' &nbsp;&nbsp; <a href="#" onclick="return leaflet_marker_open(\''+data.pose.segment+'\',\''+(data.pose.index-1)+'\');">« «</a>'
+        if (data.pose.pos < data.pose.length)
+            html +=     ' &nbsp;&nbsp; <a href="#" onclick="return leaflet_marker_open(\''+data.pose.segment+'\',\''+(data.pose.index+1)+'\');">» »</a>'
+
+        html +=     '</div>';
+
+        // segment
+        html +=     '<div style="font-size:10px;padding-bottom:15px;">Segment : &nbsp;'+data.pose.segment+'</div>';
 
         // geo
         if (data.state.gps) {
@@ -355,6 +364,15 @@ $(document).ready(function() {
         popup.setContent(html);
 
     };
+
+    /**
+     * leaflet_marker_open()
+     */
+    var leaflet_marker_open = function(segment,index) {
+        leaflet.cluster[segment+'_'+index].openPopup();
+        return false;
+    };
+    window.leaflet_marker_open = leaflet_marker_open; // scope
 
     /**
      * leaflet_fitbounds()
@@ -630,7 +648,7 @@ $(document).ready(function() {
         // cluster
         var cluster = new L.MarkerClusterGroup({
             showCoverageOnHover: false,
-            maxClusterRadius: 35,
+            maxClusterRadius: 25,
             singleMarkerMode: false,
             spiderfyOnMaxZoom: true,
             animateAddingMarkers: false,
