@@ -656,8 +656,10 @@ $(document).ready(function() {
                 popup +=      '<div>Latitude : &nbsp;&nbsp;'+pose.lat+'</div>'
                             + '<div>Longitude : &nbsp;'+pose.lng+'</div>'
                             + '<div style="padding-top:7px;padding-bottom:7px;">Altitude : &nbsp;'+pose.alt+'</div>';
-            popup +=          '<div style="font-size:10px;">JP4 status : &nbsp;'+pose.status.charAt(0).toUpperCase()+pose.status.slice(1)+'</div>'
-                            + '<div style="font-size:10px;">GPS status : &nbsp;'+(pose.guess?'Guessed':'Received')+'</div>';
+            popup +=          '<div style="font-size:10px;">GPS status : &nbsp;'+(pose.guess?'Guessed':'Received')+'</div>'
+                            + '<div style="font-size:10px;">JP4 status : &nbsp;'+pose.status.charAt(0).toUpperCase()+pose.status.slice(1)+' (splitted : '+data.split+')</div>';
+            if (!_.isNull(data.preview))
+                popup +=      '<div><img src="php/preview.php?src='+storage.master.path+'/'+segment+'/preview/'+data.preview+'/'+pose.folder+'/'+pose.sec+'_'+usc+'.jpeg" alt="" width="640" /></div>'
 
             popup += '<div style="padding-top:7px;"><a target="_blank" href="lib/elphel_panorama_preview/fullsize_canvas.php?settings=settings.xml&width=240&height=180&path='+storage.master.path+'/'+segment+'/jp4/0/'+pose.sec+'_'+usc+'_1.jp4">Click to open Elphel JP4 preview</a></div>';
 
@@ -665,6 +667,7 @@ $(document).ready(function() {
             var clustermarker = new L.marker(latlng,{icon:icon})
                 .bindPopup(popup,{
                     minWidth: 250,
+                    maxWidth: 700,
                     closeButton: false,
                     closeOnClick: true
             })
