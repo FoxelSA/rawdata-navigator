@@ -61,6 +61,7 @@ $(document).ready(function() {
             bounds: 17
         },
         bounds: null,
+        cluster: [],
         overlays: [],
         colors: {
             segments: ['#f00','#0c0','#00f']
@@ -326,6 +327,36 @@ $(document).ready(function() {
     };
 
     /**
+     * leaflet_marker_popup()
+     */
+    var leaflet_marker_popup = function(popup,data) {
+
+        var html =  '<div style="font-weight:700;">'+data.time.sec+' '+data.time.usc+'</div>'
+                        + '<div style="font-size:10px;padding-top:6px;">Pose '+data.pose.pos+' of '+data.pose.length+'</div>'
+                        + '<div style="font-size:10px;padding-bottom:15px;">Segment : &nbsp;'+data.pose.segment+'</div>';
+
+        // geo
+        if (data.state.gps) {
+            html +=     '<div>Latitude : &nbsp;&nbsp;'+data.geo.lat+'</div>'
+                            + '<div>Longitude : &nbsp;'+data.geo.lng+'</div>'
+                            + '<div style="padding-top:7px;padding-bottom:15px;">Altitude : &nbsp;'+data.geo.alt+'</div>';
+        }
+
+        // status
+        html +=     '<div style="font-size:10px;">GPS status : &nbsp;'+(data.state.guess?'Guessed':'Received')+'</div>'
+                        + '<div style="font-size:10px;">JP4 status : &nbsp;'+data.state.jp4+' (segment splitted : '+data.state.splitted+')</div>';
+
+        // preview
+        if (data.state.preview && !data.state.trashed) {
+            html +=     '<div style="width:640px;padding-top:15px;"><img src="php/preview.php?src='+data.src+'/'+data.time.sec+'_'+data.time.usc+'.jpeg" alt="" width="640" height="320" /></div>';
+        }
+
+        // set content
+        popup.setContent(html);
+
+    };
+
+    /**
      * leaflet_fitbounds()
      */
     var leaflet_fitbounds = function() {
@@ -381,6 +412,7 @@ $(document).ready(function() {
         });
 
         // pointers
+        leaflet.cluster = [];
         leaflet.overlays = [];
         leaflet.tilelayers.timebased = null;
 
@@ -645,40 +677,56 @@ $(document).ready(function() {
 
             // icon
             var icon = leaflet_marker_icon(pose,color);
-            var preview = !_.isNull(data.preview);
-
-            // padding
-            var usc = String('000000'+pose.usc).slice(-6);
 
             // popup
-            var popup = '<div style="font-weight:700;">'+pose.sec+' '+usc+'</div>'
-                            + '<div style="font-size:10px;padding-top:6px;">Pose '+(index+1)+' of '+length+'</div>'
-                            + '<div style="font-size:10px;padding-bottom:15px;">Segment : &nbsp;'+segment+'</div>';
-            if (data.gps)
-                popup +=      '<div>Latitude : &nbsp;&nbsp;'+pose.lat+'</div>'
-                            + '<div>Longitude : &nbsp;'+pose.lng+'</div>'
-                            + '<div style="padding-top:7px;padding-bottom:15px;">Altitude : &nbsp;'+pose.alt+'</div>';
-
-            popup +=          '<div style="font-size:10px;">GPS status : &nbsp;'+(pose.guess?'Guessed':'Received')+'</div>'
-                            + '<div style="font-size:10px;">JP4 status : &nbsp;'+pose.status.charAt(0).toUpperCase()+pose.status.slice(1)+' (segment splitted : '+data.split+')</div>';
-
-            if (preview && pose.status!='trashed')
-                popup +=      '<div style="width:640px;padding-top:15px;"><img src="php/preview.php?src='+storage.master.path+'/'+segment+'/preview/'+data.preview+'/'+pose.folder+'/'+pose.sec+'_'+usc+'.jpeg" alt="" width="640" height="320" /></div>'
+            var popup = {
+                segment: segment,
+                time: {
+                    sec: pose.sec,
+                    usc: String('000000'+pose.usc).slice(-6)
+                },
+                pose: {
+                    segment: segment,
+                    index: index,
+                    pos: index+1,
+                    length: length
+                },
+                geo: {
+                    lat: pose.lat,
+                    lng: pose.lng,
+                    alt: pose.alt
+                },
+                state: {
+                    gps: data.gps,
+                    guess: pose.guess,
+                    status: pose.status,
+                    jp4: pose.status.charAt(0).toUpperCase()+pose.status.slice(1),
+                    splitted: data.split,
+                    trashed: (pose.status=='trashed'),
+                    preview: !_.isNull(data.preview)
+                },
+                src: storage.master.path+'/'+segment+'/preview/'+data.preview+'/'+pose.folder
+            };
 
             // cluster marker
             var clustermarker = new L.marker(latlng,{icon:icon})
-                .bindPopup(popup,{
+                .bindPopup('',{
                     minWidth: 250,
                     maxWidth: 700,
                     closeButton: false,
-                    closeOnClick: true
+                    closeOnClick: true,
+                    foxel: popup
             })
                 .on('click', function() {
                     this.openPopup();
+            })
+                .on('popupopen', function(e) {
+                    leaflet_marker_popup(e.popup,e.popup.options.foxel);
             });
 
             // add cluster marker to cluster
             cluster.addLayer(clustermarker);
+            leaflet.cluster[segment+'_'+index] = clustermarker;
 
             // add to trashed poses
             if (pose.status == 'trashed') {
