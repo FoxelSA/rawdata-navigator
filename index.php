@@ -69,7 +69,7 @@
 <div id="map"></div>
 
 <div id="master">
-    <select style="width:300px;"></select>
+    <select style="width:400px;"></select>
 </div>
 
 <div id="timeline"></div>

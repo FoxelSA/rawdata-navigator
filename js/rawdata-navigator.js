@@ -456,17 +456,17 @@ $(document).ready(function() {
 
                 // group per mac
                 var optgroup = $('<optgroup>',{'label':mac});
-                $.each(masters, function(master,segments) {
+                $.each(masters, function(master,obj) {
 
                     var id = mac+'/'+master;
 
                     // option
-                    optgroup.append($('<option>',{'value':id}).text(master));
+                    optgroup.append($('<option>',{'value':id}).text(JSON.stringify({master:master,name:obj.name})));
 
                     // keep segments
                     storage.segmentation.push({
                         master: master,
-                        segments: segments
+                        segments: obj.segments
                     });
 
                 });
@@ -478,12 +478,16 @@ $(document).ready(function() {
                 placeholder: 'Select raw data set...',
                 formatResult: function(item) {
                     if (!item.id) return item.text; // optgroup
-                    var date = new Date(parseInt(item.text,10)*1000); // milliseconds
-                    return item.text+'<div class="master dates"><div>'+date.toUTCString()+'</div><div>'+date+'</div></div>';
+                    var obj = JSON.parse(item.text);
+                    var date = new Date(parseInt(obj.master,10)*1000); // milliseconds
+                    var name = !_.isNull(obj.name) ? ' - '+obj.name : '';
+                    return obj.master+name+'<div class="master dates"><div>'+date.toUTCString()+'</div><div>'+date+'</div></div>';
                 },
                 formatSelection: function(item) {
-                    var date = new Date(parseInt(item.text,10)*1000); // milliseconds
-                    return item.id.replace('/',' :: <strong>')+'</strong>';
+                    var obj = JSON.parse(item.text);
+                    var date = new Date(parseInt(obj.master,10)*1000); // milliseconds
+                    var name = !_.isNull(obj.name) ? ' - '+obj.name : '';
+                    return item.id.replace('/',' :: <strong>')+name+'</strong>';
                 }
             });
 

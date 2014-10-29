@@ -57,6 +57,7 @@ $camera_lsdir = scandir($camera_path);
 foreach ($camera_lsdir as $macaddress) {
 
     $macaddress_path = $camera_path.'/'.$macaddress;
+    $rawmaster_path = $macaddress_path.'/raw/sync';
     $rawsegment_path = $macaddress_path.'/raw/segment';
     if (!is_dir($rawsegment_path))
         continue;
@@ -68,25 +69,32 @@ foreach ($camera_lsdir as $macaddress) {
     foreach ($rawsegment_lsdir as $master) {
 
         $master_path = $rawsegment_path.'/'.$master;
+        $sync_path = $rawmaster_path.'/'.$master;
         if (!is_dir($master_path) || substr($master,0,1)=='.')
             continue;
 
-        $csps[$macaddress][$master] = array();
+        $csps[$macaddress][$master] = (object)array('name'=>null,'segments'=>array());
         $master_lsdir = scandir($master_path);
 
         // loop over segments
         foreach ($master_lsdir as $segment) {
 
             $segment_path = $master_path.'/'.$segment;
+
+            // not processed
             if (!file_exists($segment_path.'/csps/exports/rawdata-navigator.json'))
                 continue;
 
-            $csps[$macaddress][$master][$segment] = (object)array('name'=>'N/A');
+            // description exists
+            if (file_exists($sync_path.'/info/description.info'))
+                $csps[$macaddress][$master]->name = file_get_contents($sync_path.'/info/description.info');
+
+            $csps[$macaddress][$master]->segments[$segment] = (object)array(); // options
 
         }
 
         // clean
-        if (empty($csps[$macaddress][$master]))
+        if (empty($csps[$macaddress][$master]->segments))
             unset($csps[$macaddress][$master]);
 
     }
@@ -99,4 +107,5 @@ foreach ($camera_lsdir as $macaddress) {
 
 // output
 header('Content-Type: application/json');
+header('Cache-Control: no-cache, must-revalidate');
 echo json_encode($csps);

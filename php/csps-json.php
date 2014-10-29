@@ -43,4 +43,5 @@ if (!isset($_GET['json']) || empty($_GET['json']) || !file_exists($_GET['json'])
 
 // output
 header('Content-Type: application/json');
+header('Cache-Control: no-cache, must-revalidate');
 echo file_get_contents($_GET['json']);
