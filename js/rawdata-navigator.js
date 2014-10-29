@@ -60,7 +60,7 @@ $(document).ready(function() {
             bounds: 17
         },
         bounds: null,
-        cluster: [],
+        popups: [],
         overlays: [],
         colors: {
             segments: ['#f00','#0c0','#00f']
@@ -369,7 +369,7 @@ $(document).ready(function() {
      * leaflet_marker_open()
      */
     var leaflet_marker_open = function(segment,index) {
-        leaflet.cluster[segment+'_'+index].openPopup();
+        leaflet.popups[segment+'_'+index].openPopup();
         return false;
     };
     window.leaflet_marker_open = leaflet_marker_open; // scope
@@ -430,7 +430,7 @@ $(document).ready(function() {
         });
 
         // pointers
-        leaflet.cluster = [];
+        leaflet.popups = [];
         leaflet.overlays = [];
         leaflet.tilelayers.timebased = null;
 
@@ -641,8 +641,9 @@ $(document).ready(function() {
 
         // trace
         var trace = [];
+        var popups = [];
 
-        // segment feature group [trace,cluster]
+        // segment feature group [trace,cluster,popups]
         var segmentlayer = new L.featureGroup();
 
         // cluster
@@ -728,6 +729,15 @@ $(document).ready(function() {
 
             // cluster marker
             var clustermarker = new L.marker(latlng,{icon:icon})
+                .on('click', function() {
+                    leaflet_marker_open(segment,index);
+            });
+
+            // popup marker
+            var popupmarker = L.circle(latlng, 0.1, {
+                fill: false,
+                stroke: false
+            })
                 .bindPopup('',{
                     minWidth: 250,
                     maxWidth: 700,
@@ -735,34 +745,32 @@ $(document).ready(function() {
                     closeOnClick: true,
                     foxel: popup
             })
-                .on('click', function() {
-                    this.openPopup();
-            })
                 .on('popupopen', function(e) {
                     leaflet_marker_popup(e.popup,e.popup.options.foxel);
             });
 
             // add cluster marker to cluster
             cluster.addLayer(clustermarker);
-            leaflet.cluster[segment+'_'+index] = clustermarker;
+
+            // keep popup marker
+            popups.push(popupmarker);
+            leaflet.popups[segment+'_'+index] = popupmarker;
 
             // add to trashed poses
             if (pose.status == 'trashed') {
-                leaflet.bulk.trashed.points.push(L.circle(latlng, 0.25, {
+                leaflet.bulk.trashed.points.push(L.circle(latlng, 0.55, {
                     color: '#000',
-                    fillColor: '#000',
                     opacity: 1,
-                    fillOpacity: 0
+                    fill: false
                 }));
             }
 
             // add to validated poses
             else if (pose.status == 'validated') {
-                leaflet.bulk.validated.points.push(L.circle(latlng, 0.25, {
+                leaflet.bulk.validated.points.push(L.circle(latlng, 0.55, {
                     color: '#912cee',
-                    fillColor: '#912cee',
                     opacity: 1,
-                    fillOpacity: 0
+                    fill: false
                 }));
             }
 
@@ -781,9 +789,10 @@ $(document).ready(function() {
             }
         );
 
-        // add to segmentlayer [trace,cluster]
+        // add to segmentlayer [trace,cluster,popups]
         segmentlayer.addLayer(polyline);
         segmentlayer.addLayer(cluster);
+        segmentlayer.addLayer(new L.featureGroup(popups));
 
         // segmentlayer custom properties
         _.extend(segmentlayer, {
