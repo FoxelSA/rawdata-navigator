@@ -100,7 +100,6 @@ $(document).ready(function() {
         },
         segmentation: [],
         json: {
-            data: [],
             keys: [],
             remaining: 0
         }
@@ -527,7 +526,6 @@ $(document).ready(function() {
         // init json
         storage.json.keys = _.keys(storage.master.segments);
         storage.json.remaining = storage.json.keys.length;
-        storage.json.data = [];
 
         // clear timeline
         timeline.items = [];
@@ -565,7 +563,6 @@ $(document).ready(function() {
 
         // keep object
         _.extend(data,{segment:segment});
-        storage.json.data.push(data);
 
         // specific poses
         var poses = {
