@@ -648,24 +648,25 @@ $(document).ready(function() {
 
             // icon
             var icon = leaflet_marker_icon(pose,color);
+            var preview = !_.isNull(data.preview);
 
             // padding
             var usc = String('000000'+pose.usc).slice(-6);
 
             // popup
             var popup = '<div style="font-weight:700;">'+pose.sec+' '+usc+'</div>'
-                            + '<div style="font-size:10px;padding-top:3px;">Pose '+(index+1)+' of '+length+'</div>'
-                            + '<div style="font-size:10px;padding-bottom:7px;">Segment : &nbsp;'+segment+'</div>';
+                            + '<div style="font-size:10px;padding-top:6px;">Pose '+(index+1)+' of '+length+'</div>'
+                            + '<div style="font-size:10px;padding-bottom:15px;">Segment : &nbsp;'+segment+'</div>';
             if (data.gps)
                 popup +=      '<div>Latitude : &nbsp;&nbsp;'+pose.lat+'</div>'
                             + '<div>Longitude : &nbsp;'+pose.lng+'</div>'
-                            + '<div style="padding-top:7px;padding-bottom:7px;">Altitude : &nbsp;'+pose.alt+'</div>';
-            popup +=          '<div style="font-size:10px;">GPS status : &nbsp;'+(pose.guess?'Guessed':'Received')+'</div>'
-                            + '<div style="font-size:10px;">JP4 status : &nbsp;'+pose.status.charAt(0).toUpperCase()+pose.status.slice(1)+' (splitted : '+data.split+')</div>';
-            if (!_.isNull(data.preview))
-                popup +=      '<div><img src="php/preview.php?src='+storage.master.path+'/'+segment+'/preview/'+data.preview+'/'+pose.folder+'/'+pose.sec+'_'+usc+'.jpeg" alt="" width="640" /></div>'
+                            + '<div style="padding-top:7px;padding-bottom:15px;">Altitude : &nbsp;'+pose.alt+'</div>';
 
-            popup += '<div style="padding-top:7px;"><a target="_blank" href="lib/elphel_panorama_preview/fullsize_canvas.php?settings=settings.xml&width=240&height=180&path='+storage.master.path+'/'+segment+'/jp4/0/'+pose.sec+'_'+usc+'_1.jp4">Click to open Elphel JP4 preview</a></div>';
+            popup +=          '<div style="font-size:10px;">GPS status : &nbsp;'+(pose.guess?'Guessed':'Received')+'</div>'
+                            + '<div style="font-size:10px;">JP4 status : &nbsp;'+pose.status.charAt(0).toUpperCase()+pose.status.slice(1)+' (segment splitted : '+data.split+')</div>';
+
+            if (preview && pose.status!='trashed')
+                popup +=      '<div style="width:640px;padding-top:15px;"><img src="php/preview.php?src='+storage.master.path+'/'+segment+'/preview/'+data.preview+'/'+pose.folder+'/'+pose.sec+'_'+usc+'.jpeg" alt="" width="640" height="320" /></div>'
 
             // cluster marker
             var clustermarker = new L.marker(latlng,{icon:icon})
