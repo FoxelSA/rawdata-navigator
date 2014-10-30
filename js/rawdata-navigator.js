@@ -547,7 +547,7 @@ $(document).ready(function() {
             // preview
             var src = 'img/def.png';
             if (info.state.preview && !info.state.trashed)
-                src = 'php/preview.php?src='+info.src+'/'+info.time.sec+'_'+info.time.usc+'.jpeg';
+                src = 'php/preview.php?src='+info.src+'/'+info.time.sec+'_'+info.time.usc;
 
             // nav
             var nav = '';
@@ -696,7 +696,7 @@ $(document).ready(function() {
         // whole list
         $.each(storage.json.keys, function(sid,key) {
 
-            var filepath = storage.master.path+'/'+key+'/csps/exports/rawdata-navigator.json';
+            var filepath = storage.master.path+'/'+key+'/csps/exports/';
 
             // retrieve json
             $.getJSON('php/csps-json.php?json='+filepath,function(data) {

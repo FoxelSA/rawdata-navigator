@@ -38,10 +38,10 @@
  *      Attribution" section of <http://foxel.ch/license>.
  */
 
-if (!isset($_GET['src']) || empty($_GET['src']) || !file_exists($_GET['src']))
+if (!isset($_GET['src']) || empty($_GET['src']) || !file_exists($_GET['src'].'.jpeg'))
     exit();
 
 // output
 header('Content-Type: image/jpeg');
-header('Content-Length: '.filesize($_GET['src']));
-echo file_get_contents($_GET['src']);
+header('Content-Length: '.filesize($_GET['src'].'.jpeg'));
+echo file_get_contents($_GET['src'].'.jpeg');
