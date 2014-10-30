@@ -255,7 +255,7 @@ $(document).ready(function() {
         }, {
             name:           'Esri World Imagery',
             url:            'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-            attribution:    'Tiles &copy; Esri &mdash; ' +
+            attribution:    'Tiles &copy; Esri, ' +
                             'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
         }];
 
@@ -267,7 +267,7 @@ $(document).ready(function() {
 
             // tilelayer
             var tilelayer = _.object([provider.name],[L.tileLayer(provider.url, {
-                attribution: provider.attribution,
+                attribution: provider.attribution+' &nbsp;::&nbsp; Photogrammetric data &copy; <a href="http://foxel.ch/" target="_blank">FOXEL SA</a>',
                 minZoom: leaflet.zoom.min,
                 maxZoom: leaflet.zoom.max,
                 maxNativeZoom: leaflet.zoom.native
