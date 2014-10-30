@@ -948,7 +948,7 @@ $(document).ready(function() {
         var info = leaflet.poses[segment+'_'+index];
 
         // center map
-        leaflet.map.panTo(L.latLng(info.geo.lat-0.000065,info.geo.lng));
+        leaflet.map.panTo(L.latLng(info.geo.lat,info.geo.lng));
 
         // remove static marker
         if (!_.isNull(leaflet.info))
