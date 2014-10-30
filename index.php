@@ -76,6 +76,9 @@
     <div class="close"><a href="#">Close<span></span></a></div>
     <div class="nav"><div></div></div>
     <div class="pose"></div>
+    <div class="jump">
+        Jump to: <input id="jump" name="jump" type="text" value="" />
+    </div>
     <div class="data"></div>
     <div class="preview"></div>
 </div>

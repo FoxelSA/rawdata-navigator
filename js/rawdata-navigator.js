@@ -60,7 +60,10 @@ $(document).ready(function() {
             bounds: 17
         },
         bounds: null,
-        info: null,
+        info: {
+            layer: null,
+            current: null
+        },
         poses: [],
         overlays: [],
         colors: {
@@ -119,6 +122,9 @@ $(document).ready(function() {
 
         // timeline
         timeline_init();
+
+        // info
+        info_init();
 
         // raw data
         rawdata_init();
@@ -218,13 +224,6 @@ $(document).ready(function() {
             console.log('[zoom: '+leaflet.map.getZoom()+']');
         });
         */
-
-        // event: mouse click (info close)
-        $('#info .close a').on('click',function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            pose_close();
-        });
 
     };
 
@@ -423,7 +422,7 @@ $(document).ready(function() {
     var timeline_select = function(items) {
 
         // close pose info
-        pose_close();
+        info_close();
 
         // remove overlays
         $.each(segments_overlays(), function(i,layer) {
@@ -438,6 +437,153 @@ $(document).ready(function() {
         // selection (single or multiple) made, show filtered
         else
             segments_showselection(items);
+
+    };
+
+    /**
+     * info_init()
+     */
+    var info_init = function() {
+
+        // event: mouse click (info close)
+        $('#info .close a').on('click',function(e) {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            // close pose info
+            info_close();
+
+        });
+
+        // event: keyboard click (info close)
+        $('#jump').on('keyup',function(e) {
+
+            e.preventDefault();
+            if (e.keyCode != 13) // enter
+                return;
+
+            // requested
+            var req = parseInt($('#jump').val(),10);
+
+            // clear
+            $('#jump').val('');
+
+            // invalid
+            if (_.isNaN(req))
+                return;
+
+            // not in range
+            if (req < 1 || req > leaflet.info.current.pose.length)
+                return;
+
+            // display
+            info_display(leaflet.info.current.pose.segment,req-1);
+
+        });
+
+    };
+
+    /**
+     * info_display()
+     */
+    var info_display = function(segment,index) {
+
+        // retrieve pose info
+        var info = leaflet.poses[segment+'_'+index];
+
+        // center map
+        leaflet.map.panTo(L.latLng(info.geo.lat,info.geo.lng));
+
+        // remove static marker
+        if (!_.isNull(leaflet.info.layer))
+            leaflet.map.removeLayer(leaflet.info.layer);
+
+        // static marker
+        leaflet.info.layer = L.marker(L.latLng(info.geo.lat,info.geo.lng),{icon:L.icon({
+            iconUrl: 'img/pose-icon.png',
+            iconRetinaUrl: 'img/pose-icon-2x.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 39]
+        })});
+
+        // add static marker
+        leaflet.info.current = info;
+        leaflet.map.addLayer(leaflet.info.layer);
+
+        // show
+        $('#info').slideDown('fast',function() {
+
+            var data = '<div class="timestamp">'+info.time.sec+' '+info.time.usc+'</div>';
+
+            // milliseconds
+            var ms = new Date(parseInt(info.time.sec,10)*1000);
+
+            // geo
+            if (info.state.gps) {
+                data += '<div class="section">Geo</div>'
+                      + '<table>'
+                      + '<tr><td class="attr">Latitude</td><td>'+info.geo.lat+'</td></tr>'
+                      + '<tr><td class="attr">Longitude</td><td>'+info.geo.lng+'</td></tr>'
+                      + '<tr><td class="attr">Altitude</td><td>'+info.geo.alt+'</td></tr>'
+                      + '</table>';
+            }
+
+            // status
+            data += '<div class="section">Status</div>'
+                  + '<table>'
+                  + '<tr><td class="attr">GPS</td><td>'+(info.state.guess?'Guessed':'Received')+'</td></tr>'
+                  + '<tr><td class="attr">JP4</td><td>'+info.state.jp4+'</td></tr>'
+                  + '<tr><td class="attr">Segment</td><td>'+(info.state.splitted?'Splitted':'Not splitted yet')+'</td></tr>'
+                  + '</table>';
+
+            // date
+            data += '<div class="section">Date</div>'
+                  + '<table>'
+                  + '<tr><td class="attr">UTC</td><td>'+ms.simple_utc()+'</td></tr>'
+                  + '<tr><td class="attr">Local</td><td>'+ms.simple_local()+'</td></tr>'
+                  + '</table>';
+
+            // preview
+            var src = 'img/def.png';
+            if (info.state.preview && !info.state.trashed)
+                src = 'php/preview.php?src='+info.src+'/'+info.time.sec+'_'+info.time.usc+'.jpeg';
+
+            // nav
+            var nav = '';
+            if (info.pose.index > 0)
+                nav += '<a href="#" onclick="return info_display(\''+info.pose.segment+'\',\''+(info.pose.index-1)+'\');"><span class="prev"></span>Prev</a>';
+            if (info.pose.pos < info.pose.length)
+                nav += '<a href="#" onclick="return info_display(\''+info.pose.segment+'\',\''+(info.pose.index+1)+'\');">Next<span class="next"></span></a>';
+
+            // set content
+            $('#info .data').html(data);
+            $('#info .preview').html('<img src="'+src+'" alt="" width="640" height="320" />');
+            $('#info .nav > div').html(nav);
+            $('#info .pose').html('Segment '+info.pose.segment+' &nbsp; &nbsp; &nbsp; Pose '+info.pose.pos+' of '+info.pose.length);
+
+        });
+
+        return false;
+
+    };
+    window.info_display = info_display; // global scope
+
+    /**
+     * info_close()
+     */
+    var info_close = function() {
+
+        // remove static marker
+        if (!_.isNull(leaflet.info.layer))
+            leaflet.map.removeLayer(leaflet.info.layer);
+
+        // clear
+        leaflet.info.layer = null;
+        leaflet.info.current = null;
+
+        // hide
+        $('#info').slideUp('fast');
 
     };
 
@@ -521,7 +667,7 @@ $(document).ready(function() {
     var rawdata_selected = function() {
 
         // close pose info
-        pose_close();
+        info_close();
 
         // keep choice
         var value = $('#master select').val().split('/');
@@ -692,7 +838,7 @@ $(document).ready(function() {
             // cluster marker
             var clustermarker = new L.marker(latlng,{icon:icon})
                 .on('click', function() {
-                    pose_display(segment,index);
+                    info_display(segment,index);
             });
 
             // add cluster marker to cluster
@@ -936,104 +1082,6 @@ $(document).ready(function() {
         // validated
         leaflet.bulk.validated.layer = L.layerGroup(leaflet.bulk.validated.points);
         leaflet.control.layers.addOverlay(leaflet.bulk.validated.layer,'Validated poses (#'+leaflet.bulk.validated.points.length+') only (all segments)');
-
-    };
-
-    /**
-     * pose_display()
-     */
-    var pose_display = function(segment,index) {
-
-        // retrieve pose info
-        var info = leaflet.poses[segment+'_'+index];
-
-        // center map
-        leaflet.map.panTo(L.latLng(info.geo.lat,info.geo.lng));
-
-        // remove static marker
-        if (!_.isNull(leaflet.info))
-            leaflet.map.removeLayer(leaflet.info);
-
-        // static marker
-        leaflet.info = L.marker(L.latLng(info.geo.lat,info.geo.lng),{icon:L.icon({
-            iconUrl: 'img/pose-icon.png',
-            iconRetinaUrl: 'img/pose-icon-2x.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 39]
-        })});
-
-        // add static marker
-        leaflet.map.addLayer(leaflet.info);
-
-        // show
-        $('#info').slideDown('fast',function() {
-
-            var data = '<div class="timestamp">'+info.time.sec+' '+info.time.usc+'</div>';
-
-            // milliseconds
-            var ms = new Date(parseInt(info.time.sec,10)*1000);
-
-            // geo
-            if (info.state.gps) {
-                data += '<div class="section">Geo</div>'
-                      + '<table>'
-                      + '<tr><td class="attr">Latitude</td><td>'+info.geo.lat+'</td></tr>'
-                      + '<tr><td class="attr">Longitude</td><td>'+info.geo.lng+'</td></tr>'
-                      + '<tr><td class="attr">Altitude</td><td>'+info.geo.alt+'</td></tr>'
-                      + '</table>';
-            }
-
-            // status
-            data += '<div class="section">Status</div>'
-                  + '<table>'
-                  + '<tr><td class="attr">GPS</td><td>'+(info.state.guess?'Guessed':'Received')+'</td></tr>'
-                  + '<tr><td class="attr">JP4</td><td>'+info.state.jp4+'</td></tr>'
-                  + '<tr><td class="attr">Segment</td><td>'+(info.state.splitted?'Splitted':'Not splitted yet')+'</td></tr>'
-                  + '</table>';
-
-            // date
-            data += '<div class="section">Date</div>'
-                  + '<table>'
-                  + '<tr><td class="attr">UTC</td><td>'+ms.simple_utc()+'</td></tr>'
-                  + '<tr><td class="attr">Local</td><td>'+ms.simple_local()+'</td></tr>'
-                  + '</table>';
-
-            // preview
-            var src = 'img/def.png';
-            if (info.state.preview && !info.state.trashed)
-                src = 'php/preview.php?src='+info.src+'/'+info.time.sec+'_'+info.time.usc+'.jpeg';
-
-            // nav
-            var nav = '';
-            if (info.pose.index > 0)
-                nav += '<a href="#" onclick="return pose_display(\''+info.pose.segment+'\',\''+(info.pose.index-1)+'\');"><span class="prev"></span>Prev</a>';
-            if (info.pose.pos < info.pose.length)
-                nav += '<a href="#" onclick="return pose_display(\''+info.pose.segment+'\',\''+(info.pose.index+1)+'\');">Next<span class="next"></span></a>';
-
-            // set content
-            $('#info .data').html(data);
-            $('#info .preview').html('<img src="'+src+'" alt="" width="640" height="320" />');
-            $('#info .nav > div').html(nav);
-            $('#info .pose').html('Segment '+info.pose.segment+' &nbsp; &nbsp; &nbsp; Pose '+info.pose.pos+' of '+info.pose.length);
-
-        });
-
-        return false;
-
-    };
-    window.pose_display = pose_display; // global scope
-
-    /**
-     * pose_close()
-     */
-    var pose_close = function() {
-
-        // remove static marker
-        if (!_.isNull(leaflet.info))
-            leaflet.map.removeLayer(leaflet.info);
-
-        // hide
-        $('#info').slideUp('fast');
 
     };
 
