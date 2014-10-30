@@ -72,6 +72,14 @@
     <select style="width:400px;"></select>
 </div>
 
+<div id="info">
+    <div class="close"><a href="#">Close<span></span></a></div>
+    <div class="nav"><div></div></div>
+    <div class="pose"></div>
+    <div class="data"></div>
+    <div class="preview"></div>
+</div>
+
 <div id="timeline"></div>
 
 <div id="overlay">

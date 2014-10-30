@@ -60,7 +60,8 @@ $(document).ready(function() {
             bounds: 17
         },
         bounds: null,
-        popups: [],
+        info: null,
+        poses: [],
         overlays: [],
         colors: {
             segments: ['#f00','#0c0','#00f']
@@ -218,6 +219,13 @@ $(document).ready(function() {
         });
         */
 
+        // event: mouse click (info close)
+        $('#info .close a').on('click',function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            pose_close();
+        });
+
     };
 
     /**
@@ -324,55 +332,6 @@ $(document).ready(function() {
     };
 
     /**
-     * leaflet_marker_popup()
-     */
-    var leaflet_marker_popup = function(popup,data) {
-
-        var html =  '<div style="font-weight:700;">'+data.time.sec+' '+data.time.usc+'</div>'
-                        + '<div style="font-size:10px;padding-top:6px;">'
-                            + 'Pose '+data.pose.pos+' of '+data.pose.length;
-
-        if (data.pose.index > 0)
-            html +=     ' &nbsp;&nbsp; <a href="#" onclick="return leaflet_marker_open(\''+data.pose.segment+'\',\''+(data.pose.index-1)+'\');">« «</a>'
-        if (data.pose.pos < data.pose.length)
-            html +=     ' &nbsp;&nbsp; <a href="#" onclick="return leaflet_marker_open(\''+data.pose.segment+'\',\''+(data.pose.index+1)+'\');">» »</a>'
-
-        html +=     '</div>';
-
-        // segment
-        html +=     '<div style="font-size:10px;padding-bottom:15px;">Segment : &nbsp;'+data.pose.segment+'</div>';
-
-        // geo
-        if (data.state.gps) {
-            html +=     '<div>Latitude : &nbsp;&nbsp;'+data.geo.lat+'</div>'
-                            + '<div>Longitude : &nbsp;'+data.geo.lng+'</div>'
-                            + '<div style="padding-top:7px;padding-bottom:15px;">Altitude : &nbsp;'+data.geo.alt+'</div>';
-        }
-
-        // status
-        html +=     '<div style="font-size:10px;">GPS status : &nbsp;'+(data.state.guess?'Guessed':'Received')+'</div>'
-                        + '<div style="font-size:10px;">JP4 status : &nbsp;'+data.state.jp4+' (segment splitted : '+data.state.splitted+')</div>';
-
-        // preview
-        if (data.state.preview && !data.state.trashed) {
-            html +=     '<div style="width:640px;padding-top:15px;"><img src="php/preview.php?src='+data.src+'/'+data.time.sec+'_'+data.time.usc+'.jpeg" alt="" width="640" height="320" /></div>';
-        }
-
-        // set content
-        popup.setContent(html);
-
-    };
-
-    /**
-     * leaflet_marker_open()
-     */
-    var leaflet_marker_open = function(segment,index) {
-        leaflet.popups[segment+'_'+index].openPopup();
-        return false;
-    };
-    window.leaflet_marker_open = leaflet_marker_open; // scope
-
-    /**
      * leaflet_fitbounds()
      */
     var leaflet_fitbounds = function() {
@@ -428,7 +387,7 @@ $(document).ready(function() {
         });
 
         // pointers
-        leaflet.popups = [];
+        leaflet.poses = [];
         leaflet.overlays = [];
         leaflet.tilelayers.timebased = null;
 
@@ -462,6 +421,9 @@ $(document).ready(function() {
      * timeline_select()
      */
     var timeline_select = function(items) {
+
+        // close pose info
+        pose_close();
 
         // remove overlays
         $.each(segments_overlays(), function(i,layer) {
@@ -528,7 +490,7 @@ $(document).ready(function() {
                     var obj = JSON.parse(item.text);
                     var date = new Date(parseInt(obj.master,10)*1000); // milliseconds
                     var name = !_.isNull(obj.name) ? ' - '+obj.name : '';
-                    return obj.master+name+'<div class="master dates"><div>'+date.toUTCString()+'</div><div>'+date+'</div></div>';
+                    return obj.master+name+'<div class="master dates">UTC: '+date.simple_utc()+' &nbsp; &nbsp; Local: '+date.simple_local()+'</div></div>';
                 },
                 formatSelection: function(item) {
                     var obj = JSON.parse(item.text);
@@ -557,6 +519,9 @@ $(document).ready(function() {
      * rawdata_selected()
      */
     var rawdata_selected = function() {
+
+        // close pose info
+        pose_close();
 
         // keep choice
         var value = $('#master select').val().split('/');
@@ -612,7 +577,7 @@ $(document).ready(function() {
         // keep object
         _.extend(data,{segment:segment});
 
-        // specific poses
+        // extreme poses
         var poses = {
             first: _.first(data.pose),
             last: _.last(data.pose)
@@ -639,9 +604,8 @@ $(document).ready(function() {
 
         // trace
         var trace = [];
-        var popups = [];
 
-        // segment feature group [trace,cluster,popups]
+        // segment feature group [trace,cluster]
         var segmentlayer = new L.featureGroup();
 
         // cluster
@@ -695,12 +659,12 @@ $(document).ready(function() {
             // icon
             var icon = leaflet_marker_icon(pose,color);
 
-            // popup
-            var popup = {
+            // pose info
+            leaflet.poses[segment+'_'+index] = {
                 segment: segment,
                 time: {
                     sec: pose.sec,
-                    usc: String('000000'+pose.usc).slice(-6)
+                    usc: String(pose.usc).zeropad(6)
                 },
                 pose: {
                     segment: segment,
@@ -728,31 +692,11 @@ $(document).ready(function() {
             // cluster marker
             var clustermarker = new L.marker(latlng,{icon:icon})
                 .on('click', function() {
-                    leaflet_marker_open(segment,index);
-            });
-
-            // popup marker
-            var popupmarker = L.circle(latlng, 0.1, {
-                fill: false,
-                stroke: false
-            })
-                .bindPopup('',{
-                    minWidth: 250,
-                    maxWidth: 700,
-                    closeButton: false,
-                    closeOnClick: true,
-                    foxel: popup
-            })
-                .on('popupopen', function(e) {
-                    leaflet_marker_popup(e.popup,e.popup.options.foxel);
+                    pose_display(segment,index);
             });
 
             // add cluster marker to cluster
             cluster.addLayer(clustermarker);
-
-            // keep popup marker
-            popups.push(popupmarker);
-            leaflet.popups[segment+'_'+index] = popupmarker;
 
             // add to trashed poses
             if (pose.status == 'trashed') {
@@ -787,10 +731,9 @@ $(document).ready(function() {
             }
         );
 
-        // add to segmentlayer [trace,cluster,popups]
+        // add to segmentlayer [trace,cluster]
         segmentlayer.addLayer(polyline);
         segmentlayer.addLayer(cluster);
-        segmentlayer.addLayer(new L.featureGroup(popups));
 
         // segmentlayer custom properties
         _.extend(segmentlayer, {
@@ -986,12 +929,136 @@ $(document).ready(function() {
      */
     var bulk_poses = function() {
 
+        // trashed
         leaflet.bulk.trashed.layer = L.layerGroup(leaflet.bulk.trashed.points);
         leaflet.control.layers.addOverlay(leaflet.bulk.trashed.layer,'Trashed poses (#'+leaflet.bulk.trashed.points.length+') only (all segments)');
 
+        // validated
         leaflet.bulk.validated.layer = L.layerGroup(leaflet.bulk.validated.points);
         leaflet.control.layers.addOverlay(leaflet.bulk.validated.layer,'Validated poses (#'+leaflet.bulk.validated.points.length+') only (all segments)');
 
+    };
+
+    /**
+     * pose_display()
+     */
+    var pose_display = function(segment,index) {
+
+        // retrieve pose info
+        var info = leaflet.poses[segment+'_'+index];
+
+        // center map
+        leaflet.map.panTo(L.latLng(info.geo.lat-0.000065,info.geo.lng));
+
+        // remove static marker
+        if (!_.isNull(leaflet.info))
+            leaflet.map.removeLayer(leaflet.info);
+
+        // static marker
+        leaflet.info = L.marker(L.latLng(info.geo.lat,info.geo.lng),{icon:L.icon({
+            iconUrl: 'img/pose-icon.png',
+            iconRetinaUrl: 'img/pose-icon-2x.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 39]
+        })});
+
+        // add static marker
+        leaflet.map.addLayer(leaflet.info);
+
+        // show
+        $('#info').slideDown('fast',function() {
+
+            var data = '<div class="timestamp">'+info.time.sec+' '+info.time.usc+'</div>';
+
+            // milliseconds
+            var ms = new Date(parseInt(info.time.sec,10)*1000);
+
+            // geo
+            if (info.state.gps) {
+                data += '<div class="section">Geo</div>'
+                      + '<table>'
+                      + '<tr><td class="attr">Latitude</td><td>'+info.geo.lat+'</td></tr>'
+                      + '<tr><td class="attr">Longitude</td><td>'+info.geo.lng+'</td></tr>'
+                      + '<tr><td class="attr">Altitude</td><td>'+info.geo.alt+'</td></tr>'
+                      + '</table>';
+            }
+
+            // status
+            data += '<div class="section">Status</div>'
+                  + '<table>'
+                  + '<tr><td class="attr">GPS</td><td>'+(info.state.guess?'Guessed':'Received')+'</td></tr>'
+                  + '<tr><td class="attr">JP4</td><td>'+info.state.jp4+'</td></tr>'
+                  + '<tr><td class="attr">Segment</td><td>'+(info.state.splitted?'Splitted':'Not splitted yet')+'</td></tr>'
+                  + '</table>';
+
+            // date
+            data += '<div class="section">Date</div>'
+                  + '<table>'
+                  + '<tr><td class="attr">UTC</td><td>'+ms.simple_utc()+'</td></tr>'
+                  + '<tr><td class="attr">Local</td><td>'+ms.simple_local()+'</td></tr>'
+                  + '</table>';
+
+            // preview
+            var src = 'img/def.png';
+            if (info.state.preview && !info.state.trashed)
+                src = 'php/preview.php?src='+info.src+'/'+info.time.sec+'_'+info.time.usc+'.jpeg';
+
+            // nav
+            var nav = '';
+            if (info.pose.index > 0)
+                nav += '<a href="#" onclick="return pose_display(\''+info.pose.segment+'\',\''+(info.pose.index-1)+'\');"><span class="prev"></span>Prev</a>';
+            if (info.pose.pos < info.pose.length)
+                nav += '<a href="#" onclick="return pose_display(\''+info.pose.segment+'\',\''+(info.pose.index+1)+'\');">Next<span class="next"></span></a>';
+
+            // set content
+            $('#info .data').html(data);
+            $('#info .preview').html('<img src="'+src+'" alt="" width="640" height="320" />');
+            $('#info .nav > div').html(nav);
+            $('#info .pose').html('Segment '+info.pose.segment+' &nbsp; &nbsp; &nbsp; Pose '+info.pose.pos+' of '+info.pose.length);
+
+        });
+
+        return false;
+
+    };
+    window.pose_display = pose_display; // global scope
+
+    /**
+     * pose_close()
+     */
+    var pose_close = function() {
+
+        // remove static marker
+        if (!_.isNull(leaflet.info))
+            leaflet.map.removeLayer(leaflet.info);
+
+        // hide
+        $('#info').slideUp('fast');
+
+    };
+
+    // extend string prototype
+    String.prototype.zeropad = function(length) {
+        var string = this;
+        while (string.length < length)
+            string = '0'+string;
+        return string;
+    };
+
+    // extend date prototype
+    Date.prototype.simple_utc = function() {
+        var ms = this;
+        return String(ms.getUTCDate()).zeropad(2)+'.'+String((ms.getUTCMonth()+1)).zeropad(2)+'.'+ms.getUTCFullYear()+' '
+              +String(ms.getUTCHours()).zeropad(2)+':'+String(ms.getUTCMinutes()).zeropad(2)+':'+String(ms.getUTCSeconds()).zeropad(2);
+    };
+
+    // extend date prototype
+    Date.prototype.simple_local = function() {
+        var ms = this;
+        var gmt = ms.getTimezoneOffset()/-60;
+        return String(ms.getDate()).zeropad(2)+'.'+String((ms.getMonth()+1)).zeropad(2)+'.'+ms.getFullYear()+' '
+              +String(ms.getHours()).zeropad(2)+':'+String(ms.getMinutes()).zeropad(2)+':'+String(ms.getSeconds()).zeropad(2)+' '
+              +'GMT '+(gmt>0?'+':'')+gmt;
     };
 
     // init

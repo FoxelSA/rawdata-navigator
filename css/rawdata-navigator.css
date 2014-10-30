@@ -51,6 +51,10 @@ html,body {
     font-size:13px;
 }
 
+a, a:link, a:visited, a:hover, a:active {
+    text-decoration:none;
+}
+
 #map {
     width:100%;
 }
@@ -190,12 +194,150 @@ html,body {
         font-size:9px;
     }
 
+#info {
+    display:none;
+    position:absolute;
+    bottom:120px; /* see #timeline.height */
+    left:0;
+    width:100%;
+    height:390px;
+    color:#fff;
+    background-color:rgba(0,0,0,0.9);
+}
+
+    #info a {
+        color:#fff;
+    }
+
+    #info .close {
+        position:absolute;
+        top:8px;
+        right:10px;
+        font-size:10px;
+        font-weight:700;
+        text-transform:uppercase;
+    }
+
+        #info .close span {
+            position:relative;
+            top:3px;
+            margin-left:6px;
+            font-family:'FontAwesome';
+            font-size:20px;
+            font-style:normal;
+            font-weight:normal;
+        }
+
+            #info .close span:before {
+                content:"\f103";
+            }
+
+    #info .nav {
+        position:absolute;
+        top:8px;
+        right:660px;
+        font-size:10px;
+        font-weight:700;
+        text-transform:uppercase;
+    }
+
+        #info .nav > div {
+            position:absolute;
+            top:0;
+            left:10px;
+        }
+
+        #info .nav a {
+            margin-right:25px;
+        }
+
+        #info .nav span {
+            position:relative;
+            top:2px;
+            margin-left:6px;
+            font-family:'FontAwesome';
+            font-size:20px;
+            font-style:normal;
+            font-weight:normal;
+        }
+
+            #info .nav span.prev {
+                margin-left:0;
+                margin-right:6px;
+            }
+
+            #info .nav span:before {
+                content:"\f105";
+            }
+
+            #info .nav span.prev:before {
+                content:"\f104";
+            }
+
+    #info .pose {
+        position:absolute;
+        top:16px;
+        right:265px;
+        font-size:10px;
+        font-weight:700;
+        text-transform:uppercase;
+    }
+
+    #info .data {
+        position:absolute;
+        top:70px;
+        right:730px;
+        width:300px;
+        font-size:11px;
+    }
+
+        #info .data .timestamp {
+            padding-bottom:13px;
+            font-size:14px;
+            font-weight:700;
+        }
+
+        #info .data .section {
+            padding-bottom:3px;
+            margin-top:20px;
+            margin-bottom:10px;
+            font-size:10px;
+            font-weight:700;
+            text-transform:uppercase;
+            border-bottom:solid 1px #fff;
+        }
+
+        #info .data table {
+            border-collapse:collapse;
+        }
+
+            #info .data td {
+                padding-left:0;
+                padding-right:0;
+            }
+
+                #info .data td.attr {
+                    width:100px;
+                }
+
+    #info .preview {
+        position:absolute;
+        bottom:25px;
+        right:10px;
+        width:650px;
+        text-align:right;
+    }
+
+        #info .preview img {
+            border:solid 1px #4f4f4f;
+        }
+
 #timeline {
     position:absolute;
     bottom:0;
     left:0;
     width:100%;
-    height:120px;
+    height:120px; /* see #info.bottom */
     background-color:#ebebeb;
     font-size:11px;
 }
