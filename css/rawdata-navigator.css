@@ -149,34 +149,31 @@ html,body {
 }
 
     #overlay,
-    #overlay > .bg,
-    #overlay > .content {
+    #overlay > div {
         position:absolute;
         top:0;
         left:0;
         width:auto;
         height:auto;
+        background-color:rgba(0,0,0,0.9);
     }
 
-        #overlay > .bg {
-            background-color:#000;
-            opacity:0.85;
-        }
-
-        #overlay > .content {
+        #overlay > div {
             color:#fff;
             text-align:center;
+            background-color:transparent;
         }
 
-            #overlay > .content .loader {
-                padding:15px;
-            }
+        #overlay img {
+            padding-bottom:15px;
+        }
 
-            #overlay > .content .caption {
-                font-size:10px;
-                font-weight:700;
-                text-transform:uppercase;
-            }
+        #overlay .txt {
+            font-size:10px;
+            font-weight:700;
+            text-transform:uppercase;
+            line-height:150%;
+        }
 
 #master {
     display:none;

@@ -75,12 +75,9 @@
 <div id="timeline"></div>
 
 <div id="overlay">
-    <div class="bg"></div>
-    <div class="content">
-        <div class="loader">
-            <img src="img/ajax-loader.gif" width="24" height="24" alt="Loading..." />
-        </div>
-        <div class="caption"></div>
+    <div>
+        <img src="img/ajax-loader.gif" width="24" height="24" alt="" />
+        <div class="txt"></div>
     </div>
 </div>
 

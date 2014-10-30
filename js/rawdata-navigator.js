@@ -149,11 +149,9 @@ $(document).ready(function() {
 
         $('#overlay').width(w);
         $('#overlay').children().width(w);
-
         $('#overlay').height(h);
-        $('#overlay').children(':not(.content)').height(h);
 
-        $('#overlay > .content').css('top',Math.round(h/2-$('#overlay > .content').outerHeight(true)/2));
+        $('#overlay').children().css('top',Math.round(h/2-$('#overlay').children().outerHeight(true)/2));
 
     };
 
@@ -168,7 +166,7 @@ $(document).ready(function() {
      * overlay_message()
      */
     var overlay_message = function(msg) {
-        $('#overlay .caption').html(msg);
+        $('#overlay .txt').html(msg);
     };
 
     /**
