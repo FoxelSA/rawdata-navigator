@@ -197,7 +197,7 @@ a, a:link, a:visited, a:hover, a:active {
 #info {
     display:none;
     position:absolute;
-    bottom:110px; /* see #timeline.height */
+    bottom:90px; /* see #timeline.height */
     left:0;
     width:100%;
     height:390px;
@@ -361,7 +361,11 @@ a, a:link, a:visited, a:hover, a:active {
     bottom:0;
     left:0;
     width:100%;
-    height:110px; /* see #info.bottom */
+    height:90px; /* see #info.bottom */
     background-color:#ebebeb;
     font-size:11px;
 }
+
+    .vis.timeline .item.range {
+        top:16px !important;
+    }
