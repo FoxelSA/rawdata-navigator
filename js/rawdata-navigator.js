@@ -546,7 +546,7 @@ $(document).ready(function() {
 
             // preview
             var src = 'img/def.png';
-            if (info.state.preview && !info.state.trashed)
+            if (info.state.preview && !info.state.trashed && !info.state.corrupted)
                 src = 'php/preview.php?src='+info.src+'/'+info.time.sec+'_'+info.time.usc;
 
             // nav
@@ -827,9 +827,10 @@ $(document).ready(function() {
                     gps: data.gps,
                     guess: pose.guess,
                     status: pose.status,
-                    jp4: pose.status.charAt(0).toUpperCase()+pose.status.slice(1),
+                    jp4: (pose.status=='eof' ? 'Corrupted (EOF)' : pose.status.charAt(0).toUpperCase()+pose.status.slice(1)),
                     splitted: data.split,
                     trashed: (pose.status=='trashed'),
+                    corrupted: (pose.status=='eof'),
                     preview: !_.isNull(data.preview)
                 },
                 src: storage.master.path+'/'+segment+'/preview/'+data.preview+'/'+pose.folder
@@ -845,7 +846,7 @@ $(document).ready(function() {
             cluster.addLayer(clustermarker);
 
             // add to trashed poses
-            if (pose.status == 'trashed') {
+            if (pose.status=='trashed' || pose.status=='eof') {
                 leaflet.bulk.trashed.points.push(L.circle(latlng, 0.55, {
                     color: '#000',
                     opacity: 1,
@@ -854,7 +855,7 @@ $(document).ready(function() {
             }
 
             // add to validated poses
-            else if (pose.status == 'validated') {
+            else if (pose.status=='validated') {
                 leaflet.bulk.validated.points.push(L.circle(latlng, 0.55, {
                     color: '#912cee',
                     opacity: 1,

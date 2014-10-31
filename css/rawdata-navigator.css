@@ -128,7 +128,8 @@ a, a:link, a:visited, a:hover, a:active {
             line-height:30px;
         }
 
-            .marker-pnt.type-trashed span {
+            .marker-pnt.type-trashed span,
+            .marker-pnt.type-eof span {
                 color:#000;
             }
 
@@ -146,6 +147,10 @@ a, a:link, a:visited, a:hover, a:active {
 
             .marker-pnt.type-trashed span:before {
                 content:"\f00d";
+            }
+
+            .marker-pnt.type-eof span:before {
+                content:"\f071";
             }
 
 #overlay {
