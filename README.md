@@ -4,6 +4,11 @@
 Geographical, temporal and human-understandable visualization of raw data.
 
 
+### Documentation
+
+Documentation can be consulted on the [wiki](https://github.com/FoxelSA/rawdata-navigator/wiki).
+
+
 ### Copyright
 
 Copyright (c) 2014 FOXEL SA - [http://foxel.ch](http://foxel.ch)<br />
