@@ -513,7 +513,7 @@ $(document).ready(function() {
             video.played = false;
             video.segment = segment;
             if (info.state.preview)
-                video.player.src({type:'video/webm',src:storage.master.path+'/'+segment+'/preview/'+info.state.debayer+'/segment.webm'});
+                video.player.src({type:'video/webm',src:storage.master.localhost+'/'+segment+'/preview/'+info.state.debayer+'/segment.webm'});
             else
                 video.player.src(null);
         }
@@ -625,6 +625,9 @@ $(document).ready(function() {
      */
     var info_close = function() {
 
+        // stop video
+        video.player.pause();
+
         // remove static marker
         if (!_.isNull(leaflet.info.layer))
             leaflet.map.removeLayer(leaflet.info.layer);
@@ -633,8 +636,13 @@ $(document).ready(function() {
         leaflet.info.layer = null;
         leaflet.info.current = null;
 
-        // hide
-        $('#info').slideUp('fast');
+        // wait some time for the player to stop
+        setTimeout(function() {
+
+            // hide
+            $('#info').slideUp('fast');
+
+        },250);
 
     };
 
@@ -768,6 +776,7 @@ $(document).ready(function() {
         storage.mac = value[0];
         storage.master.timestamp = value[1];
         storage.master.path = storage.root+'/camera/'+storage.mac+'/raw/segment/'+storage.master.timestamp;
+        storage.master.localhost = '/data/camera/'+storage.mac+'/raw/segment/'+storage.master.timestamp;
 
         // message
         overlay_message('Loading from<br />'+storage.master.path+'/...');
