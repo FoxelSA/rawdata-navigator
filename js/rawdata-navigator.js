@@ -65,6 +65,7 @@ $(document).ready(function() {
             current: null
         },
         poses: [],
+        videoframes: [],
         overlays: [],
         colors: {
             segments: ['#f00','#0c0','#00f']
@@ -91,6 +92,16 @@ $(document).ready(function() {
                 layer: null
             }
         }
+    };
+
+    // video
+    var video = {
+        ready: false,
+        played: false,
+        fps: 25,
+        time: 0.0,
+        player: null,
+        segment: null
     };
 
     // storage
@@ -125,6 +136,9 @@ $(document).ready(function() {
 
         // info
         info_init();
+
+        // video
+        video_init();
 
         // raw data
         rawdata_init();
@@ -387,6 +401,7 @@ $(document).ready(function() {
 
         // pointers
         leaflet.poses = [];
+        leaflet.videoframes = [];
         leaflet.overlays = [];
         leaflet.tilelayers.timebased = null;
 
@@ -492,6 +507,45 @@ $(document).ready(function() {
         // retrieve pose info
         var info = leaflet.poses[segment+'_'+index];
 
+        // switch video source
+        if (video.segment != segment) {
+            video.ready = false;
+            video.played = false;
+            video.segment = segment;
+            if (info.state.preview)
+                video.player.src({type:'video/webm',src:storage.master.path+'/'+segment+'/preview/'+info.state.debayer+'/segment.webm'});
+            else
+                video.player.src(null);
+        }
+
+        // video frame
+        var videoframe = _.indexOf(leaflet.videoframes[segment],parseInt(index,10));
+
+        // video time
+        video.time = 0.0;
+        if (videoframe > -1)
+            video.time = (videoframe/video.fps).toPrecision(6);
+
+        // video set current time
+        if (videoframe > -1 && video.ready)
+            video.player.currentTime(video.time);
+
+        // marker and map
+        info_marker(segment,index);
+
+        return false;
+
+    };
+    window.info_display = info_display; // global scope
+
+    /**
+     * info_marker()
+     */
+    var info_marker = function(segment,index) {
+
+        // retrieve pose info
+        var info = leaflet.poses[segment+'_'+index];
+
         // center map
         leaflet.map.panTo(L.latLng(info.geo.lat,info.geo.lng));
 
@@ -545,9 +599,9 @@ $(document).ready(function() {
                   + '</table>';
 
             // preview
-            var src = 'img/def.png';
-            if (info.state.preview && !info.state.trashed && !info.state.corrupted)
-                src = 'php/preview.php?src='+info.src+'/'+info.time.sec+'_'+info.time.usc;
+            var src = '';
+            if (!info.state.preview || info.state.trashed || info.state.corrupted)
+                src = '<img src="img/def.png" alt="" width="640" height="320" />';
 
             // nav
             var nav = '';
@@ -558,16 +612,13 @@ $(document).ready(function() {
 
             // set content
             $('#info .data').html(data);
-            $('#info .preview').html('<img src="'+src+'" alt="" width="640" height="320" />');
+            $('#info .preview').html(src);
             $('#info .nav > div').html(nav);
             $('#info .pose').html('Segment '+info.pose.segment+' &nbsp; &nbsp; &nbsp; Pose '+info.pose.pos+' of '+info.pose.length);
 
         });
 
-        return false;
-
     };
-    window.info_display = info_display; // global scope
 
     /**
      * info_close()
@@ -584,6 +635,49 @@ $(document).ready(function() {
 
         // hide
         $('#info').slideUp('fast');
+
+    };
+
+    /**
+     * video_init()
+     */
+    var video_init = function() {
+
+        // instanciate video.js
+        video.player = videojs('vid', {
+            "controls": true,
+            "preload": "auto",
+            "loop": true,
+            "autoplay": false,
+            "techOrder": ["html5"],
+            "children": {
+                "bigPlayButton": false,
+                "controlBar": {
+                    "currentTimeDisplay": false,
+                    "timeDivider": false,
+                    "durationDisplay": false,
+                    "children": {
+                        "volumeControl": false,
+                        "muteToggle": false
+                    }
+                }
+            }
+        })
+            .on('canplay',function() {
+                video.ready = true;
+                if (!video.played)
+                    video.player.currentTime(video.time);
+                video.played = true;
+        })
+            .on('timeupdate',function() {
+                var frame = parseInt((video.player.currentTime()*video.fps).toPrecision(6),10);
+                var pose = leaflet.videoframes[video.segment][frame];
+                info_marker(video.segment,pose);
+        })
+            .on('play',function() {
+                if (leaflet.map.getZoom() > leaflet.zoom.bounds)
+                    leaflet.map.setZoom(leaflet.zoom.bounds);
+        });
 
     };
 
@@ -777,6 +871,9 @@ $(document).ready(function() {
             buffer: null
         };
 
+        // video frames
+        leaflet.videoframes[segment] = [];
+
         // parse poses
         $.each(data.pose, function(index,pose) {
 
@@ -831,10 +928,14 @@ $(document).ready(function() {
                     splitted: data.split,
                     trashed: (pose.status=='trashed'),
                     corrupted: (pose.status=='eof'),
-                    preview: !_.isNull(data.preview)
-                },
-                src: storage.master.path+'/'+segment+'/preview/'+data.preview+'/'+pose.folder
+                    preview: !_.isNull(data.preview),
+                    debayer: data.preview
+                }
             };
+
+            // video frames
+            if (leaflet.poses[segment+'_'+index].state.preview && !leaflet.poses[segment+'_'+index].state.trashed && !leaflet.poses[segment+'_'+index].state.corrupted)
+                leaflet.videoframes[segment].push(index);
 
             // cluster marker
             var clustermarker = new L.marker(latlng,{icon:icon})

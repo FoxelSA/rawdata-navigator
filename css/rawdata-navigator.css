@@ -361,6 +361,14 @@ a, a:link, a:visited, a:hover, a:active {
             border:solid 1px #4f4f4f;
         }
 
+    #info .video {
+        position:absolute;
+        bottom:28px;
+        right:10px;
+        width:640px;
+        border:solid 1px #4f4f4f;
+    }
+
 #timeline {
     position:absolute;
     bottom:0;

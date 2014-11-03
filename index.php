@@ -49,6 +49,7 @@
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet.markercluster/MarkerCluster.Default.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/select2/select2.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/vis.js/vis.min.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/video.js/video-js.min.css" />
     <link rel="stylesheet" type="text/css" media="all" href="css/rawdata-navigator.css" />
     <script type="text/javascript" src="js/thirdparty/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/underscore.js/underscore-1.7.min.js"></script>
@@ -56,6 +57,7 @@
     <script type="text/javascript" src="js/thirdparty/leaflet.markercluster/leaflet.markercluster.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/select2/select2-3.5.1.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/vis.js/vis-3.5.0.min.js"></script>
+    <script type="text/javascript" src="js/thirdparty/video.js/video-js-4.10.2.min.js"></script>
     <script type="text/javascript" src="js/rawdata-navigator.js"></script>
     <script type="text/javascript">
         var opts = {
@@ -80,6 +82,11 @@
         Jump to: <input id="jump" name="jump" type="text" value="" />
     </div>
     <div class="data"></div>
+    <div class="video">
+        <video id="vid" class="video-js vjs-default-skin" width="640" height="320">
+            <p class="vjs-no-js">Please consider using a web browser that supports <a href="http://videojs.com/html5-video-support/" target="_blank">HTML5</a>.</p>
+        </video>
+    </div>
     <div class="preview"></div>
 </div>
 

@@ -68,6 +68,11 @@ Public License and/or a compatible license and other copyright notices.
     Copyright (c) 2010-2014 Almende B.V.<br />
     vis.js is licensed under the [Apache License 2.0](http://opensource.org/licenses/Apache-2.0).
 
+*   __Video.js 4.10.2__<br />
+    <[http://videojs.com/](http://videojs.com)><br />
+    Copyright (c) 2014 Brightcove, Inc<br />
+    Video.js is licensed under the [Apache License 2.0](http://opensource.org/licenses/Apache-2.0).
+
 *   __Font Awesome 4.1.0__<br />
     <[http://fontawesome.io](http://fontawesome.io)><br />
     Font Awesome by Dave Gandy<br />
