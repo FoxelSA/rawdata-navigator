@@ -129,7 +129,7 @@ a, a:link, a:visited, a:hover, a:active {
         }
 
             .marker-pnt.type-trashed span,
-            .marker-pnt.type-eof span {
+            .marker-pnt.type-corrupted span {
                 color:#000;
             }
 
@@ -149,7 +149,7 @@ a, a:link, a:visited, a:hover, a:active {
                 content:"\f00d";
             }
 
-            .marker-pnt.type-eof span:before {
+            .marker-pnt.type-corrupted span:before {
                 content:"\f071";
             }
 

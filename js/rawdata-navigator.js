@@ -933,10 +933,10 @@ $(document).ready(function() {
                     gps: data.gps,
                     guess: pose.guess,
                     status: pose.status,
-                    jp4: (pose.status=='eof' ? 'Corrupted (EOF)' : pose.status.charAt(0).toUpperCase()+pose.status.slice(1)),
+                    jp4: pose.status.charAt(0).toUpperCase()+pose.status.slice(1),
                     splitted: data.split,
                     trashed: (pose.status=='trashed'),
-                    corrupted: (pose.status=='eof'),
+                    corrupted: (pose.status=='corrupted'),
                     preview: !_.isNull(data.preview),
                     debayer: data.preview
                 }
@@ -956,7 +956,7 @@ $(document).ready(function() {
             cluster.addLayer(clustermarker);
 
             // add to trashed poses
-            if (pose.status=='trashed' || pose.status=='eof') {
+            if (pose.status=='trashed' || pose.status=='corrupted') {
                 leaflet.bulk.trashed.points.push(L.circle(latlng, 0.55, {
                     color: '#000',
                     opacity: 1,
