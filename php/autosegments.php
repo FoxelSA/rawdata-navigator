@@ -82,7 +82,7 @@ foreach ($camera_lsdir as $macaddress) {
             $segment_path = $master_path.'/'.$segment;
 
             // not processed
-            if (!file_exists($segment_path.'/csps/exports/rawdata-navigator.json'))
+            if (!file_exists($segment_path.'/info/rawdata-autoseg/segment.json'))
                 continue;
 
             // description exists

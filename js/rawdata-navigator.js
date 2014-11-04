@@ -799,7 +799,7 @@ $(document).ready(function() {
         // whole list
         $.each(storage.json.keys, function(sid,key) {
 
-            var filepath = storage.master.path+'/'+key+'/csps/exports/';
+            var filepath = storage.master.path+'/'+key+'/info/rawdata-autoseg/';
 
             // retrieve json
             $.getJSON('php/csps-json.php?json='+filepath,function(data) {

@@ -38,10 +38,10 @@
  *      Attribution" section of <http://foxel.ch/license>.
  */
 
-if (!isset($_GET['json']) || empty($_GET['json']) || !file_exists($_GET['json'].'/rawdata-navigator.json'))
+if (!isset($_GET['json']) || empty($_GET['json']) || !file_exists($_GET['json'].'/segment.json'))
     exit();
 
 // output
 header('Content-Type: application/json');
 header('Cache-Control: no-cache, must-revalidate');
-echo file_get_contents($_GET['json'].'/rawdata-navigator.json');
+echo file_get_contents($_GET['json'].'/segment.json');
