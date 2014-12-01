@@ -439,6 +439,9 @@ $(document).ready(function() {
         // close pose info
         info_close();
 
+        // reset video
+        video.player.src(null);
+
         // remove overlays
         $.each(segments_overlays(), function(i,layer) {
             layer.foxel.displayed = false;
@@ -627,6 +630,7 @@ $(document).ready(function() {
 
         // stop video
         video.player.pause();
+        video.player.src(null);
 
         // remove static marker
         if (!_.isNull(leaflet.info.layer))
