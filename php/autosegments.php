@@ -73,7 +73,7 @@ foreach ($camera_lsdir as $macaddress) {
         if (!is_dir($master_path) || substr($master,0,1)=='.')
             continue;
 
-        $csps[$macaddress][$master] = (object)array('name'=>null,'segments'=>array());
+        $csps[$macaddress][$master] = (object)array('name'=>NULL,'segments'=>array());
         $master_lsdir = scandir($master_path);
 
         // loop over segments
@@ -89,7 +89,7 @@ foreach ($camera_lsdir as $macaddress) {
             if (file_exists($sync_path.'/info/description.info'))
                 $csps[$macaddress][$master]->name = file_get_contents($sync_path.'/info/description.info');
 
-            $csps[$macaddress][$master]->segments[$segment] = (object)array(); // options
+            $csps[$macaddress][$master]->segments[] = $segment;
 
         }
 

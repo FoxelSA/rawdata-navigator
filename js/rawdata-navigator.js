@@ -114,10 +114,7 @@ $(document).ready(function() {
             segments: null
         },
         segmentation: [],
-        json: {
-            keys: [],
-            remaining: 0
-        }
+        json_remaining: 0
     };
 
     /**
@@ -790,8 +787,7 @@ $(document).ready(function() {
         storage.master.segments = _.findWhere(storage.segmentation,{master:storage.master.timestamp}).segments;
 
         // init json
-        storage.json.keys = _.keys(storage.master.segments);
-        storage.json.remaining = storage.json.keys.length;
+        storage.json_remaining = storage.master.segments.length;
 
         // clear timeline
         timeline.items = [];
@@ -801,7 +797,7 @@ $(document).ready(function() {
         leaflet_clear();
 
         // whole list
-        $.each(storage.json.keys, function(sid,key) {
+        $.each(storage.master.segments, function(sid,key) {
 
             var filepath = storage.master.path+'/'+key+'/info/rawdata-autoseg/';
 
@@ -1010,10 +1006,10 @@ $(document).ready(function() {
         leaflet.overlays.push(segmentlayer);
 
         // mark as done
-        storage.json.remaining--;
+        storage.json_remaining--;
 
         // last parsing
-        if (storage.json.remaining == 0)
+        if (storage.json_remaining == 0)
             segments_parsed();
 
     };
