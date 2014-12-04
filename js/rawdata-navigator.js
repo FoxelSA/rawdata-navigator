@@ -152,7 +152,7 @@ $(document).ready(function() {
 
         // event: window resize
         $(window).on('resize',function() {
-            overlay_resize();overlay_resize();
+            overlay_resize();
         });
 
     };
@@ -162,14 +162,17 @@ $(document).ready(function() {
      */
     var overlay_resize = function() {
 
+        $('body').css('overflow','hidden');
+
         var w = $(window).width();
         var h = $(window).height();
 
         $('#overlay').width(w);
         $('#overlay').children().width(w);
         $('#overlay').height(h);
-
         $('#overlay').children().css('top',Math.round(h/2-$('#overlay').children().outerHeight(true)/2));
+
+        $('body').css('overflow','visible');
 
     };
 
