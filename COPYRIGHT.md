@@ -73,7 +73,7 @@ Public License and/or a compatible license and other copyright notices.
     Copyright (c) 2014 Brightcove, Inc<br />
     Video.js is licensed under the [Apache License 2.0](http://opensource.org/licenses/Apache-2.0).
 
-*   __Font Awesome 4.1.0__<br />
+*   __Font Awesome 4.2.0__<br />
     <[http://fontawesome.io](http://fontawesome.io)><br />
-    Font Awesome by Dave Gandy<br />
+    Font Awesome by Dave Gandy - http://fontawesome.io<br />
     Font Awesome is licensed under the [SIL OFL 1.1 license](http://scripts.sil.org/OFL).
