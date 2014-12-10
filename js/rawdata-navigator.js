@@ -36,1194 +36,1396 @@
  *      Attribution" section of <http://foxel.ch/license>.
  */
 
-$(document).ready(function() {
-    "use strict";
+"use strict";
 
-    // timeline
-    var timeline = {
-        vis: null,
-        items: []
+/**
+ * RawDataNavigator class
+ * Constructor of RawDataNavigator.
+ */
+var RawDataNavigator = new function() {
+
+    /**
+     * init()
+     */
+    this.init = function(args) {
+
+        if (!_.isObject(args))
+            args = {};
+
+        prototyping.init();
+        storage.init(args);
+
+        // dom
+        overlay.init();
+        map.init();
+        timeline.init();
+        information.init();
+
+        // allocation
+        allocation.init();
+
     };
 
-    // leaflet
-    var leaflet = {
-        map: null,
-        control: {
-            scale: null,
-            layers: null
+    /**
+     * info()
+     */
+    this.info = function(segment,index) {
+        information.show(segment,index);
+    };
+
+    /**
+     * storage object
+     */
+    var storage = {
+
+        mountpoint: '/data',
+        hostpoint: '/data',
+
+        /**
+         * storage.init()
+         */
+        init: function(args) {
+
+            // mount-point
+            if (_.has(args,'mountpoint'))
+                this.mountpoint = args.mountpoint;
+
+            // host-point
+            if (_.has(args,'hostpoint'))
+                this.hostpoint = args.hostpoint;
+
+        }
+
+    };
+
+    /**
+     * overlay object
+     */
+    var overlay = {
+
+        _dom: '#overlay',
+
+        /**
+         * overlay.init()
+         */
+        init: function() {
+            this.events();
+            this.resize();
         },
+
+        /**
+         * overlay.events()
+         */
+        events: function() {
+            $(window).on('resize',function() {
+                overlay.resize();
+            });
+        },
+
+        /**
+         * overlay.show()
+         */
+        show: function(msg) {
+            $(this._dom).css('display','block');
+            $(this._dom+' .txt').html(msg);
+        },
+
+        /**
+         * overlay.hide()
+         */
+        hide: function() {
+            $(this._dom).css('display','none');
+        },
+
+        /**
+         * overlay.resize()
+         */
+        resize: function() {
+            $('body').css('overflow','hidden');
+            $(this._dom).width($(window).width());
+            $(this._dom).children().width($(window).width());
+            $(this._dom).height($(window).height());
+            $(this._dom).children().css(
+                'top',Math.round($(window).height()/2-$(this._dom).children().outerHeight(true)/2));
+            $('body').css('overflow','visible');
+        }
+
+    };
+
+    /**
+     * timeline object
+     */
+    var timeline = {
+
+        _items: [],
+        _component: null,
+        _dom: '#timeline',
+
+        /**
+         * timeline.init()
+         */
+        init: function() {
+
+            // vis.js
+            this._component = new vis.Timeline($(this._dom).get(0),[],{
+                height: $(this._dom).outerHeight(true),
+                stack: false,
+                selectable: true
+            });
+
+            // events
+            this.events();
+
+        },
+
+        /**
+         * timeline.events()
+         */
+        events: function() {
+            this._component.on('select',function(e) {
+                timeline.select(e.items);
+            });
+        },
+
+        /**
+         * timeline.add()
+         */
+        add: function(segment,info,poses) {
+            this._items.push({
+                id: segment,
+                content: segment+' ('+poses.length+' poses'+(info.gps?'':', no GPS fix')+')',
+                start: parseInt(_.first(poses).sec,10)*1000+parseInt(_.first(poses).usc,10)/1000,
+                end: parseInt(_.last(poses).sec,10)*1000+parseInt(_.last(poses).usc,10)/1000,
+                className: 'timeline'+info.color.replace('#','-')
+            });
+        },
+
+        /**
+         * timeline.update()
+         */
+        update: function() {
+            this._component.setItems(this._items);
+            this._component.fit();
+        },
+
+        /**
+         * timeline.select()
+         */
+        select: function(items) {
+
+            if (!_.isArray(items))
+                items = [items];
+
+            // highlight
+            this._component.setSelection(items);
+
+            // information
+            information.close();
+
+            // remove overlays
+            map.segments.clear();
+
+            // show segments
+            _.isEmpty(items) ? map.segments.show() : map.segments.selection(items);
+
+        },
+
+        /**
+         * timeline.clear()
+         */
+        clear: function() {
+            this._items = [];
+            this._component.clear({items:true});
+        }
+
+    };
+
+    /**
+     * allocation object
+     */
+    var allocation = {
+
+        _component: null,
+        _dom: '#allocation',
+        _tree: [],
+
+        /**
+         * allocation.init()
+         */
+        init: function() {
+
+            // component
+            this._component = $(this._dom+' select');
+
+            // size
+            this._component.width($(this._dom).width());
+
+            // placeholder
+            this._component.append($('<option>'));
+
+            // select2
+            this._component.select2({
+                placeholder: 'Select a dataset...',
+                formatResult: this.formatters.item,
+                formatSelection: this.formatters.selection,
+                sortResults: this.formatters.sorting
+            });
+
+            // events
+            this.events();
+
+            // load
+            this.json.load();
+
+        },
+
+        /**
+         * allocation.events()
+         */
+        events: function() {
+            this._component.on('change',function() {
+                allocation.select();
+            });
+        },
+
+        /**
+         * allocation.add()
+         */
+        add: function(mac,master,obj) {
+
+            // tree mac
+            if (!_.isArray(this._tree[mac]))
+                this._tree[mac] = [];
+
+            // tree master
+            if (!_.isArray(this._tree[mac][master]))
+                this._tree[mac][master] = [];
+
+            // tree segments
+            this._tree[mac][master] = obj.segments;
+
+            // selector
+            this._component.append(
+                $('<option>',{'value':mac+'/'+master})
+                    .text(JSON.stringify({master:master,mac:mac,name:obj.name})));
+
+        },
+
+        /**
+         * allocation.select()
+         */
+        select: function() {
+            this.clear();
+            this.set();
+            segmentation.json.load();
+        },
+
+        /**
+         * allocation.set()
+         */
+        set: function() {
+            var val = this._component.val().split('/');
+            this.current.mac = val[0];
+            this.current.master = val[1];
+            this.current.path = storage.mountpoint+'/camera/'+this.current.mac+'/raw/segment/'+this.current.master;
+            this.current.host = storage.hostpoint+'/camera/'+this.current.mac+'/raw/segment/'+this.current.master;
+        },
+
+        /**
+         * allocation.show()
+         */
+        show: function() {
+            $(this._dom).show();
+        },
+
+        /**
+         * allocation.clear()
+         */
+        clear: function() {
+            information.close();
+            timeline.clear();
+            map.clear();
+            segmentation.clear();
+        },
+
+        /**
+         * allocation.current{}
+         */
+        current: {
+
+            mac: null,
+            master: null,
+            path: null,
+            host: null,
+
+            /**
+             * allocation.current.segments()
+             */
+            segments: function() {
+                return allocation._tree[this.mac][this.master];
+            }
+
+        },
+
+        /**
+         * allocation.json{}
+         */
+        json: {
+
+            /**
+             * allocation.json.load()
+             */
+            load: function() {
+                overlay.show('Loading master allocations from<br />'+storage.mountpoint+'/');
+                $.getJSON('php/autosegments.php?storage='+storage.mountpoint,allocation.json.success).fail(allocation.json.fail);
+            },
+
+            /**
+             * allocation.json.success()
+             */
+            success: function(data) {
+
+                // parse json
+                $.each(data, function(mac,masters) {
+                    $.each(masters, function(master,obj) {
+                        allocation.add(mac,master,obj);
+                    });
+                });
+
+                // gui
+                overlay.hide();
+                allocation.show();
+
+            },
+
+            /**
+             * allocation.json.fail()
+             */
+            fail: function() {
+                overlay.show('Failed to load master allocations from<br />'+storage.mountpoint+'/');
+            }
+
+        },
+
+        /**
+         * allocation.formatters{}
+         */
+        formatters: {
+
+            /**
+             * allocation.formatters.item()
+             */
+            item: function(item) {
+
+                // optgroup
+                if (!item.id)
+                    return this.formatters.group(item);
+
+                // properties
+                var obj = JSON.parse(item.text);
+                var date = new Date(parseInt(obj.master,10)*1000); // milliseconds
+                var name = !_.isNull(obj.name) ? '<div class="name">'+obj.name+'</div>' : '';
+
+                return '<div class="allocation"><span></span>'+obj.master
+                            + '<div class="info">'+name
+                            + '<div class="camera">Camera: '+obj.mac+'</div>'
+                            + '<div class="date">UTC: '+date.getSimpleUTCDate()
+                                + ' &nbsp; Local: '+date.getSimpleLocalDate()+'</div></div></div>';
+
+            },
+
+            /**
+             * allocation.formatters.group()
+             */
+            group: function(item) {
+                return item.text;
+            },
+
+            /**
+             * allocation.formatters.selection()
+             */
+            selection: function(item) {
+                var obj = JSON.parse(item.text);
+                var name = !_.isNull(obj.name) ? ' - '+obj.name : '';
+                return item.id.replace('/',' :: <strong>')+name+'</strong>';
+            },
+
+            /**
+             * allocation.formatters.sorting()
+             */
+            sorting: function(results,container,query) {
+                return _.sortBy(results,function(item) {
+                    return JSON.parse(item.text).master;
+                }).reverse();
+            }
+
+        }
+
+    };
+
+    /**
+     * segmentation object
+     */
+    var segmentation = {
+
+        _items: {},
+        _colors: ['#f00','#0c0','#00f'],
+
+        /**
+         * segmentation.items()
+         */
+        items: function() {
+            return this._items;
+        },
+
+        /**
+         * segmentation.geolocated()
+         */
+        geolocated: function() {
+            return _.filter(this.items(), function(item) {
+                return item.info.gps;
+            });
+        },
+
+        /**
+         * segmentation.linear()
+         */
+        linear: function() {
+            return _.filter(this.items(), function(item) {
+                return !item.info.gps;
+            });
+        },
+
+        /**
+         * segmentation.add()
+         */
+        add: function(segment,obj) {
+            _.extend(this._items,_.object([segment],[obj]));
+        },
+
+        /**
+         * segmentation.item()
+         */
+        item: function(segment) {
+            return this._items[segment];
+        },
+
+        /**
+         * segmentation.info()
+         */
+        info: function(segment) {
+            return this.item(segment).info;
+        },
+
+        /**
+         * segmentation.layer()
+         */
+        layer: function(segment) {
+            return this.item(segment).layer;
+        },
+
+        /**
+         * segmentation.poses()
+         */
+        poses: function(segment) {
+            return this.item(segment).poses;
+        },
+
+        /**
+         * segmentation.pose()
+         */
+        pose: function(segment,index) {
+            return this.poses(segment)[index];
+        },
+
+        /**
+         * segmentation.vframes()
+         */
+        vframes: function(segment) {
+            return this.item(segment).vframes;
+        },
+
+        /**
+         * segmentation.vframe()
+         */
+        vframe: function(segment,index) {
+            return this.vframes(segment)[index];
+        },
+
+        /**
+         * segmentation.vframeindex()
+         */
+        vframeindex: function(segment,index) {
+            return _.indexOf(this.vframes(segment),parseInt(index,10));
+        },
+
+        /**
+         * segmentation.clear()
+         */
+        clear: function() {
+            this._items = {};
+        },
+
+        /**
+         * segmentation.json{}
+         */
+        json: {
+
+            _remaining: 0,
+
+            /**
+             * segmentation.json.load()
+             */
+            load: function() {
+                overlay.show('Loading segments from<br />'+allocation.current.path+'/');
+                this._remaining = allocation.current.segments().length;
+                $.each(allocation.current.segments(), function(index,segment) {
+                    $.getJSON('php/csps-json.php?json='+allocation.current.path+'/'+segment+'/info/rawdata-autoseg/',function(data) {
+                        segmentation.json.success(index,segment,data);
+                    }).fail(segmentation.json.fail);
+                });
+            },
+
+            /**
+             * segmentation.json.success()
+             */
+            success: function(index,segment,data) {
+                _.extend(data,{segment:segment});
+                this.parse(index,segment,data);
+            },
+
+            /**
+             * segmentation.json.fail()
+             */
+            fail: function() {
+                overlay.show('Failed to load segments from<br />'+allocation.current.path+'/');
+            },
+
+            /**
+             * segmentation.json.parse()
+             */
+            parse: function(call,segment,data) {
+
+                var poses = [];
+                var vframes = [];
+
+                var info = {
+                    gps: data.gps,
+                    split: data.split,
+                    preview: !_.isNull(data.preview),
+                    debayer: data.preview,
+                    color: segmentation._colors[call % segmentation._colors.length]
+                };
+
+                var track = [];
+                var layer = map.helpers.layer(segment);
+                var cluster = map.helpers.cluster.group(info);
+
+                // gui
+                overlay.show('Building layers, please wait...');
+
+                // poses
+                $.each(data.pose, function(index,pose) {
+
+                    // geopoint
+                    var latlng = map.helpers.latlng(pose,info,call,index);
+
+                    // add on track
+                    track.push(latlng);
+
+                    // add on vframes
+                    if (info.preview && pose.status=='validated')
+                        vframes.push(index);
+
+                    // add on cluster
+                    cluster.addLayer(map.helpers.cluster.marker(segment,pose,latlng,info,index));
+
+                    // add on poses
+                    poses[index] = {
+                        sec: pose.sec,
+                        usc: String(pose.usc).zeropad(6),
+                        latlng: latlng,
+                        alt: pose.alt,
+                        guess: pose.guess,
+                        status: pose.status
+                    };
+
+                });
+
+                // add on layer
+                layer.addLayer(map.helpers.polyline(segment,info,track));
+                layer.addLayer(cluster);
+
+                // add on timeline
+                timeline.add(segment,info,data.pose);
+
+                // segmentation
+                segmentation.add(segment,{info:info,layer:layer,poses:poses,vframes:vframes});
+                this._remaining--;
+
+                // last parsing
+                if (this._remaining == 0)
+                    this.done();
+
+            },
+
+            /**
+             * segmentation.json.done()
+             */
+            done: function() {
+                timeline.update();
+                map.segments.show();
+                overlay.hide();
+            }
+
+        }
+
+    };
+
+    /**
+     * map object
+     */
+    var map = {
+
+        _component: null,
+        _dom: '#map',
+
+        /**
+         * map.init()
+         */
+        init: function() {
+
+            this.events();
+            this.resize();
+
+            // leaflet
+            this._component = L.map('map', {
+                keyboard: true,
+                scrollWheelZoom: true,
+                boxZoom: false,
+                zoom: this.zoom.default,
+                minZoom: this.zoom.min,
+                maxZoom: this.zoom.max,
+                center: [46.205007,6.145134]
+            });
+
+            // scale
+            L.control.scale().addTo(this._component);
+
+            // tiles
+            this.tiles.init();
+
+        },
+
+        /**
+         * map.events()
+         */
+        events: function() {
+            $(window).on('resize',function() {
+                map.resize();
+            });
+        },
+
+        /**
+         * map.resize()
+         */
+        resize: function() {
+            $(this._dom).width($(window).width());
+            $(this._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
+        },
+
+        /**
+         * map.clear()
+         */
+        clear: function() {
+            this.segments.clear();
+            this.tiles.reset();
+        },
+
+        /**
+         * map.zoom{}
+         */
         zoom: {
-            base: 4,
+
+            default: 4,
             min: 3,
             max: 25,
             native: 18,
-            bounds: 17
-        },
-        bounds: null,
-        info: {
-            layer: null,
-            current: null
-        },
-        poses: [],
-        videoframes: [],
-        overlays: [],
-        colors: {
-            segments: ['#f00','#0c0','#00f']
-        },
-        timebased: {
-            only: false,
-            index: 0,
-            shift: {
-                lat: -0.005
-            }
-        },
-        tilelayers: {
-            grey: [],
-            providers: [],
-            timebased: null
-        },
-        bulk: {
-            trashed: {
-                points: [],
-                layer: null
+            bounds: 17,
+
+            /**
+             * map.zoom.fit()
+             */
+            fit: function() {
+
+                var bounds = null;
+                $.each(map.segments.displayed(), function(index,layer) {
+                    _.isNull(bounds) ?
+                        bounds = layer.getBounds() : bounds.extend(layer.getBounds());
+                });
+
+                // empty
+                if (_.isNull(bounds))
+                    return;
+
+                // fit
+                map._component.fitBounds(bounds);
+
+                // zoom
+                this.bounding();
+
+                // center
+                map._component.panTo(bounds.getCenter());
+
             },
-            validated: {
-                points: [],
-                layer: null
+
+            /**
+             * map.zoom.bounding()
+             */
+            bounding: function() {
+                var zoom = map._component.getZoom() > this.bounds ?
+                    this.bounds : map._component.getZoom()-1;
+                map._component.setZoom(zoom);
             }
-        }
-    };
 
-    // video
-    var video = {
-        ready: false,
-        played: false,
-        fps: 25,
-        time: 0.0,
-        player: null,
-        segment: null
-    };
-
-    // storage
-    var storage = {
-        root: '/data',
-        mac: null,
-        master: {
-            timestamp: null,
-            path: null,
-            segments: null
         },
-        segmentation: [],
-        json_remaining: 0
-    };
 
-    /**
-     * rawdata_navigator_init()
-     */
-    var rawdata_navigator_init = function() {
-
-        // overlay
-        overlay_init();
-
-        // map
-        leaflet_init();
-
-        // timeline
-        timeline_init();
-
-        // info
-        info_init();
-
-        // video
-        video_init();
-
-        // raw data
-        rawdata_init();
-
-    };
-
-    /**
-     * overlay_init()
-     */
-    var overlay_init = function() {
-
-        // dom
-        overlay_resize();
-
-        // event: window resize
-        $(window).on('resize',function() {
-            overlay_resize();
-        });
-
-    };
-
-    /**
-     * overlay_resize()
-     */
-    var overlay_resize = function() {
-
-        $('body').css('overflow','hidden');
-
-        var w = $(window).width();
-        var h = $(window).height();
-
-        $('#overlay').width(w);
-        $('#overlay').children().width(w);
-        $('#overlay').height(h);
-        $('#overlay').children().css('top',Math.round(h/2-$('#overlay').children().outerHeight(true)/2));
-
-        $('body').css('overflow','visible');
-
-    };
-
-    /**
-     * overlay_show()
-     */
-    var overlay_show = function() {
-        $('#overlay').css('display','block');
-    };
-
-    /**
-     * overlay_message()
-     */
-    var overlay_message = function(msg) {
-        $('#overlay .txt').html(msg);
-    };
-
-    /**
-     * overlay_hide()
-     */
-    var overlay_hide = function() {
-        $('#overlay').css('display','none');
-    };
-
-    /**
-     * leaflet_init()
-     */
-    var leaflet_init = function() {
-
-        // dom
-        leaflet_resize();
-
-        // tile layers
-        var basemaps = leaflet_tilelayers();
-
-        // instanciate leaflet
-        leaflet.map = L.map('map', {
-            keyboard: true,
-            scrollWheelZoom: true,
-            zoom: leaflet.zoom.base,
-            minZoom: leaflet.zoom.min,
-            maxZoom: leaflet.zoom.max,
-            center: [46.205007,6.145134],
-            layers: [_.first(_.values(basemaps))]
-        });
-
-        // layers
-        leaflet.control.layers = L.control.layers(basemaps,{});
-        leaflet.control.layers.addTo(leaflet.map);
-
-        // scaling rule
-        leaflet.control.scale = L.control.scale();
-        leaflet.control.scale.addTo(leaflet.map);
-
-        // event: window resize
-        $(window).on('resize',function() {
-            leaflet_resize();
-        });
-
-        /*
-        // event: leaflet map zoom end
-        leaflet.map.on('zoomend',function() {
-            console.log('[zoom: '+leaflet.map.getZoom()+']');
-        });
-        */
-
-    };
-
-    /**
-     * leaflet_resize()
-     */
-    var leaflet_resize = function() {
-        $('#map').width($(window).width());
-        $('#map').height($(window).height()-$('#timeline').outerHeight(true));
-    };
-
-    /**
-     * leaflet_tilelayers()
-     */
-    var leaflet_tilelayers = function() {
-
-        // tile providers
-        var providers = [{
-            name:           'OpenStreetMap Mapnik',
-            url:            'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            attribution:    '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-                            '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>'
-        }, {
-            name:           'OpenStreetMap Black and White',
-            url:            'http://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png',
-            attribution:    '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-                            '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>'
-        }, {
-            name:           'Esri World Imagery',
-            url:            'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-            attribution:    'Tiles &copy; Esri, ' +
-                            'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-        }];
-
-        // base maps
-        var basemaps = {};
-
-        // parse providers
-        $.each(providers, function(index,provider) {
-
-            // tilelayer
-            var tilelayer = _.object([provider.name],[L.tileLayer(provider.url, {
-                attribution: provider.attribution+' &nbsp;::&nbsp; Photogrammetric data &copy; <a href="http://foxel.ch/" target="_blank">FOXEL SA</a>',
-                minZoom: leaflet.zoom.min,
-                maxZoom: leaflet.zoom.max,
-                maxNativeZoom: leaflet.zoom.native
-            })]);
-
-            // add to basemaps
-            _.extend(basemaps,tilelayer);
-
-            // keep pointer to tilelayer
-            leaflet.tilelayers.providers.push(tilelayer);
-
-        });
-
-        // grey tilelayer
-        var greytile = _.object(['Timebased Mode'],[L.tileLayer('img/tile.png',{})]);
-
-        // keep pointer to tilelayer
-        leaflet.tilelayers.grey.push(greytile);
-
-        return basemaps;
-
-    };
-
-    /**
-     * leaflet_cluster_icon()
-     */
-    var leaflet_cluster_icon = function(cluster,color) {
-
-        var count = cluster.getChildCount();
-
-        var css = ' marker-cluster-';
-        if (count < 50)
-            css += 'small';
-        else if (count < 100)
-            css += 'medium';
-        else
-            css += 'large';
-        css += ' '+color.replace('#','seg-');
-
-        return new L.divIcon({
-            html: '<div><span>'+count+'</span></div>',
-            className: 'marker-cluster'+css,
-            iconSize: new L.point(40,40)
-        });
-
-    };
-
-    /**
-     * leaflet_marker_icon()
-     */
-    var leaflet_marker_icon = function(pose,color) {
-
-        var type = pose.status;
-        var css = 'marker-pnt '+color.replace('#','seg-')+' type-'+type;
-
-        return new L.divIcon({
-            html: '<div><span></span></div>',
-            className: css,
-            iconSize: new L.point(30,30)
-        });
-
-    };
-
-    /**
-     * leaflet_fitbounds()
-     */
-    var leaflet_fitbounds = function() {
-
-        leaflet.bounds = null;
-
-        // extract bounds of displayed segments
-        $.each(segments_displayed(), function(index,layer) {
-            if (_.isNull(leaflet.bounds))
-                leaflet.bounds = layer.getBounds();
-            else
-                leaflet.bounds.extend(layer.getBounds());
-        });
-
-        // nothing displayed, nothing to do
-        if (_.isNull(leaflet.bounds))
-            return;
-
-        // fit
-        leaflet.map.fitBounds(leaflet.bounds);
-
-        // unzoom if too close
-        if (leaflet.map.getZoom() > leaflet.zoom.bounds)
-            leaflet.map.setZoom(leaflet.zoom.bounds);
-        else
-            leaflet.map.setZoom(leaflet.map.getZoom()-1); // force redraw on some browsers
-
-        // center map
-        leaflet.map.panTo(leaflet.bounds.getCenter());
-
-    };
-
-    /**
-     * leaflet_clear()
-     */
-    var leaflet_clear = function() {
-
-        // trashed poses
-        if (!_.isNull(leaflet.bulk.trashed.layer)) {
-            leaflet.map.removeLayer(leaflet.bulk.trashed.layer);
-            leaflet.control.layers.removeLayer(leaflet.bulk.trashed.layer);
-        }
-
-        // validated poses
-        if (!_.isNull(leaflet.bulk.validated.layer)) {
-            leaflet.map.removeLayer(leaflet.bulk.validated.layer);
-            leaflet.control.layers.removeLayer(leaflet.bulk.validated.layer);
-        }
-
-        // overlays
-        $.each(leaflet.overlays, function(index,layer) {
-            leaflet.map.removeLayer(layer);
-        });
-
-        // pointers
-        leaflet.poses = [];
-        leaflet.videoframes = [];
-        leaflet.overlays = [];
-        leaflet.tilelayers.timebased = null;
-
-        leaflet.bulk.trashed.points = [];
-        leaflet.bulk.trashed.layer = null;
-        leaflet.bulk.validated.points = [];
-        leaflet.bulk.validated.layer = null;
-
-    };
-
-    /**
-     * timeline_init()
-     */
-    var timeline_init = function() {
-
-        // instanciate vis.js
-        timeline.vis = new vis.Timeline($('#timeline').get(0),[],{
-            height: $('#timeline').outerHeight(true),
-            stack: false,
-            selectable: true
-        });
-
-        // event: vis.js timeline select
-        timeline.vis.on('select',function(e) {
-            timeline_select(e.items);
-        });
-
-    };
-
-    /**
-     * timeline_select()
-     */
-    var timeline_select = function(items) {
-
-        // close pose info
-        info_close();
-
-        // reset video
-        video.player.src(null);
-
-        // remove overlays
-        $.each(segments_overlays(), function(i,layer) {
-            layer.foxel.displayed = false;
-            leaflet.map.removeLayer(layer);
-        });
-
-        // no selection, show all
-        if (items.length == 0)
-            segments_showall();
-
-        // selection (single or multiple) made, show filtered
-        else
-            segments_showselection(items);
-
-    };
-
-    /**
-     * info_init()
-     */
-    var info_init = function() {
-
-        // event: mouse click (info close)
-        $('#info .close a').on('click',function(e) {
-
-            e.preventDefault();
-            e.stopPropagation();
-
-            // close pose info
-            info_close();
-
-        });
-
-        // event: keyboard click (info close)
-        $('#jump').on('keyup',function(e) {
-
-            e.preventDefault();
-            if (e.keyCode != 13) // enter
-                return;
-
-            // requested
-            var req = parseInt($('#jump').val(),10);
-
-            // clear
-            $('#jump').val('');
-
-            // invalid
-            if (_.isNaN(req))
-                return;
-
-            // not in range
-            if (req < 1 || req > leaflet.info.current.pose.length)
-                return;
-
-            // display
-            info_display(leaflet.info.current.pose.segment,req-1);
-
-        });
-
-    };
-
-    /**
-     * info_display()
-     */
-    var info_display = function(segment,index) {
-
-        // retrieve pose info
-        var info = leaflet.poses[segment+'_'+index];
-
-        // switch video source
-        if (video.segment != segment) {
-            video.ready = false;
-            video.played = false;
-            video.segment = segment;
-            if (info.state.preview)
-                video.player.src({type:'video/webm',src:storage.master.localhost+'/'+segment+'/preview/'+info.state.debayer+'/segment.webm'});
-            else
-                video.player.src(null);
-        }
-
-        // video frame
-        var videoframe = _.indexOf(leaflet.videoframes[segment],parseInt(index,10));
-
-        // video time
-        video.time = 0.0;
-        if (videoframe > -1)
-            video.time = (videoframe/video.fps).toPrecision(6);
-
-        // video set current time
-        if (videoframe > -1 && video.ready)
-            video.player.currentTime(video.time);
-
-        // marker and map
-        info_marker(segment,index);
-
-        return false;
-
-    };
-    window.info_display = info_display; // global scope
-
-    /**
-     * info_marker()
-     */
-    var info_marker = function(segment,index) {
-
-        // retrieve pose info
-        var info = leaflet.poses[segment+'_'+index];
-
-        // center map
-        leaflet.map.panTo(L.latLng(info.geo.lat,info.geo.lng));
-
-        // remove static marker
-        if (!_.isNull(leaflet.info.layer))
-            leaflet.map.removeLayer(leaflet.info.layer);
-
-        // static marker
-        leaflet.info.layer = L.marker(L.latLng(info.geo.lat,info.geo.lng),{icon:L.icon({
-            iconUrl: 'img/pose-icon.png',
-            iconRetinaUrl: 'img/pose-icon-2x.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 39]
-        })});
-
-        // add static marker
-        leaflet.info.current = info;
-        leaflet.map.addLayer(leaflet.info.layer);
-
-        // show
-        $('#info').slideDown('fast',function() {
-
-            var data = '<div class="timestamp">'+info.time.sec+' '+info.time.usc+'</div>';
-
-            // milliseconds
-            var ms = new Date(parseInt(info.time.sec,10)*1000);
-
-            // geo
-            if (info.state.gps) {
-                data += '<div class="section">Geo</div>'
-                      + '<table>'
-                      + '<tr><td class="attr">Latitude</td><td>'+info.geo.lat+'</td></tr>'
-                      + '<tr><td class="attr">Longitude</td><td>'+info.geo.lng+'</td></tr>'
-                      + '<tr><td class="attr">Altitude</td><td>'+info.geo.alt+'</td></tr>'
-                      + '</table>';
-            }
-
-            // status
-            data += '<div class="section">Status</div>'
-                  + '<table>'
-                  + '<tr><td class="attr">GPS</td><td>'+(info.state.guess?'Guessed':'Received')+'</td></tr>'
-                  + '<tr><td class="attr">JP4</td><td>'+info.state.jp4+'</td></tr>'
-                  + '<tr><td class="attr">Segment</td><td>'+(info.state.splitted?'Splitted':'Not splitted yet')+'</td></tr>'
-                  + '</table>';
-
-            // date
-            data += '<div class="section">Date</div>'
-                  + '<table>'
-                  + '<tr><td class="attr">UTC</td><td>'+ms.simple_utc()+'</td></tr>'
-                  + '<tr><td class="attr">Local</td><td>'+ms.simple_local()+'</td></tr>'
-                  + '</table>';
-
-            // preview
-            var src = '';
-            if (!info.state.preview || info.state.trashed || info.state.corrupted)
-                src = '<img src="img/def.png" alt="" width="640" height="320" />';
-
-            // nav
-            var nav = '';
-            if (info.pose.index > 0)
-                nav += '<a href="#" onclick="return info_display(\''+info.pose.segment+'\',\''+(info.pose.index-1)+'\');"><span class="prev"></span>Prev</a>';
-            if (info.pose.pos < info.pose.length)
-                nav += '<a href="#" onclick="return info_display(\''+info.pose.segment+'\',\''+(info.pose.index+1)+'\');">Next<span class="next"></span></a>';
-
-            // set content
-            $('#info .data').html(data);
-            $('#info .preview').html(src);
-            $('#info .nav > div').html(nav);
-            $('#info .pose').html('Segment '+info.pose.segment+' &nbsp; &nbsp; &nbsp; Pose '+info.pose.pos+' of '+info.pose.length);
-
-        });
-
-    };
-
-    /**
-     * info_close()
-     */
-    var info_close = function() {
-
-        // stop video
-        video.player.pause();
-        video.player.src(null);
-
-        // remove static marker
-        if (!_.isNull(leaflet.info.layer))
-            leaflet.map.removeLayer(leaflet.info.layer);
-
-        // clear
-        leaflet.info.layer = null;
-        leaflet.info.current = null;
-
-        // wait some time for the player to stop
-        setTimeout(function() {
-
-            // hide
-            $('#info').slideUp('fast');
-
-        },250);
-
-    };
-
-    /**
-     * video_init()
-     */
-    var video_init = function() {
-
-        // instanciate video.js
-        video.player = videojs('vid', {
-            "controls": true,
-            "preload": "auto",
-            "loop": true,
-            "autoplay": false,
-            "techOrder": ["html5"],
-            "children": {
-                "bigPlayButton": false,
-                "controlBar": {
-                    "currentTimeDisplay": false,
-                    "timeDivider": false,
-                    "durationDisplay": false,
-                    "children": {
-                        "volumeControl": false,
-                        "muteToggle": false
-                    }
-                }
-            }
-        })
-            .on('canplay',function() {
-                video.ready = true;
-                if (!video.played)
-                    video.player.currentTime(video.time);
-                video.played = true;
-        })
-            .on('timeupdate',function() {
-                var frame = parseInt((video.player.currentTime()*video.fps).toPrecision(6),10);
-                var pose = leaflet.videoframes[video.segment][frame];
-                info_marker(video.segment,pose);
-        })
-            .on('play',function() {
-                if (leaflet.map.getZoom() > leaflet.zoom.bounds)
-                    leaflet.map.setZoom(leaflet.zoom.bounds);
-        });
-
-    };
-
-    /**
-     * rawdata_init()
-     */
-    var rawdata_init = function() {
-
-        // storage override
-        if (!_.isNull(opts.root))
-            storage.root = opts.root;
-
-        // message
-        overlay_message('Loading from<br />'+storage.root+'/camera/[mac-address]/raw/segment/...');
-
-        // retrieve auto segments
-        $.getJSON('php/autosegments.php?storage='+storage.root,function(data) {
-
-            // master selector
-            var select = $('#master select');
-            select.append($('<option>'));
-
-            // parse data
-            $.each(data, function(mac,masters) {
-
-                // group per mac
-                var optgroup = $('<optgroup>',{'label':mac});
-                $.each(masters, function(master,obj) {
-
-                    var id = mac+'/'+master;
-
-                    // option
-                    optgroup.append($('<option>',{'value':id}).text(JSON.stringify({master:master,name:obj.name})));
-
-                    // keep segments
-                    storage.segmentation.push({
-                        master: master,
-                        segments: obj.segments
-                    });
+        /**
+         * map.tiles{}
+         */
+        tiles: {
+
+            _maps: [],
+            _static: null,
+            _linear: null,
+
+            control: null,
+
+            /**
+             * map.tiles.init()
+             */
+            init: function() {
+
+                this.control = L.control.layers({},{}).addTo(map._component);
+
+                this.maps();
+                this.static();
+
+            },
+
+            /**
+             * map.tiles.maps()
+             */
+            maps: function() {
+
+                if (!_.isEmpty(this._maps))
+                    return this._maps;
+
+                // sources
+                var sources = [{
+                    description: 'OpenStreetMap Mapnik',
+                    url: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
+                                    + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>'
+                }, {
+                    description: 'OpenStreetMap Black and White',
+                    url: 'http://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png',
+                    attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
+                                    + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>'
+                }, {
+                    description: 'Esri World Imagery',
+                    url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                    attribution: 'Tiles &copy; Esri, '
+                                    + 'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                }];
+
+                // layers
+                $.each(sources, function(index,source) {
+
+                    var layer = _.extend(
+                        L.tileLayer(source.url, {
+                            attribution: source.attribution
+                                + ' &nbsp;::&nbsp; Photogrammetric data &copy; <a href="http://foxel.ch/" target="_blank">FOXEL SA</a>',
+                            minZoom: map.zoom.min,
+                            maxZoom: map.zoom.max,
+                            maxNativeZoom: map.zoom.native
+                        }),{
+                            description:source.description
+                        });
+
+                    // reference
+                    map.tiles._maps.push(layer);
+
+                    // add to map
+                    if (index == 0)
+                        map._component.addLayer(layer);
+
+                    // add to layer control
+                    map.tiles.control.addBaseLayer(layer,source.description);
 
                 });
-                select.append(optgroup);
-            });
 
-            // instanciate select2
-            select.select2({
-                placeholder: 'Select raw data set...',
-                formatResult: function(item) {
-                    if (!item.id) return item.text; // optgroup
-                    var obj = JSON.parse(item.text);
-                    var date = new Date(parseInt(obj.master,10)*1000); // milliseconds
-                    var name = !_.isNull(obj.name) ? ' - '+obj.name : '';
-                    return obj.master+name+'<div class="master dates">UTC: '+date.simple_utc()+' &nbsp; &nbsp; Local: '+date.simple_local()+'</div></div>';
-                },
-                formatSelection: function(item) {
-                    var obj = JSON.parse(item.text);
-                    var date = new Date(parseInt(obj.master,10)*1000); // milliseconds
-                    var name = !_.isNull(obj.name) ? ' - '+obj.name : '';
-                    return item.id.replace('/',' :: <strong>')+name+'</strong>';
-                }
-            });
+            },
 
-            // event: select change
-            select.on('change',function() {
-                rawdata_selected();
-            });
+            /**
+             * map.tiles.static()
+             */
+            static: function() {
 
-            // display
-            overlay_hide();
-            $('#master').show();
+                if (!_.isNull(this._static))
+                    return this._static;
 
-        }).fail(function() {
-            overlay_message('Failed to retrieve initial JSON data<br />Incorrect mount point ?');
-        });
+                this._static = _.extend(
+                    L.tileLayer('img/tile.png', {
+                        attribution: 'Photogrammetric data &copy; <a href="http://foxel.ch/" target="_blank">FOXEL SA</a>',
+                        minZoom: map.zoom.min,
+                        maxZoom: map.zoom.max
+                    }),{
+                        description:'Timebased Mode'
+                    });
 
-    };
+            },
 
-    /**
-     * rawdata_selected()
-     */
-    var rawdata_selected = function() {
+            /**
+             * map.tiles.update()
+             */
+            update: function() {
 
-        // close pose info
-        info_close();
+                var item = _.first(map.segments.displayed());
+                var info = segmentation.info(item.segment);
 
-        // keep choice
-        var value = $('#master select').val().split('/');
-        storage.mac = value[0];
-        storage.master.timestamp = value[1];
-        storage.master.path = storage.root+'/camera/'+storage.mac+'/raw/segment/'+storage.master.timestamp;
-        storage.master.localhost = '/data/camera/'+storage.mac+'/raw/segment/'+storage.master.timestamp;
+                if (!_.isNull(this._linear) && !info.gps == this._linear)
+                    return;
+                this._linear = !info.gps;
 
-        // message
-        overlay_message('Loading from<br />'+storage.master.path+'/...');
-        overlay_show();
+                // current tiles
+                $.each((!info.gps ? this.maps() : [this.static()]),function(index,layer) {
+                    map._component.removeLayer(layer);
+                    map.tiles.control.removeLayer(layer);
+                });
 
-        // segments of selected master
-        storage.master.segments = _.findWhere(storage.segmentation,{master:storage.master.timestamp}).segments;
+                // updated tiles
+                $.each((!info.gps ? [this.static()] : this.maps()),function(index,layer) {
+                    if (index == 0)
+                        map._component.addLayer(layer);
+                    map.tiles.control.addBaseLayer(layer,layer.description);
+                });
 
-        // init json
-        storage.json_remaining = storage.master.segments.length;
+            },
 
-        // clear timeline
-        timeline.items = [];
-        timeline.vis.clear({items:true});
-
-        // clear leaflet
-        leaflet_clear();
-
-        // whole list
-        $.each(storage.master.segments, function(sid,key) {
-
-            var filepath = storage.master.path+'/'+key+'/info/rawdata-autoseg/';
-
-            // retrieve json
-            $.getJSON('php/csps-json.php?json='+filepath,function(data) {
-
-                // parse
-                segment_parsing(sid,key,data);
-
-            }).fail(function() {
-                overlay_message('Failed to retrieve<br />'+filepath);
-            });
-
-        });
-
-    };
-
-    /**
-     * segment_parsing()
-     */
-    var segment_parsing = function(sid,segment,data) {
-
-        // message
-        overlay_message('Building layers, please wait...');
-
-        // keep object
-        _.extend(data,{segment:segment});
-
-        // extreme poses
-        var poses = {
-            first: _.first(data.pose),
-            last: _.last(data.pose)
-        };
-
-        // range
-        var length = data.pose.length;
-        var range = {
-            start: parseInt(poses.first.sec,10)*1000+parseInt(poses.first.usc,10)/1000,
-            end: parseInt(poses.last.sec,10)*1000+parseInt(poses.last.usc,10)/1000
-        };
-
-        // color
-        var color = leaflet.colors.segments[sid % leaflet.colors.segments.length];
-
-        // timeline range
-        timeline.items.push({
-            id: segment,
-            content: ''+segment+' ('+length+' poses'+(data.gps?'':', no GPS fix')+')',
-            start: range.start,
-            end: range.end,
-            className: 'timeline'+color.replace('#','-')
-        });
-
-        // trace
-        var trace = [];
-
-        // segment feature group [trace,cluster]
-        var segmentlayer = new L.featureGroup();
-
-        // cluster
-        var cluster = new L.MarkerClusterGroup({
-            showCoverageOnHover: false,
-            maxClusterRadius: 25,
-            singleMarkerMode: false,
-            spiderfyOnMaxZoom: true,
-            animateAddingMarkers: false,
-            iconCreateFunction: function(cluster) {
-                return leaflet_cluster_icon(cluster,color);
-            }
-        });
-
-        // timebased segment
-        if (!data.gps)
-            leaflet.timebased.index++;
-
-        // shift
-        var shift = {
-            lat: leaflet.timebased.shift.lat,
-            lng: 0,
-            buffer: null
-        };
-
-        // video frames
-        leaflet.videoframes[segment] = [];
-
-        // parse poses
-        $.each(data.pose, function(index,pose) {
-
-            // timebased shifting
-            if (!data.gps) {
-
-                var displace = 0;
-                var usec = parseInt(pose.sec,10)*1000000+parseInt(pose.usc,10);
-                if (!_.isNull(shift.buffer))
-                    displace = (usec-shift.buffer)/2000000000;
-                shift.lng += displace;
-                shift.buffer = usec;
-
-                // position
-                pose.lat = leaflet.timebased.index * shift.lat;
-                pose.lng = shift.lng;
-
+            /**
+             * map.tiles.reset()
+             */
+            reset: function() {
+                this._linear = null;
             }
 
-            // geo point
-            var latlng = L.latLng(pose.lat,pose.lng);
+        },
 
-            // trace
-            trace.push(latlng);
+        /**
+         * map.segments{}
+         */
+        segments: {
 
-            // icon
-            var icon = leaflet_marker_icon(pose,color);
+            /**
+             * map.segments.layers()
+             */
+            layers: function() {
+                var layers = [];
+                $.each(segmentation.items(), function(index,item) {
+                    layers.push(item.layer);
+                });
+                return layers;
+            },
 
-            // pose info
-            leaflet.poses[segment+'_'+index] = {
-                segment: segment,
-                time: {
-                    sec: pose.sec,
-                    usc: String(pose.usc).zeropad(6)
-                },
-                pose: {
+            /**
+             * map.segments.displayed()
+             */
+            displayed: function() {
+                return _.filter(this.layers(), function(layer) {
+                    return layer.displayed;
+                });
+            },
+
+            /**
+             * map.segments.show()
+             */
+            show: function() {
+
+                var segments = _.isEmpty(segmentation.geolocated()) ?
+                    segmentation.linear() : segmentation.geolocated();
+
+                // add to map
+                $.each(segments, function(index,segment) {
+                    segment.layer.displayed = true;
+                    map._component.addLayer(segment.layer);
+                });
+
+                // map
+                map.tiles.update();
+                map.zoom.fit();
+
+            },
+
+            /**
+             * map.segments.selection()
+             */
+            selection: function(items) {
+
+                var geolocated = 0;
+                var linear = 0;
+                var selected = [];
+
+                // filter
+                $.each(segmentation.items(), function(index,segment) {
+                    if (!_.contains(items,index))
+                        return;
+                    segment.info.gps ? geolocated++ : linear++; // detect mixed geolocated+linear selection
+                    selected.push(segment);
+                });
+
+                // add to map
+                $.each(selected, function(index,segment) {
+                    if (geolocated > 0 && linear > 0 && !segment.info.gps) // mixed then filter on geolocated
+                        return;
+                    segment.layer.displayed = true;
+                    map._component.addLayer(segment.layer);
+                });
+
+                // map
+                map.tiles.update();
+                map.zoom.fit();
+
+            },
+
+            /**
+             * map.segments.clear()
+             */
+            clear: function() {
+                $.each(this.layers(), function(index,layer) {
+                    layer.displayed = false;
+                    map._component.removeLayer(layer);
+                });
+            }
+
+        },
+
+        /**
+         * map.helpers{}
+         */
+        helpers: {
+
+            /**
+             * map.helpers.layer()
+             */
+            layer: function(segment) {
+                return _.extend(new L.featureGroup(), {
                     segment: segment,
-                    index: index,
-                    pos: index+1,
-                    length: length
-                },
-                geo: {
-                    lat: pose.lat,
-                    lng: pose.lng,
-                    alt: pose.alt
-                },
-                state: {
-                    gps: data.gps,
-                    guess: pose.guess,
-                    status: pose.status,
-                    jp4: pose.status.charAt(0).toUpperCase()+pose.status.slice(1),
-                    splitted: data.split,
-                    trashed: (pose.status=='trashed'),
-                    corrupted: (pose.status=='corrupted'),
-                    preview: !_.isNull(data.preview),
-                    debayer: data.preview
+                    displayed: false
+                });
+            },
+
+            /**
+             * map.helpers.latlng()
+             */
+            latlng: function(pose,info,vshift,hshift) {
+                if (!info.gps) {
+                    pose.lat = vshift * -0.005;
+                    pose.lng = hshift * 0.00005;
                 }
+                return L.latLng(pose.lat,pose.lng);
+            },
+
+            /**
+             * map.helpers.polyline()
+             */
+            polyline: function(segment,info,track) {
+                return L.polyline(track, {
+                    color: info.color,
+                    weight: 3,
+                    smoothFactor: 1,
+                    opacity: 1
+                }).on('click', function() {
+                    timeline.select(segment);
+                });
+            },
+
+            /**
+             * map.cluster{}
+             */
+            cluster: {
+
+                /**
+                 * map.helpers.cluster.group()
+                 */
+                group: function(info) {
+                    return new L.MarkerClusterGroup({
+                        showCoverageOnHover: false,
+                        maxClusterRadius: 25,
+                        singleMarkerMode: false,
+                        spiderfyOnMaxZoom: true,
+                        animateAddingMarkers: false,
+                        iconCreateFunction: function(cluster) {
+                            var c = cluster.getChildCount();
+                            return L.divIcon({
+                                html: '<div><span>'+c+'</span></div>',
+                                className: 'marker-cluster marker-cluster-'
+                                    + (c < 50 ? 'small' : '')+(c >= 50 && c < 100 ? 'medium' : '')+(c >= 100 ? 'large' : '')
+                                    + ' '+info.color.replace('#','seg-'),
+                                iconSize: L.point(40,40)
+                            });
+                        }
+                    });
+                },
+
+                /**
+                 * map.helpers.cluster.marker()
+                 */
+                marker: function(segment,pose,latlng,info,index) {
+                    return L.marker(latlng, {
+                        icon: L.divIcon({
+                            html: '<div><span></span></div>',
+                            className: 'marker-pnt '+info.color.replace('#','seg-')+' type-'+pose.status,
+                            iconSize: L.point(30,30)
+                        })
+                    }).on('click', function() {
+                        information.show(segment,index);
+                    });
+                }
+
+            }
+
+        }
+
+    };
+
+    /**
+     * information object
+     */
+    var information = {
+
+        _component: null,
+        _dom: '#info',
+
+        _segment: null,
+        _index: null,
+        _layer: null,
+
+        /**
+         * information.init()
+         */
+        init: function() {
+            this._component = $(this._dom+' .data');
+            this.events();
+            this.video.init();
+        },
+
+        /**
+         * information.events()
+         */
+        events: function() {
+
+            // close
+            $(this._dom+' .close a').on('click',function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                information.close();
+            });
+
+            // jump
+            $('#jump').on('keyup',function(e) {
+
+                e.preventDefault();
+                if (e.keyCode != 13) // enter
+                    return;
+
+                // value
+                var req = parseInt($('#jump').val(),10);
+                $('#jump').val('');
+
+                // invalid
+                if (_.isNaN(req))
+                    return;
+                // not in range
+                if (req < 1 || req > segmentation.poses(information._segment).length)
+                    return;
+
+                // display
+                information.show(information._segment,req-1);
+
+            });
+
+        },
+
+        /**
+         * information.show()
+         */
+        show: function(segment,index) {
+
+            var info = segmentation.info(segment);
+            var pose = segmentation.pose(segment,index);
+            var videoframe = segmentation.vframeindex(segment,index);
+
+            // change source
+            if (this.video._segment != segment && videoframe > -1) {
+                this.video.clear();
+                this.video._segment = segment;
+                if (info.preview)
+                    this.video._player.src({type:'video/webm',src:allocation.current.host+'/'+segment+'/preview/'+info.debayer+'/segment.webm'});
+            }
+
+            // timing
+            this.video._timing = 0.0;
+            if (videoframe > -1)
+                this.video._timing = (videoframe/this.video._fps).toPrecision(6);
+
+            // go to timing
+            if (videoframe > -1 && this.video._ready)
+                this.video._player.currentTime(this.video._timing);
+
+            // details
+            this.details(segment,index);
+
+        },
+
+        /**
+         * information.details()
+         */
+        details: function(segment,index) {
+
+            index = parseInt(index,10);
+            var info = segmentation.info(segment);
+            var pose = segmentation.pose(segment,index);
+            var poses = segmentation.poses(segment);
+
+            // center map
+            map._component.panTo(pose.latlng);
+
+            // clear marker
+            if (!_.isNull(this._layer))
+                map._component.removeLayer(this._layer);
+
+            // static marker
+            this._layer = L.marker(pose.latlng,{icon:L.icon({
+                iconUrl: 'img/pose-icon.png',
+                iconRetinaUrl: 'img/pose-icon-2x.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 39]
+            })});
+
+            // add static marker
+            this._segment = segment;
+            this._index = index;
+            map._component.addLayer(this._layer);
+
+            // show
+            $(this._dom).slideDown('fast',function() {
+
+                // timestamp
+                information._component.find('.timestamp').html(pose.sec+'.'+pose.usc);
+
+                // geo
+                if (info.gps) {
+                    information._component.find('.section.geo').css('display','block');
+                    information._component.find('.lat').html(pose.latlng.lat);
+                    information._component.find('.lng').html(pose.latlng.lng);
+                    information._component.find('.alt').html(pose.alt);
+                } else {
+                    information._component.find('.section.geo').css('display','none');
+                    information._component.find('.lat').html('');
+                    information._component.find('.lng').html('');
+                    information._component.find('.alt').html('');
+                }
+
+                // status
+                information._component.find('.gps').html(info.gps?(pose.guess?'Guessed':'Valid'):'No GPS fix');
+                information._component.find('.jp4').html(pose.status.charAt(0).toUpperCase()+pose.status.slice(1));
+                information._component.find('.split').html(info.split?'Yes':'No');
+
+                // date
+                var date = new Date(parseInt(pose.sec,10)*1000);
+                information._component.find('.utc').html(date.getSimpleUTCDate());
+                information._component.find('.gmt').html(date.getSimpleLocalDate());
+
+                // html
+                $(information._dom+' .preview').html(
+                    (!info.preview || pose.status!='validated') ? '<img src="img/def.png" alt="" width="640" height="320" />' : ''
+                );
+                $(information._dom+' .nav > div').html(
+                    ((index > 0) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index-1)+'\');return false;"><span class="prev"></span>Prev</a>' : '')
+                    + ((index+1 < poses.length) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index+1)+'\');return false;">Next<span class="next"></span></a>' : '')
+                );
+                $(information._dom+' .pose').html(
+                    'Segment '+segment+' &nbsp; &nbsp; &nbsp; '
+                    + 'Pose '+(index+1)+' of '+poses.length
+                );
+
+            });
+
+        },
+
+        /**
+         * information.close()
+         */
+        close: function() {
+
+            this.video.clear();
+            this.clear();
+
+            // wait for the player to stop
+            setTimeout(function() {
+                $(information._dom).slideUp('fast');
+            },250);
+
+        },
+
+        /**
+         * information.clear()
+         */
+        clear: function() {
+            if (!_.isNull(this._layer))
+                map._component.removeLayer(this._layer);
+            this._layer = null;
+            this._segment = null;
+            this._index = null;
+        },
+
+        /**
+         * information.video{}
+         */
+        video: {
+
+            _component: null,
+            _dom: '#video',
+            _player: null,
+
+            _ready: false,
+            _changed: true,
+            _fps: 25,
+            _timing: 0.0,
+            _segment: null,
+
+            /**
+             * information.video.init()
+             */
+            init: function() {
+
+                // vis.js
+                this._player = videojs('vid', {
+                    controls: true,
+                    preload: 'auto',
+                    loop: true,
+                    autoplay: false,
+                    techOrder: ['html5'],
+                    children: {
+                        bigPlayButton: false,
+                        controlBar: {
+                            currentTimeDisplay: false,
+                            timeDivider: false,
+                            durationDisplay: false,
+                            children: {
+                                volumeControl: false,
+                                muteToggle: false
+                            }
+                        }
+                    }
+                });
+
+                // events
+                this.events();
+
+            },
+
+            /**
+             * information.video.events()
+             */
+            events: function() {
+
+                this._player.on('canplay',function() {
+                    information.video._ready = true;
+                    if (information.video._changed)
+                        information.video._player.currentTime(information.video._timing);
+                    information.video._changed = false;
+                });
+
+                this._player.on('timeupdate',function() {
+                    var frame = parseInt((information.video._player.currentTime()*information.video._fps).toPrecision(6),10);
+                    information.details(information.video._segment,segmentation.vframe(information.video._segment,frame));
+                });
+
+                this._player.on('play',function() {
+                    map.zoom.bounding();
+                });
+
+            },
+
+            /**
+             * information.video.clear()
+             */
+            clear: function() {
+
+                this._ready = false;
+                this._changed = true;
+                this._timing = 0.0;
+
+                this._player.pause();
+                this._player.src(null);
+            }
+
+        }
+
+    };
+
+    /**
+     * prototyping object
+     */
+    var prototyping = {
+
+        /**
+         * prototyping.init()
+         */
+        init: function() {
+            this.string();
+            this.date();
+        },
+
+        /**
+         * prototyping.string()
+         */
+        string: function() {
+            String.prototype.zeropad = function(length) {
+                var string = this;
+                while (string.length < length)
+                    string = '0'+string;
+                return string;
+            };
+        },
+
+        /**
+         * prototyping.date()
+         */
+        date: function() {
+
+            Date.prototype.getSimpleUTCDate = function() {
+                var ms = this;
+                if (_.isNaN(ms.getUTCDate()))
+                    return 'Invalid date';
+                return String(ms.getUTCDate()).zeropad(2)+'.'+String((ms.getUTCMonth()+1)).zeropad(2)+'.'+ms.getUTCFullYear()+' '
+                      +String(ms.getUTCHours()).zeropad(2)+':'+String(ms.getUTCMinutes()).zeropad(2)+':'+String(ms.getUTCSeconds()).zeropad(2);
             };
 
-            // video frames
-            if (leaflet.poses[segment+'_'+index].state.preview && !leaflet.poses[segment+'_'+index].state.trashed && !leaflet.poses[segment+'_'+index].state.corrupted)
-                leaflet.videoframes[segment].push(index);
+            Date.prototype.getSimpleLocalDate = function() {
+                var ms = this;
+                if (_.isNaN(ms.getDate()))
+                    return 'Invalid date';
+                var gmt = ms.getTimezoneOffset()/-60;
+                return String(ms.getDate()).zeropad(2)+'.'+String((ms.getMonth()+1)).zeropad(2)+'.'+ms.getFullYear()+' '
+                      +String(ms.getHours()).zeropad(2)+':'+String(ms.getMinutes()).zeropad(2)+':'+String(ms.getSeconds()).zeropad(2)+' '
+                      +'GMT '+(gmt>0?'+':'')+gmt;
+            };
 
-            // cluster marker
-            var clustermarker = new L.marker(latlng,{icon:icon})
-                .on('click', function() {
-                    info_display(segment,index);
-            });
-
-            // add cluster marker to cluster
-            cluster.addLayer(clustermarker);
-
-            // add to trashed poses
-            if (pose.status=='trashed' || pose.status=='corrupted') {
-                leaflet.bulk.trashed.points.push(L.circle(latlng, 0.55, {
-                    color: '#000',
-                    opacity: 1,
-                    fill: false
-                }));
-            }
-
-            // add to validated poses
-            else if (pose.status=='validated') {
-                leaflet.bulk.validated.points.push(L.circle(latlng, 0.55, {
-                    color: '#912cee',
-                    opacity: 1,
-                    fill: false
-                }));
-            }
-
-        });
-
-        // trace polyline
-        var polyline = L.polyline(trace, {
-            color: color,
-            weight: 2,
-            smoothFactor: 1,
-            opacity: 1
-        })
-            .on('click', function() {
-                timeline_select([segment]);
-                timeline.vis.setSelection(segment);
-            }
-        );
-
-        // add to segmentlayer [trace,cluster]
-        segmentlayer.addLayer(polyline);
-        segmentlayer.addLayer(cluster);
-
-        // segmentlayer custom properties
-        _.extend(segmentlayer, {
-            foxel: {
-                type: 'segment',
-                segment: segment,
-                gps: data.gps,
-                displayed: false
-            }
-        });
-
-        // keep pointers to layers
-        leaflet.overlays.push(segmentlayer);
-
-        // mark as done
-        storage.json_remaining--;
-
-        // last parsing
-        if (storage.json_remaining == 0)
-            segments_parsed();
+        }
 
     };
 
-    /**
-     * segments_overlays()
-     */
-    var segments_overlays = function() {
-        return _.filter(leaflet.overlays, function(layer) {
-            return !_.isUndefined(layer.foxel) && layer.foxel.type=='segment';
-        });
-    };
-
-    /**
-     * segments_timebased()
-     */
-    var segments_timebased = function(timebased) {
-        timebased = _.isUndefined(timebased) ? true : timebased;
-        return _.filter(segments_overlays(), function(layer) {
-            return timebased ? !layer.foxel.gps : layer.foxel.gps;
-        });
-    };
-
-    /**
-     * segments_displayed()
-     */
-    var segments_displayed = function(displayed) {
-        displayed = _.isUndefined(displayed) ? true : displayed;
-        return _.filter(segments_overlays(), function(layer) {
-            return displayed ? layer.foxel.displayed : !layer.foxel.displayed;
-        });
-    };
-
-    /**
-     * segments_parsed()
-     */
-    var segments_parsed = function() {
-
-        // timebased only
-        leaflet.timebased.only = segments_timebased().length == segments_overlays().length;
-
-        // update timeline
-        timeline.vis.setItems(timeline.items);
-        timeline.vis.fit();
-
-        // add segments to map
-        segments_showall();
-
-        // add trashed/validated poses to map
-        bulk_poses();
-
-        // display
-        overlay_hide();
-        console.log('[done. last segment parsed]');
-
-    };
-
-    /**
-     * segments_showall()
-     */
-    var segments_showall = function() {
-
-        // add segments to map (timebased only, or every another one otherwise)
-        $.each(segments_timebased(leaflet.timebased.only), function(index,layer) {
-            layer.foxel.displayed = true;
-            leaflet.map.addLayer(layer);
-        });
-
-        // tilelayers
-        segments_tilelayers();
-
-        // fit and center map on bounds
-        leaflet_fitbounds();
-
-    };
-
-    /**
-     * segments_showselection()
-     */
-    var segments_showselection = function(items) {
-
-        var selected = [];
-        var count = {
-            gps: 0,
-            timebased: 0
-        };
-
-        // extract segments layers from selection
-        $.each(segments_overlays(), function(i,layer) {
-
-            // not in selection
-            if (!_.contains(items,layer.foxel.segment))
-                return;
-
-            // type
-            if (layer.foxel.gps)
-                count.gps++;
-            else
-                count.timebased++;
-
-            // keep
-            selected.push(layer);
-
-        });
-
-        // detected mixed (gps and timebased) selection
-        var mixed = count.gps > 0 && count.timebased > 0;
-
-        // add filtered segments to map
-        $.each(selected, function(index,layer) {
-
-            // mixed case, keep only gps based
-            if (mixed && !layer.foxel.gps)
-                return;
-
-            // add to map
-            layer.foxel.displayed = true;
-            leaflet.map.addLayer(layer);
-
-        });
-
-        // tilelayers
-        segments_tilelayers();
-
-        // fit and center map on bounds
-        leaflet_fitbounds();
-
-    };
-
-    /**
-     * segments_tilelayers()
-     */
-    var segments_tilelayers = function() {
-
-        // state
-        var timebased = !_.first(segments_displayed()).foxel.gps;
-        if (!_.isNull(leaflet.tilelayers.timebased) && timebased == leaflet.tilelayers.timebased)
-            return;
-
-        // new stage
-        leaflet.tilelayers.timebased = timebased;
-
-        // layers
-        var add = timebased ? leaflet.tilelayers.grey : leaflet.tilelayers.providers;
-        var remove = timebased ? leaflet.tilelayers.providers : leaflet.tilelayers.grey;
-
-        // remove
-        $.each(remove,function(index,obj) {
-
-            var key = _.first(_.keys(obj));
-            var layer = obj[key];
-
-            leaflet.map.removeLayer(layer);
-            leaflet.control.layers.removeLayer(layer);
-
-        });
-
-        // add
-        $.each(add,function(index,obj) {
-
-            var key = _.first(_.keys(obj));
-            var layer = obj[key];
-
-            if (index == 0)
-                leaflet.map.addLayer(layer);
-            leaflet.control.layers.addBaseLayer(layer,key);
-
-        });
-
-    };
-
-    /**
-     * bulk_poses()
-     */
-    var bulk_poses = function() {
-
-        // trashed
-        leaflet.bulk.trashed.layer = L.layerGroup(leaflet.bulk.trashed.points);
-        leaflet.control.layers.addOverlay(leaflet.bulk.trashed.layer,'Trashed poses (#'+leaflet.bulk.trashed.points.length+') only (all segments)');
-
-        // validated
-        leaflet.bulk.validated.layer = L.layerGroup(leaflet.bulk.validated.points);
-        leaflet.control.layers.addOverlay(leaflet.bulk.validated.layer,'Validated poses (#'+leaflet.bulk.validated.points.length+') only (all segments)');
-
-    };
-
-    // extend string prototype
-    String.prototype.zeropad = function(length) {
-        var string = this;
-        while (string.length < length)
-            string = '0'+string;
-        return string;
-    };
-
-    // extend date prototype
-    Date.prototype.simple_utc = function() {
-        var ms = this;
-        return String(ms.getUTCDate()).zeropad(2)+'.'+String((ms.getUTCMonth()+1)).zeropad(2)+'.'+ms.getUTCFullYear()+' '
-              +String(ms.getUTCHours()).zeropad(2)+':'+String(ms.getUTCMinutes()).zeropad(2)+':'+String(ms.getUTCSeconds()).zeropad(2);
-    };
-
-    // extend date prototype
-    Date.prototype.simple_local = function() {
-        var ms = this;
-        var gmt = ms.getTimezoneOffset()/-60;
-        return String(ms.getDate()).zeropad(2)+'.'+String((ms.getMonth()+1)).zeropad(2)+'.'+ms.getFullYear()+' '
-              +String(ms.getHours()).zeropad(2)+':'+String(ms.getMinutes()).zeropad(2)+':'+String(ms.getSeconds()).zeropad(2)+' '
-              +'GMT '+(gmt>0?'+':'')+gmt;
-    };
-
-    // init
-    rawdata_navigator_init();
-
-});
+};

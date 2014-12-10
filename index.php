@@ -60,9 +60,17 @@
     <script type="text/javascript" src="js/thirdparty/video.js/video-js-4.10.2.min.js"></script>
     <script type="text/javascript" src="js/rawdata-navigator.js"></script>
     <script type="text/javascript">
-        var opts = {
-            root: <?php echo isset($_GET['storage']) && !empty($_GET['storage']) ? '\''.rtrim($_GET['storage'],'/').'\'' : 'null'; ?>
-        };
+        $(document).ready(function() {
+            // init
+            RawDataNavigator.init({
+            <?php if (isset($_GET['mountpoint']) && !empty($_GET['mountpoint'])): ?>
+                mountpoint: <?php echo json_encode(rtrim($_GET['mountpoint'],'/')); ?>,
+            <?php endif; ?>
+            <?php if (isset($_GET['hostpoint']) && !empty($_GET['hostpoint'])): ?>
+                hostpoint: <?php echo json_encode(rtrim($_GET['hostpoint'],'/')); ?>,
+            <?php endif; ?>
+            });
+        });
     </script>
 </head>
 
@@ -70,8 +78,8 @@
 
 <div id="map"></div>
 
-<div id="master">
-    <select style="width:400px;"></select>
+<div id="allocation">
+    <select></select>
 </div>
 
 <div id="info">
@@ -81,7 +89,26 @@
     <div class="jump">
         Jump to: <input id="jump" name="jump" type="text" value="" />
     </div>
-    <div class="data"></div>
+    <div class="data">
+        <div class="timestamp"></div>
+        <div class="section geo">Geo</div>
+        <table class="section geo">
+            <tr><td class="attr">Latitude</td><td class="lat"></td></tr>
+            <tr><td class="attr">Longitude</td><td class="lng"></td></tr>
+            <tr><td class="attr">Altitude</td><td class="lat"></td></tr>
+        </table>
+        <div class="section status">Status</div>
+        <table class="section status">
+            <tr><td class="attr">GPS</td><td class="gps"></td></tr>
+            <tr><td class="attr">JP4</td><td class="jp4"></td></tr>
+            <tr><td class="attr">Splitted</td><td class="split"></td></tr>
+        </table>
+        <div class="section date">Date</div>
+        <table class="section date">
+            <tr><td class="attr">UTC</td><td class="utc"></td></tr>
+            <tr><td class="attr">Local time</td><td class="gmt"></td></tr>
+        </table>
+    </div>
     <div class="video">
         <video id="vid" class="video-js vjs-default-skin" width="640" height="320">
             <p class="vjs-no-js">Please consider using a web browser that supports <a href="http://videojs.com/html5-video-support/" target="_blank">HTML5</a>.</p>

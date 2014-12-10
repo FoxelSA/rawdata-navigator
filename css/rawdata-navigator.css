@@ -184,20 +184,64 @@ a, a:link, a:visited, a:hover, a:active {
             line-height:150%;
         }
 
-#master {
+#allocation {
     display:none;
     position:absolute;
     left:50px;
     top:10px;
-    width:450px;
+    width:500px;
 }
 
-    .master.dates {
+    .allocation {
         padding-top:2px;
-        padding-left:10px;
         padding-bottom:5px;
-        font-size:9px;
+        font-weight:700;
     }
+
+        .allocation span {
+            margin-right:8px;
+            color:#888;
+            font-family:'FontAwesome';
+            font-size:16px;
+            font-style:normal;
+            font-weight:normal;
+        }
+
+            .allocation span:before {
+                content:"\f019";
+            }
+
+            .select2-highlighted .allocation span {
+                color:#fff;
+            }
+
+    .allocation .info {
+        padding-top:6px;
+        padding-left:23px;
+        color:#666;
+        font-size:10px;
+    }
+
+        .allocation .name {
+            padding-bottom:3px;
+            color:#000;
+            font-weight:700;
+        }
+
+        .allocation .camera {
+            padding-bottom:2px;
+            font-size:9px;
+            font-weight:normal;
+        }
+
+        .allocation .date {
+            font-size:9px;
+            font-weight:normal;
+        }
+
+        .select2-highlighted .allocation .info {
+            color:#fff;
+        }
 
 #info {
     display:none;
@@ -326,7 +370,7 @@ a, a:link, a:visited, a:hover, a:active {
             font-weight:700;
         }
 
-        #info .data .section {
+        #info .data div.section {
             padding-bottom:3px;
             margin-top:20px;
             margin-bottom:10px;
