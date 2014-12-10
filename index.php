@@ -57,7 +57,7 @@
     <script type="text/javascript" src="js/thirdparty/leaflet.markercluster/leaflet.markercluster.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/select2/select2-3.5.1.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/vis.js/vis-3.5.0.min.js"></script>
-    <script type="text/javascript" src="js/thirdparty/video.js/video-js-4.10.2.min.js"></script>
+    <script type="text/javascript" src="js/thirdparty/video.js/video-js-4.11.1.min.js"></script>
     <script type="text/javascript" src="js/rawdata-navigator.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
