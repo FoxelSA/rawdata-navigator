@@ -54,7 +54,7 @@
     <script type="text/javascript" src="js/thirdparty/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/underscore.js/underscore-1.7.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/leaflet/leaflet-0.7.3.min.js"></script>
-    <script type="text/javascript" src="js/thirdparty/leaflet.markercluster/leaflet.markercluster.min.js"></script>
+    <script type="text/javascript" src="js/thirdparty/leaflet.markercluster/leaflet.markercluster-37cdfca01d.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/select2/select2-3.5.2.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/vis.js/vis-3.7.2.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/video.js/video-js-4.11.1.min.js"></script>
