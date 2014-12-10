@@ -58,7 +58,7 @@ Public License and/or a compatible license and other copyright notices.
     Copyright (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors<br />
     Underscore.js is licensed under the [MIT license](http://opensource.org/licenses/MIT).
 
-*   __Select2 3.5.1__<br />
+*   __Select2 3.5.2__<br />
     <[http://ivaynberg.github.io/select2/](http://ivaynberg.github.io/select2/)><br />
     Copyright (c) 2014 Igor Vaynberg<br />
     Select2 is dual licensed under the [Apache License 2.0](http://opensource.org/licenses/Apache-2.0) and the [GNU GPL license v2](http://www.gnu.org/licenses/gpl-2.0.html).
