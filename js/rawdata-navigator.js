@@ -784,7 +784,7 @@ var RawDataNavigator = new function() {
              */
             bounding: function() {
                 var zoom = map._component.getZoom() > this.bounds ?
-                    this.bounds : map._component.getZoom()-1;
+                    this.bounds : map._component.getZoom();
                 map._component.setZoom(zoom);
             }
 
