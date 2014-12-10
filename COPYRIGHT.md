@@ -63,10 +63,10 @@ Public License and/or a compatible license and other copyright notices.
     Copyright (c) 2014 Igor Vaynberg<br />
     Select2 is dual licensed under the [Apache License 2.0](http://opensource.org/licenses/Apache-2.0) and the [GNU GPL license v2](http://www.gnu.org/licenses/gpl-2.0.html).
 
-*   __vis.js 3.5.0__<br />
+*   __vis.js 3.7.2__<br />
     <[http://visjs.org](http://visjs.org)><br />
-    Copyright (c) 2010-2014 Almende B.V.<br />
-    vis.js is licensed under the [Apache License 2.0](http://opensource.org/licenses/Apache-2.0).
+    Copyright (c) 2011-2014 Almende B.V, http://almende.com<br />
+    vis.js is dual licensed under the [Apache License 2.0](http://opensource.org/licenses/Apache-2.0) and the [MIT license](http://opensource.org/licenses/MIT).
 
 *   __Video.js 4.11.1__<br />
     <[http://videojs.com/](http://videojs.com)><br />
