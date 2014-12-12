@@ -38,10 +38,9 @@
  *      Attribution" section of <http://foxel.ch/license>.
  */
 
-if (!isset($_GET['src']) || empty($_GET['src']) || !file_exists($_GET['src'].'.jpeg'))
+if (!isset($_GET['src']) || empty($_GET['src']) || !file_exists($_GET['src'].'.webm'))
     exit();
 
 // output
-header('Content-Type: image/jpeg');
-header('Content-Length: '.filesize($_GET['src'].'.jpeg'));
-echo file_get_contents($_GET['src'].'.jpeg');
+$file = $_GET['src'].'.webm';
+require('thirdparty/mp4streaming/streamer.php');

@@ -79,21 +79,13 @@ var RawDataNavigator = new function() {
     var storage = {
 
         mountpoint: '/data',
-        hostpoint: '/data',
 
         /**
          * storage.init()
          */
         init: function(args) {
-
-            // mount-point
             if (_.has(args,'mountpoint'))
                 this.mountpoint = args.mountpoint;
-
-            // host-point
-            if (_.has(args,'hostpoint'))
-                this.hostpoint = args.hostpoint;
-
         }
 
     };
@@ -328,7 +320,6 @@ var RawDataNavigator = new function() {
             this.current.mac = val[0];
             this.current.master = val[1];
             this.current.path = storage.mountpoint+'/camera/'+this.current.mac+'/raw/segment/'+this.current.master;
-            this.current.host = storage.hostpoint+'/camera/'+this.current.mac+'/raw/segment/'+this.current.master;
         },
 
         /**
@@ -356,7 +347,6 @@ var RawDataNavigator = new function() {
             mac: null,
             master: null,
             path: null,
-            host: null,
 
             /**
              * allocation.current.segments()
@@ -1171,7 +1161,7 @@ var RawDataNavigator = new function() {
                 this.video.clear();
                 this.video._segment = segment;
                 if (info.preview)
-                    this.video._player.src({type:'video/webm',src:allocation.current.host+'/'+segment+'/preview/'+info.debayer+'/segment.webm'});
+                    this.video._player.src({type:'video/webm',src:'php/segment-video.php?src='+allocation.current.path+'/'+segment+'/preview/'+info.debayer+'/segment'});
             }
 
             // timing

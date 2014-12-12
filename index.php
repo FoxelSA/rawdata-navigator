@@ -66,9 +66,6 @@
             <?php if (isset($_GET['mountpoint']) && !empty($_GET['mountpoint'])): ?>
                 mountpoint: <?php echo json_encode(rtrim($_GET['mountpoint'],'/')); ?>,
             <?php endif; ?>
-            <?php if (isset($_GET['hostpoint']) && !empty($_GET['hostpoint'])): ?>
-                hostpoint: <?php echo json_encode(rtrim($_GET['hostpoint'],'/')); ?>,
-            <?php endif; ?>
             });
         });
     </script>

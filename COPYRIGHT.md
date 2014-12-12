@@ -73,6 +73,11 @@ Public License and/or a compatible license and other copyright notices.
     Copyright (c) 2014 Brightcove, Inc<br />
     Video.js is licensed under the [Apache License 2.0](http://opensource.org/licenses/Apache-2.0).
 
+*   __MP4Streaming [3860cbccc8]__<br />
+    <[https://github.com/tuxxin/MP4Streaming](https://github.com/tuxxin/MP4Streaming/tree/3860cbccc8fa83bd1851d84b3d0d79a6c0e70ac2)><br />
+    Copyright (c) 2014 tuxxin<br />
+    MP4Streaming is licensed under the [MIT license](http://opensource.org/licenses/MIT).
+
 *   __Font Awesome 4.2.0__<br />
     <[http://fontawesome.io](http://fontawesome.io)><br />
     Font Awesome by Dave Gandy - http://fontawesome.io<br />
