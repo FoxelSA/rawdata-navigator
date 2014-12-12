@@ -182,10 +182,12 @@ var RawDataNavigator = new function() {
         /**
          * timeline.add()
          */
-        add: function(segment,info,poses) {
+        add: function(segment,info,poses,validated,trashed,corrupted) {
             this._items.push({
                 id: segment,
-                content: segment+' ('+poses.length+' poses'+(info.gps?'':', no GPS fix')+')',
+                content: '<strong>'+segment+'</strong> :: '
+                    + poses.length+' poses ['+validated+' valid, '+trashed+' trashed, '+corrupted+' corrupted] :: '
+                    + (info.gps?'GPS available':'no GPS fix'),
                 start: parseInt(_.first(poses).sec,10)*1000+parseInt(_.first(poses).usc,10)/1000,
                 end: parseInt(_.last(poses).sec,10)*1000+parseInt(_.last(poses).usc,10)/1000,
                 className: 'timeline'+info.color.replace('#','-')
@@ -611,6 +613,10 @@ var RawDataNavigator = new function() {
                 var layer = map.helpers.layer(segment);
                 var cluster = map.helpers.cluster.group(info);
 
+                var validated = 0;
+                var trashed = 0;
+                var corrupted = 0;
+
                 // gui
                 overlay.show('Building layers, please wait...');
 
@@ -626,6 +632,14 @@ var RawDataNavigator = new function() {
                     // add on vframes
                     if (info.preview && pose.status=='validated')
                         vframes.push(index);
+
+                    // type
+                    if (pose.status=='trashed')
+                        trashed++;
+                    else if (pose.status=='corrupted')
+                        corrupted++;
+                    else
+                        validated++;
 
                     // add on cluster
                     cluster.addLayer(map.helpers.cluster.marker(segment,pose,latlng,info,index));
@@ -647,7 +661,7 @@ var RawDataNavigator = new function() {
                 layer.addLayer(cluster);
 
                 // add on timeline
-                timeline.add(segment,info,data.pose);
+                timeline.add(segment,info,data.pose,validated,trashed,corrupted);
 
                 // segmentation
                 segmentation.add(segment,{info:info,layer:layer,poses:poses,vframes:vframes});
