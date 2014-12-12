@@ -689,7 +689,7 @@ var RawDataNavigator = new function() {
             this.resize();
 
             // leaflet
-            this._component = L.map('map', {
+            this._component = L.map(this._dom.substring(1), {
                 keyboard: true,
                 scrollWheelZoom: true,
                 boxZoom: false,
@@ -1009,7 +1009,7 @@ var RawDataNavigator = new function() {
              * map.helpers.layer()
              */
             layer: function(segment) {
-                return _.extend(new L.featureGroup(), {
+                return _.extend(L.featureGroup(), {
                     segment: segment,
                     displayed: false
                 });
@@ -1108,6 +1108,7 @@ var RawDataNavigator = new function() {
             this._component = $(this._dom+' .data');
             this.events();
             this.video.init();
+            this.overview.init();
         },
 
         /**
@@ -1157,12 +1158,19 @@ var RawDataNavigator = new function() {
             var videoframe = segmentation.vframeindex(segment,index);
 
             // change source
-            if (this.video._segment != segment && videoframe > -1) {
+            if (this._segment != segment && videoframe > -1) {
                 this.video.clear();
-                this.video._segment = segment;
                 if (info.preview)
                     this.video._player.src({type:'video/webm',src:'php/segment-video.php?src='+allocation.current.path+'/'+segment+'/preview/'+info.debayer+'/segment'});
             }
+
+            // change track
+            if (this._segment != segment)
+                this.overview.track(segment);
+
+            // store
+            this._segment = segment;
+            this._index = index;
 
             // timing
             this.video._timing = 0.0;
@@ -1188,28 +1196,32 @@ var RawDataNavigator = new function() {
             var pose = segmentation.pose(segment,index);
             var poses = segmentation.poses(segment);
 
-            // center map
-            map._component.panTo(pose.latlng);
-
-            // clear marker
-            if (!_.isNull(this._layer))
-                map._component.removeLayer(this._layer);
-
             // static marker
-            this._layer = L.marker(pose.latlng,{icon:L.icon({
-                iconUrl: 'img/pose-icon.png',
-                iconRetinaUrl: 'img/pose-icon-2x.png',
-                iconSize: [25, 41],
-                iconAnchor: [12, 39]
-            })});
+            if (_.isNull(this._layer)) {
 
-            // add static marker
-            this._segment = segment;
-            this._index = index;
-            map._component.addLayer(this._layer);
+                this._layer = L.marker(pose.latlng,{icon:L.icon({
+                    iconUrl: 'img/pose-icon.png',
+                    iconRetinaUrl: 'img/pose-icon-2x.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 39]
+                })});
+
+                // add static marker on map
+                map._component.addLayer(this._layer);
+
+            }
+
+            // place static marker
+            this._layer.setLatLng(pose.latlng);
+
+            // track marker
+            information.overview.marker(segment,pose);
 
             // show
             $(this._dom).slideDown('fast',function() {
+
+                // fix overview
+                information.overview._component.invalidateSize();
 
                 // timestamp
                 information._component.find('.timestamp').html(pose.sec+'.'+pose.usc);
@@ -1293,7 +1305,6 @@ var RawDataNavigator = new function() {
             _changed: true,
             _fps: 25,
             _timing: 0.0,
-            _segment: null,
 
             /**
              * information.video.init()
@@ -1340,11 +1351,7 @@ var RawDataNavigator = new function() {
 
                 this._player.on('timeupdate',function() {
                     var frame = parseInt((information.video._player.currentTime()*information.video._fps).toPrecision(6),10);
-                    information.details(information.video._segment,segmentation.vframe(information.video._segment,frame));
-                });
-
-                this._player.on('play',function() {
-                    map.zoom.bounding();
+                    information.details(information._segment,segmentation.vframe(information._segment,frame));
                 });
 
             },
@@ -1360,6 +1367,129 @@ var RawDataNavigator = new function() {
 
                 this._player.pause();
                 this._player.src(null);
+            }
+
+        },
+
+        /**
+         * information.overview{}
+         */
+        overview: {
+
+            _component: null,
+            _dom: '#overview',
+
+            _track: null,
+            _marker: null,
+
+            /**
+             * information.overview.init()
+             */
+            init: function() {
+
+                // leaflet
+                this._component = L.map(this._dom.substring(1), {
+                    keyboard: false,
+                    dragging: false,
+                    touchZoom: false,
+                    scrollWheelZoom: false,
+                    doubleClickZoom: false,
+                    boxZoom: false,
+                    zoomControl: false,
+                    attributionControl:false,
+                    zoom: map.zoom.default,
+                    minZoom: map.zoom.min,
+                    maxZoom: map.zoom.max,
+                    center: [46.205007,6.145134]
+                });
+
+                // scale
+                L.control.scale().addTo(this._component);
+
+                // tiles
+                var tiles = _.first(map.tiles.maps());
+
+                // add tiles on map
+                this._component.addLayer(
+                    L.tileLayer(tiles._url, {
+                        minZoom: tiles.options.minZoom,
+                        maxZoom: tiles.options.maxZoom,
+                        maxNativeZoom: tiles.options.maxNativeZoom
+                    }));
+
+            },
+
+            /**
+             * information.overview.track()
+             */
+            track: function(segment) {
+
+                var info = segmentation.info(segment);
+                var poses = segmentation.poses(segment);
+
+                // hide map
+                $(this._dom).css('visibility','hidden');
+
+                // clear track
+                if (!_.isNull(this._track))
+                    this._component.removeLayer(this._track);
+
+                // linear
+                if (!info.gps)
+                    return;
+
+                // add on track
+                var track = [];
+                $.each(poses,function(index,pose) {
+                    track.push(pose.latlng);
+                });
+
+                // add on map
+                this._track = map.helpers.polyline(segment,info,track);
+                this._component.addLayer(this._track);
+
+                // bounds
+                var bounds = this._track.getBounds();
+
+                // wait a bit (leaflet take some time to be ready)
+                setTimeout(function () {
+
+                    // show map
+                    $(information.overview._dom).css('visibility','visible');
+
+                    // fit
+                    information.overview._component.fitBounds(bounds);
+
+                    // center
+                    information.overview._component.panTo(bounds.getCenter());
+
+                },500);
+
+            },
+
+            /**
+             * information.overview.marker()
+             */
+            marker: function(segment,pose) {
+
+                // track marker
+                if (_.isNull(this._marker)) {
+
+                    this._marker = L.marker(pose.latlng,{icon:L.icon({
+                        iconUrl: 'img/pose-icon.png',
+                        iconRetinaUrl: 'img/pose-icon-2x.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 39]
+                    })});
+
+                    // add track marker on map
+                    this._component.addLayer(this._marker);
+
+                }
+
+                // place track marker
+                this._marker.setLatLng(pose.latlng);
+
             }
 
         }

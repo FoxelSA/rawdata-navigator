@@ -106,6 +106,7 @@
             <tr><td class="attr">Local time</td><td class="gmt"></td></tr>
         </table>
     </div>
+    <div id="overview"></div>
     <div class="video">
         <video id="vid" class="video-js vjs-default-skin" width="640" height="320">
             <p class="vjs-no-js">Please consider using a web browser that supports <a href="http://videojs.com/html5-video-support/" target="_blank">HTML5</a>.</p>

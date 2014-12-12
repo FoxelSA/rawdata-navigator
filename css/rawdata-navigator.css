@@ -359,7 +359,7 @@ a, a:link, a:visited, a:hover, a:active {
     #info .data {
         position:absolute;
         top:70px;
-        right:730px;
+        right:720px;
         width:300px;
         font-size:11px;
     }
@@ -410,6 +410,15 @@ a, a:link, a:visited, a:hover, a:active {
         bottom:28px;
         right:10px;
         width:640px;
+        border:solid 1px #4f4f4f;
+    }
+
+    #overview {
+        position:absolute;
+        bottom:28px;
+        right:1085px;
+        width:400px;
+        height:320px;
         border:solid 1px #4f4f4f;
     }
 
