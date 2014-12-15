@@ -435,3 +435,8 @@ a, a:link, a:visited, a:hover, a:active {
     .vis.timeline .item.range {
         top:16px !important;
     }
+
+        .vis.timeline .item.range.information {
+            top:12px !important;
+            border-width:5px;
+        }

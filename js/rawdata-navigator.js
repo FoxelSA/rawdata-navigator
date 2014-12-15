@@ -45,7 +45,7 @@
 var RawDataNavigator = new function() {
 
     /**
-     * init()
+     * [public] init()
      */
     this.init = function(args) {
 
@@ -67,7 +67,7 @@ var RawDataNavigator = new function() {
     };
 
     /**
-     * info()
+     * [public] info()
      */
     this.info = function(segment,index) {
         information.show(segment,index);
@@ -185,7 +185,8 @@ var RawDataNavigator = new function() {
         add: function(segment,info,poses,validated,trashed,corrupted) {
             this._items.push({
                 id: segment,
-                content: '<strong>'+segment+'</strong> :: '
+                content: '<div id="timeline_'+segment+'"></div>'
+                    + '<strong>'+segment+'</strong> :: '
                     + poses.length+' poses ['+validated+' valid, '+trashed+' trashed, '+corrupted+' corrupted] :: '
                     + (info.gps?'GPS available':'no GPS fix'),
                 start: parseInt(_.first(poses).sec,10)*1000+parseInt(_.first(poses).usc,10)/1000,
@@ -217,6 +218,42 @@ var RawDataNavigator = new function() {
             // update the timeline
             this._component.setItems(this._items);
             this._component.fit();
+
+            // events hack
+            $.each(this._items,function(index,item) {
+                timeline.box(item.id).bind('contextmenu',function(e) {
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // select
+                    timeline.rightclick(item.id);
+
+                });
+            });
+
+        },
+
+        /**
+         * timeline.box()
+         */
+        box: function(segment) {
+            return $('#timeline_'+segment).parent().parent();
+        },
+
+        /**
+         * timeline.boxes()
+         */
+        boxes: function() {
+            return $(this._dom+' .item.range');
+        },
+
+        /**
+         * timeline.active()
+         */
+        active: function(segment) {
+            timeline.boxes(segment).removeClass('information');
+            timeline.box(segment).addClass('information');
         },
 
         /**
@@ -238,6 +275,23 @@ var RawDataNavigator = new function() {
 
             // show segments
             _.isEmpty(items) ? map.segments.show() : map.segments.selection(items);
+
+        },
+
+        /**
+         * timeline.rightclick()
+         */
+        rightclick: function(segment) {
+
+            // remove overlays
+            map.segments.clear();
+
+            // show segment
+            map.segments.selection([segment]);
+
+            // show information on videoframe
+            var vframe = segmentation.vframe(segment,0);
+            information.show(segment,_.isUndefined(vframe)?0:vframe);
 
         },
 
@@ -1198,6 +1252,9 @@ var RawDataNavigator = new function() {
             // change track
             if (this._segment != segment)
                 this.overview.track(segment);
+
+            // timeline
+            timeline.active(segment);
 
             // store
             this._segment = segment;
