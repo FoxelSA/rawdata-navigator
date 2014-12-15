@@ -198,6 +198,23 @@ var RawDataNavigator = new function() {
          * timeline.update()
          */
         update: function() {
+
+            // date range
+            var min = _.min(this._items,function(item) {
+                    return item.start;
+                });
+            var max = _.max(this._items,function(item) {
+                    return item.end;
+                });
+            var ts = (max.end-min.start)/100;
+
+            // range locking
+            this._component.setOptions({
+                min: min.start-ts,
+                max: max.end+ts
+            });
+
+            // update the timeline
             this._component.setItems(this._items);
             this._component.fit();
         },
