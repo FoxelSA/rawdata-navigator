@@ -185,13 +185,20 @@ var RawDataNavigator = new function() {
         add: function(segment,info,poses,validated,trashed,corrupted) {
             this._items.push({
                 id: segment,
-                content: '<div id="timeline_'+segment+'"></div>'
-                    + '<strong>'+segment+'</strong> :: '
-                    + poses.length+' poses ['+validated+' valid, '+trashed+' trashed, '+corrupted+' corrupted] :: '
-                    + (info.gps?'GPS available':'no GPS fix'),
+                content: '<div id="timeline_'+segment+'"></div><strong>'+segment+'</strong>',
                 start: parseInt(_.first(poses).sec,10)*1000+parseInt(_.first(poses).usc,10)/1000,
                 end: parseInt(_.last(poses).sec,10)*1000+parseInt(_.last(poses).usc,10)/1000,
-                className: 'timeline'+info.color.replace('#','-')
+                className: 'timeline'+info.color.replace('#','-'),
+                segmentation: {
+                    length: poses.length,
+                    validated: validated,
+                    trashed: trashed,
+                    corrupted: corrupted,
+                    gps: info.gps,
+                    split: info.split,
+                    preview: info.preview,
+                    debayer: info.debayer
+                }
             });
         },
 
@@ -221,6 +228,23 @@ var RawDataNavigator = new function() {
 
             // events hack
             $.each(this._items,function(index,item) {
+
+                // mouse enter
+                timeline.box(item.id).on('mouseenter',function(e) {
+                    $('#statistics div').html(item.segmentation.length+' poses'
+                        + ' ['+item.segmentation.validated+' valid, '+item.segmentation.trashed+' trashed, '+item.segmentation.corrupted+' corrupted]'
+                        + ' <span>GPS :&nbsp; '+(item.segmentation.gps?'Yes':'No')+'</span>'
+                        + ' <span>Splitted :&nbsp; '+(item.segmentation.split?'Yes':'No')+'</span>'
+                        + ' <span>Preview :&nbsp; '+(item.segmentation.preview?'Yes ('+item.segmentation.debayer+')':'No')+'</span>');
+                    $('#statistics').stop(true,false).slideDown(100);
+                });
+
+                // mouse leave
+                timeline.box(item.id).on('mouseleave',function(e) {
+                    $('#statistics').stop(true,false).slideUp(100);
+                });
+
+                // right-click
                 timeline.box(item.id).bind('contextmenu',function(e) {
 
                     e.preventDefault();
@@ -1306,7 +1330,7 @@ var RawDataNavigator = new function() {
             information.overview.marker(segment,pose);
 
             // show
-            $(this._dom).slideDown('fast',function() {
+            $(this._dom).stop(true,false).slideDown('fast',function() {
 
                 // fix overview
                 information.overview._component.invalidateSize();
@@ -1364,7 +1388,7 @@ var RawDataNavigator = new function() {
 
             // wait for the player to stop
             setTimeout(function() {
-                $(information._dom).slideUp('fast');
+                $(information._dom).stop(true,false).slideUp('fast');
             },250);
 
         },

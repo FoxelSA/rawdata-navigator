@@ -116,6 +116,7 @@
 </div>
 
 <div id="timeline"></div>
+<div id="statistics"><div></div></div>
 
 <div id="overlay">
     <div>
