@@ -276,8 +276,9 @@ var RawDataNavigator = new function() {
          * timeline.active()
          */
         active: function(segment) {
-            timeline.boxes(segment).removeClass('information');
-            timeline.box(segment).addClass('information');
+            timeline.boxes().removeClass('information');
+            if (!_.isNull(segment))
+                timeline.box(segment).addClass('information');
         },
 
         /**
@@ -1385,6 +1386,7 @@ var RawDataNavigator = new function() {
 
             this.video.clear();
             this.clear();
+            timeline.active(null);
 
             // wait for the player to stop
             setTimeout(function() {
