@@ -2,12 +2,16 @@
 ## Changelog
 
 
-### 1.2.0 (December 12, 2014)
+### 1.2.0 (December 17, 2014)
 
 - `FIXED` Remove the _data_ symbolic link dependency as video streaming is allowed now.
 - `ADDED` Information panel now shows a secondary global map of the segment track.
 - `FIXED` Playing the segment video doesn't unzoom and move the primary map anymore.
-- `ADDED` Timeline blocks now shows additional poses and GPS information.
+- `FIXED` Timeline is now locked to dates from the first to the last segment.
+- `ADDED` Timeline blocks now shows additional information in a tooltip.
+- `ADDED` Opened segment information panel is now reflected in the timeline.
+- `ADDED` Right-clicking a segment in timeline now open its information panel.
+- `FIXED` Disabled OSM Black&White tiles as the server has gone away.
 
 
 ### 1.1.0 (December 10, 2014)
