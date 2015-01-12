@@ -803,6 +803,7 @@ var RawDataNavigator = new function() {
                 keyboard: true,
                 scrollWheelZoom: true,
                 boxZoom: false,
+                zoomControl: false,
                 zoom: this.zoom.default,
                 minZoom: this.zoom.min,
                 maxZoom: this.zoom.max,
@@ -811,6 +812,9 @@ var RawDataNavigator = new function() {
 
             // scale
             L.control.scale().addTo(this._component);
+
+            // scale
+            L.control.zoom({position: 'topright'}).addTo(this._component);
 
             // tiles
             this.tiles.init();
