@@ -115,7 +115,7 @@
     <div class="preview"></div>
 </div>
 
-<div id="timeline"></div>
+<!--div id="timeline"></div-->
 <div id="statistics"><div></div></div>
 
 <div id="overlay">

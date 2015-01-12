@@ -58,7 +58,7 @@ var RawDataNavigator = new function() {
         // dom
         overlay.init();
         map.init();
-        timeline.init();
+        //timeline.init();
         information.init();
 
         // allocation
