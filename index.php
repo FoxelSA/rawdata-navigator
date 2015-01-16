@@ -78,7 +78,7 @@
 
 <div id="map"></div>
 
-<div id="leftpanel">
+<div id="leftpanel" class="panel">
   <div class="views">
     <a class="button current" id="viewonmap">Voir sur la carte</a>
     <a class="button" id="viewasvignette">Voir vignettes</a>
@@ -87,6 +87,10 @@
   <div class="content"></div>
 </div>
 
+<div id="leftpanel2" class="panel">
+  <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
+  <div class="content"></div>
+</div>
 
 <!--div id="timeline"></div-->
 <div id="statistics"><div></div></div>
@@ -116,7 +120,7 @@
 
 <div id="panels" style="visibility: invisible">
 
-<div id="home" class="panel">
+<div id="home" class="panel_content">
 
   <div id="allocation">
         <select></select>
@@ -136,7 +140,7 @@
 </div>
 
 <div id="panels2" style="visibility: invisible">
-<div id="pose_info" class="panel">
+<div id="pose_info" class="panel_content">
     <div class="pose"></div>
     <div class="video">
         <video id="vid" class="video-js vjs-default-skin" width="640" height="320">

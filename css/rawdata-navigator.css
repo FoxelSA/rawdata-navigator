@@ -301,11 +301,11 @@ a.fa:active {
             color:#fff;
         }
 
-#leftpanel {
+.panel {
     left:-660px;
 }
 
-#leftpanel {
+.panel {
     z-index: 100;
     display:block;
     position:absolute;
@@ -367,11 +367,11 @@ a.fa:active {
   background: orange;
 }
 
-    #info a, #leftpanel.content a {
+    #info a, .panel.content a {
         color:#fff;
     }
 
-        #leftpanel .close {
+        .panel .close {
             z-index: 1000;
             position: absolute;
             text-transform:uppercase;
@@ -384,7 +384,7 @@ a.fa:active {
             font-weight:normal;
         }
 
-             #info .close span, #leftpanel .close span {
+             #info .close span, .panel .close span {
                padding-right: 0.25em;
              }
 
@@ -557,7 +557,7 @@ a.fa:active {
     }
 
 
-.panel {
+.panel_content {
   visibility: hidden;
 }
 

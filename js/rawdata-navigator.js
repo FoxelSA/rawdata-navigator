@@ -39,8 +39,8 @@
 "use strict";
 
 L.Map.prototype.panToOffset = function (latlng, offset, options) {
-    var x = this.latLngToContainerPoint(latlng).x - offset[0]
-    var y = this.latLngToContainerPoint(latlng).y - offset[1]
+    var x = this.latLngToContainerPoint(latlng).x - (offset?offset[0]:0);
+    var y = this.latLngToContainerPoint(latlng).y - (offset?offset[1]:0);
     var point = this.containerPointToLatLng([x, y])
     return this.setView(point, this._zoom, { pan: options })
 }
@@ -69,6 +69,24 @@ var RawDataNavigator = new function() {
         map.init();
         leftbar.init();
         leftpanel.init();
+        leftpanel2.init();
+
+        // update map._offset on panel visibility events
+        map.panelState={};
+        $(leftpanel._dom+', '+leftpanel2._dom).on('visible hidden',function(e) {
+          map.panelState[e.target.id]=e.type;
+          var offset_h=0;
+          $.each(map.panelState,function(id,visibility){
+            if (visibility=="visible") {
+              offset_h=Math.max($('#'+id).outerWidth(true)/2,offset_h);
+            }
+          });
+          if (offset_h!=map._offset[0]) {
+            map._offset=[offset_h,0];
+          }
+          map._component.panToOffset(information.overview._marker.getLatLng(),map._offset);
+        });
+
         home.init();
         leftpanel.setContent(home);
         //timeline.init();
@@ -839,25 +857,28 @@ var RawDataNavigator = new function() {
 
     }; // leftbar
 
-
     /**
      * leftpanel object
      */
-    var leftpanel = this.leftpanel = new Panel();
+    var leftpanel = this.leftpanel = new Panel({
+        _dom: "#leftpanel",
+        _pool: "#panels",
+        _backround_alpha: 0.8,
+    });
+
     var leftpanel2 = this.leftpanel2 = new Panel({
         _dom: "#leftpanel2",
         _pool: "#panels2",
-        _backround_alpha: 1.0
+        _background_alpha: 1.0
     });
-    
+
     function Panel(options) {
       if (!(this instanceof Panel)) {
         return new Panel(options);
       }
       $.extend(true,this,options);
     }
-    
-    
+
     $.extend(Panel.prototype,{
 
       _dom: "#leftpanel",
@@ -908,6 +929,8 @@ var RawDataNavigator = new function() {
         'background-color': 'rbga('+panel._background_rgb+','+panel._background_alpha/2+')'
       });
       panel.visible=false;
+      $(panel._dom).trigger('hidden');
+
     }, // panel_hide
 
     show: function panel_show(){
@@ -917,6 +940,8 @@ var RawDataNavigator = new function() {
         'background-color': 'rgba('+panel._background_rgb+','+panel._background_alpha+')'
       });
       panel.visible=true;
+      $(panel._dom).trigger('visible');
+
     }, // panel_show
 
     setContent: function panel_setContent(content){
@@ -926,7 +951,7 @@ var RawDataNavigator = new function() {
         return;
       }
 
-      // hide previous content 
+      // hide previous content
       if (panel.content && panel.content._dom) {
         $(panel._pool).append($(panel.content._dom));
       }
@@ -959,7 +984,7 @@ var RawDataNavigator = new function() {
       /**
        * map.init()
        */
-      init: function() {
+      init: function map_init() {
 
           this.events();
           this.resize();
@@ -978,6 +1003,26 @@ var RawDataNavigator = new function() {
               center: [46.205007,6.145134]
           });
 
+          this._component.fitBounds = function (bounds, options) {
+              options = options || {};
+              bounds = bounds.getBounds ? bounds.getBounds() : L.latLngBounds(bounds);
+
+              var paddingTL = L.point(options.paddingTopLeft || options.padding || [0, 0]),
+                  paddingBR = L.point(options.paddingBottomRight || options.padding || [0, 0]),
+
+                  zoom = this.getBoundsZoom(bounds, false, paddingTL.add(paddingBR)),
+                  paddingOffset = paddingBR.subtract(paddingTL).divideBy(2),
+
+                  swPoint = this.project(bounds.getSouthWest(), zoom),
+                  nePoint = this.project(bounds.getNorthEast(), zoom),
+                  center = this.unproject(swPoint.add(nePoint).divideBy(2).add(paddingOffset), zoom);
+
+              this._zoom = options && options.maxZoom ? Math.min(options.maxZoom, zoom) : zoom;
+
+              return this.panToOffset(center, RawDataNavigator.map._offset, options);
+          }
+
+
           // scale
           L.control.scale({position: 'bottomleft'}).addTo(this._component);
 
@@ -987,21 +1032,21 @@ var RawDataNavigator = new function() {
           // tiles
           this.tiles.init();
 
-      },
+      }, // map_init
 
       /**
        * map.events()
        */
-      events: function() {
+      events: function map_events() {
           $(window).on('resize',function() {
               map.resize();
           });
-      },
+      }, // map_events
 
       /**
        * map.resize()
        */
-      resize: function() {
+      resize: function map_resize() {
         $(this._dom).width($(window).width()-$(leftbar._dom).outerWidth(true)); //-(parseInt($(information._dom).css('left'))>0?$(information._dom).outerWidth(true):0));
         $(this._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
 
@@ -1018,10 +1063,11 @@ var RawDataNavigator = new function() {
         }
         */
 
-
         $(leftbar._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
         $(leftpanel._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
-      },
+        $(leftpanel2._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
+
+      }, // map_resize
 
       /**
        * map.clear()
@@ -1400,7 +1446,6 @@ var RawDataNavigator = new function() {
   var information = this.information = {
       _width: 660,
       _buttonid: '#info_button',
-//        _minHeight: 800,
       _component: null,
       _dom: '#pose_info',
 
@@ -1429,7 +1474,9 @@ var RawDataNavigator = new function() {
       /**
        * information.events()
        */
-      events: function() {
+      events: function information_events() {
+
+          var information=this;
 
           $(this._buttonid).on('click',function(e){
              information.showPanel();
@@ -1463,7 +1510,7 @@ var RawDataNavigator = new function() {
         /**
          * information.show()
          */
-        show: function(segment,index) {
+        show: function information_show(segment,index) {
 
             var info = segmentation.info(segment);
             var pose = segmentation.pose(segment,index);
@@ -1500,16 +1547,23 @@ var RawDataNavigator = new function() {
             this.details(segment,index);
 
             this.showPanel();
-        },
 
-        showPanel: function() {
-            // show info panel
+        }, // information_show
+
+        showPanel: function information_showPanel() {
+
+            // hide info_button
             $(this._buttonid).hide();
-            leftpanel.setContent(this);
-            leftpanel.show();
-            map._offset=[$(this._dom).outerWidth(true)/2,0];
+
+            // set panel content
+            leftpanel2.setContent(this);
+
+            // show panel
+            leftpanel2.show();
+
             this.visible=true;
-        },
+
+        }, // information_showPanel
 
         /**
          * information.details()
@@ -1603,10 +1657,8 @@ var RawDataNavigator = new function() {
 
             setTimeout(function() {
 
-              leftpanel.hide();
-              map._offset=[0,0];
+              leftpanel2.hide();
               information.visible=false;
-              map._component.panTo(information.overview._marker.getLatLng());
               setTimeout(function(){
                 $('#info_button').fadeIn();
               },1000);
@@ -1844,7 +1896,7 @@ var RawDataNavigator = new function() {
                       });
                       information.panTimeout=null;
                     },250);
-                  } 
+                  }
                 }
 
             }
