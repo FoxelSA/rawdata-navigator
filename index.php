@@ -38,12 +38,13 @@
  *      Attribution" section of <http://foxel.ch/license>.
  */
 
-?><!DOCTYPE HTML>
+ ?><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Raw data navigator</title>
+    <link rel="stylesheet" type="text/css" media="all" href="font-awesome-4.2.0/css/font-awesome.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet/leaflet.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet.markercluster/MarkerCluster.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet.markercluster/MarkerCluster.Default.css" />
@@ -58,6 +59,7 @@
     <script type="text/javascript" src="js/thirdparty/select2/select2-3.5.2.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/vis.js/vis-3.7.2.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/video.js/video-js-4.11.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.globalstylesheet.js"></script>
     <script type="text/javascript" src="js/rawdata-navigator.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
@@ -73,47 +75,18 @@
 
 <body>
 
+
 <div id="map"></div>
 
-<div id="allocation">
-    <select></select>
+<div id="leftpanel">
+  <div class="views">
+    <a class="button current" id="viewonmap">Voir sur la carte</a>
+    <a class="button" id="viewasvignette">Voir vignettes</a>
+  </div>
+  <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
+  <div class="content"></div>
 </div>
 
-<div id="info">
-    <div class="close"><a href="#">Close<span></span></a></div>
-    <div class="nav"><div></div></div>
-    <div class="pose"></div>
-    <div class="jump">
-        Jump to: <input id="jump" name="jump" type="text" value="" />
-    </div>
-    <div class="data">
-        <div class="timestamp"></div>
-        <div class="section geo">Geo</div>
-        <table class="section geo">
-            <tr><td class="attr">Latitude</td><td class="lat"></td></tr>
-            <tr><td class="attr">Longitude</td><td class="lng"></td></tr>
-            <tr><td class="attr">Altitude</td><td class="lat"></td></tr>
-        </table>
-        <div class="section status">Status</div>
-        <table class="section status">
-            <tr><td class="attr">GPS</td><td class="gps"></td></tr>
-            <tr><td class="attr">JP4</td><td class="jp4"></td></tr>
-            <tr><td class="attr">Splitted</td><td class="split"></td></tr>
-        </table>
-        <div class="section date">Date</div>
-        <table class="section date">
-            <tr><td class="attr">UTC</td><td class="utc"></td></tr>
-            <tr><td class="attr">Local time</td><td class="gmt"></td></tr>
-        </table>
-    </div>
-    <div id="overview"></div>
-    <div class="video">
-        <video id="vid" class="video-js vjs-default-skin" width="640" height="320">
-            <p class="vjs-no-js">Please consider using a web browser that supports <a href="http://videojs.com/html5-video-support/" target="_blank">HTML5</a>.</p>
-        </video>
-    </div>
-    <div class="preview"></div>
-</div>
 
 <!--div id="timeline"></div-->
 <div id="statistics"><div></div></div>
@@ -123,6 +96,83 @@
         <img src="img/ajax-loader.gif" width="24" height="24" alt="" />
         <div class="txt"></div>
     </div>
+</div>
+
+<div id="leftbar">
+  <nav>
+    <a class="fa fa-angle-double-right fa-fw"></a>
+    <div class="separator"></div>
+    <a class="fa fa-cogs fa-fw"></a>
+    <a class="fa fa-download fa-fw"></a>
+    <div class="separator"></div>
+    <a class="fa fa-list-ul fa-fw"></a>
+    <a class="fa fa-gear fa-fw"></a>
+    <div class="separator"></div>
+    <a class="fa fa-power-off fa-fw"></a>
+  </nav>
+</div> 
+
+<div id="info_button"><a class="fa fa-fw fa-angle-double-right"></a></div>
+
+<div id="panels" style="visibility: invisible">
+
+<div id="home" class="panel">
+
+  <div id="allocation">
+        <select></select>
+  </div>
+
+  <!--div id="search">
+
+    <input type="search" name="search">
+    <select multiple name="keywords" value="Mots clés">
+    </select>
+    <button class="button" id="search">SEARCH</button>
+
+  </div-->
+
+</div>
+
+</div>
+
+<div id="panels2" style="visibility: invisible">
+<div id="pose_info" class="panel">
+    <div class="pose"></div>
+    <div class="video">
+        <video id="vid" class="video-js vjs-default-skin" width="640" height="320">
+            <p class="vjs-no-js">Please consider using a web browser that supports <a href="http://videojs.com/html5-video-support/" target="_blank">HTML5</a>.</p>
+        </video>
+    </div>
+    <div class="preview"></div>
+    <span class="jump">
+        Jump to: <input id="jump" name="jump" type="text" value="" />
+    </span>
+    <span class="nav"><div></div></span>
+    <div class="data">
+      <div class="timestamp"></div>
+        <table class="section date">
+          <tr>
+            <td class="attr">UTC</td><td class="utc"></td>
+            <td class="attr">Local time</td><td class="gmt"></td>
+          </tr>
+        </table>
+      <table><tr><td>
+        <table class="section geo">
+            <tr><td class="attr">Latitude</td><td class="lat"></td></tr>
+            <tr><td class="attr">Longitude</td><td class="lng"></td></tr>
+            <tr><td class="attr">Altitude</td><td class="lat"></td></tr>
+          </table>
+        </td><td>
+        <table class="section status">
+            <tr><td class="attr">GPS</td><td class="gps"></td></tr>
+            <tr><td class="attr">JP4</td><td class="jp4"></td></tr>
+            <tr><td class="attr">Splitted</td><td class="split"></td></tr>
+          </table>
+        </td></tr></table>
+    </div>
+    <div id="map_overview"></div>
+</div>
+
 </div>
 
 </body>

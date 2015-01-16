@@ -38,6 +38,13 @@
 
 "use strict";
 
+L.Map.prototype.panToOffset = function (latlng, offset, options) {
+    var x = this.latLngToContainerPoint(latlng).x - offset[0]
+    var y = this.latLngToContainerPoint(latlng).y - offset[1]
+    var point = this.containerPointToLatLng([x, y])
+    return this.setView(point, this._zoom, { pan: options })
+}
+
 /**
  * RawDataNavigator class
  * Constructor of RawDataNavigator.
@@ -49,6 +56,8 @@ var RawDataNavigator = new function() {
      */
     this.init = function(args) {
 
+        var rawdataNavigator=this;
+
         if (!_.isObject(args))
             args = {};
 
@@ -58,6 +67,10 @@ var RawDataNavigator = new function() {
         // dom
         overlay.init();
         map.init();
+        leftbar.init();
+        leftpanel.init();
+        home.init();
+        leftpanel.setContent(home);
         //timeline.init();
         information.init();
 
@@ -65,6 +78,29 @@ var RawDataNavigator = new function() {
         allocation.init();
 
     };
+
+    var home = this.home = {
+
+        _dom: '#home',
+
+        init: function home_init(){
+
+          var home=this;
+          $('.views .button',home._dom).on('click',function(e){
+
+            if ($(e.target).hasClass('current')) {
+              return;
+            }
+
+            switch(e.target.id) {
+            case 'viewasvignette':
+            case 'viewonmap':
+            }
+          });
+
+        }
+    };
+
 
     /**
      * [public] info()
@@ -76,7 +112,7 @@ var RawDataNavigator = new function() {
     /**
      * storage object
      */
-    var storage = {
+    var storage = this.storage = {
 
         mountpoint: '/data',
 
@@ -93,7 +129,7 @@ var RawDataNavigator = new function() {
     /**
      * overlay object
      */
-    var overlay = {
+    var overlay = this.overlay = {
 
         _dom: '#overlay',
 
@@ -147,7 +183,7 @@ var RawDataNavigator = new function() {
     /**
      * timeline object
      */
-    var timeline = {
+    var timeline = this.timeline = {
 
         _items: [],
         _component: null,
@@ -206,6 +242,9 @@ var RawDataNavigator = new function() {
          * timeline.update()
          */
         update: function() {
+
+            if (!this._component)
+                return;
 
             // date range
             var min = _.min(this._items,function(item) {
@@ -325,7 +364,8 @@ var RawDataNavigator = new function() {
          */
         clear: function() {
             this._items = [];
-            this._component.clear({items:true});
+            if (this._component)
+                this._component.clear({items:true});
         }
 
     };
@@ -333,7 +373,7 @@ var RawDataNavigator = new function() {
     /**
      * allocation object
      */
-    var allocation = {
+    var allocation = this.allocation = {
 
         _component: null,
         _dom: '#allocation',
@@ -554,7 +594,7 @@ var RawDataNavigator = new function() {
     /**
      * segmentation object
      */
-    var segmentation = {
+    var segmentation = this.segmentation = {
 
         _items: {},
         _colors: ['#f00','#0c0','#00f'],
@@ -783,463 +823,617 @@ var RawDataNavigator = new function() {
     };
 
     /**
-     * map object
+     * leftbar object
      */
-    var map = {
+    var leftbar = this.leftbar = {
 
-        _component: null,
-        _dom: '#map',
+      _dom: "#leftbar",
 
-        /**
-         * map.init()
-         */
-        init: function() {
+      init: function leftbar_init(){
+        $(leftbar._dom).on('click.leftbar',leftbar.click);
+      },
 
-            this.events();
-            this.resize();
+      click: function leftbar_click(e){
+        leftpanel.toggle();
+      }
 
-            // leaflet
-            this._component = L.map(this._dom.substring(1), {
-                keyboard: true,
-                scrollWheelZoom: true,
-                boxZoom: false,
-                zoomControl: false,
-                zoom: this.zoom.default,
-                minZoom: this.zoom.min,
-                maxZoom: this.zoom.max,
-                center: [46.205007,6.145134]
-            });
+    }; // leftbar
 
-            // scale
-            L.control.scale().addTo(this._component);
-
-            // scale
-            L.control.zoom({position: 'topright'}).addTo(this._component);
-
-            // tiles
-            this.tiles.init();
-
-        },
-
-        /**
-         * map.events()
-         */
-        events: function() {
-            $(window).on('resize',function() {
-                map.resize();
-            });
-        },
-
-        /**
-         * map.resize()
-         */
-        resize: function() {
-            $(this._dom).width($(window).width());
-            $(this._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
-        },
-
-        /**
-         * map.clear()
-         */
-        clear: function() {
-            this.segments.clear();
-            this.tiles.reset();
-        },
-
-        /**
-         * map.zoom{}
-         */
-        zoom: {
-
-            default: 4,
-            min: 3,
-            max: 25,
-            native: 18,
-            bounds: 17,
-
-            /**
-             * map.zoom.fit()
-             */
-            fit: function() {
-
-                var bounds = null;
-                $.each(map.segments.displayed(), function(index,layer) {
-                    _.isNull(bounds) ?
-                        bounds = layer.getBounds() : bounds.extend(layer.getBounds());
-                });
-
-                // empty
-                if (_.isNull(bounds))
-                    return;
-
-                // fit
-                map._component.fitBounds(bounds);
-
-                // zoom
-                this.bounding();
-
-                // center
-                map._component.panTo(bounds.getCenter());
-
-            },
-
-            /**
-             * map.zoom.bounding()
-             */
-            bounding: function() {
-                var zoom = map._component.getZoom() > this.bounds ?
-                    this.bounds : map._component.getZoom();
-                map._component.setZoom(zoom);
-            }
-
-        },
-
-        /**
-         * map.tiles{}
-         */
-        tiles: {
-
-            _maps: [],
-            _static: null,
-            _linear: null,
-
-            control: null,
-
-            /**
-             * map.tiles.init()
-             */
-            init: function() {
-
-                this.control = L.control.layers({},{}).addTo(map._component);
-
-                this.maps();
-                this.static();
-
-            },
-
-            /**
-             * map.tiles.maps()
-             */
-            maps: function() {
-
-                if (!_.isEmpty(this._maps))
-                    return this._maps;
-
-                // sources
-                var sources = [{
-                    description: 'OpenStreetMap Mapnik',
-                    url: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
-                                    + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>'
-                },
-                /*
-                {
-                    description: 'OpenStreetMap Black and White',
-                    url: 'http://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png',
-                    attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
-                                    + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>'
-                },
-                */
-                {
-                    description: 'Esri World Imagery',
-                    url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-                    attribution: 'Tiles &copy; Esri, '
-                                    + 'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-                }];
-
-                // layers
-                $.each(sources, function(index,source) {
-
-                    var layer = _.extend(
-                        L.tileLayer(source.url, {
-                            attribution: source.attribution
-                                + ' &nbsp;::&nbsp; Photogrammetric data &copy; <a href="http://foxel.ch/" target="_blank">FOXEL SA</a>',
-                            minZoom: map.zoom.min,
-                            maxZoom: map.zoom.max,
-                            maxNativeZoom: map.zoom.native
-                        }),{
-                            description:source.description
-                        });
-
-                    // reference
-                    map.tiles._maps.push(layer);
-
-                    // add to map
-                    if (index == 0)
-                        map._component.addLayer(layer);
-
-                    // add to layer control
-                    map.tiles.control.addBaseLayer(layer,source.description);
-
-                });
-
-            },
-
-            /**
-             * map.tiles.static()
-             */
-            static: function() {
-
-                if (!_.isNull(this._static))
-                    return this._static;
-
-                this._static = _.extend(
-                    L.tileLayer('img/tile.png', {
-                        attribution: 'Photogrammetric data &copy; <a href="http://foxel.ch/" target="_blank">FOXEL SA</a>',
-                        minZoom: map.zoom.min,
-                        maxZoom: map.zoom.max
-                    }),{
-                        description:'Timebased Mode'
-                    });
-
-            },
-
-            /**
-             * map.tiles.update()
-             */
-            update: function() {
-
-                var item = _.first(map.segments.displayed());
-                var info = segmentation.info(item.segment);
-
-                if (!_.isNull(this._linear) && !info.gps == this._linear)
-                    return;
-                this._linear = !info.gps;
-
-                // current tiles
-                $.each((!info.gps ? this.maps() : [this.static()]),function(index,layer) {
-                    map._component.removeLayer(layer);
-                    map.tiles.control.removeLayer(layer);
-                });
-
-                // updated tiles
-                $.each((!info.gps ? [this.static()] : this.maps()),function(index,layer) {
-                    if (index == 0)
-                        map._component.addLayer(layer);
-                    map.tiles.control.addBaseLayer(layer,layer.description);
-                });
-
-            },
-
-            /**
-             * map.tiles.reset()
-             */
-            reset: function() {
-                this._linear = null;
-            }
-
-        },
-
-        /**
-         * map.segments{}
-         */
-        segments: {
-
-            /**
-             * map.segments.layers()
-             */
-            layers: function() {
-                var layers = [];
-                $.each(segmentation.items(), function(index,item) {
-                    layers.push(item.layer);
-                });
-                return layers;
-            },
-
-            /**
-             * map.segments.displayed()
-             */
-            displayed: function() {
-                return _.filter(this.layers(), function(layer) {
-                    return layer.displayed;
-                });
-            },
-
-            /**
-             * map.segments.show()
-             */
-            show: function() {
-
-                var segments = _.isEmpty(segmentation.geolocated()) ?
-                    segmentation.linear() : segmentation.geolocated();
-
-                // add to map
-                $.each(segments, function(index,segment) {
-                    segment.layer.displayed = true;
-                    map._component.addLayer(segment.layer);
-                });
-
-                // map
-                map.tiles.update();
-                map.zoom.fit();
-
-            },
-
-            /**
-             * map.segments.selection()
-             */
-            selection: function(items) {
-
-                var geolocated = 0;
-                var linear = 0;
-                var selected = [];
-
-                // filter
-                $.each(segmentation.items(), function(index,segment) {
-                    if (!_.contains(items,index))
-                        return;
-                    segment.info.gps ? geolocated++ : linear++; // detect mixed geolocated+linear selection
-                    selected.push(segment);
-                });
-
-                // add to map
-                $.each(selected, function(index,segment) {
-                    if (geolocated > 0 && linear > 0 && !segment.info.gps) // mixed then filter on geolocated
-                        return;
-                    segment.layer.displayed = true;
-                    map._component.addLayer(segment.layer);
-                });
-
-                // map
-                map.tiles.update();
-                map.zoom.fit();
-
-            },
-
-            /**
-             * map.segments.clear()
-             */
-            clear: function() {
-                $.each(this.layers(), function(index,layer) {
-                    layer.displayed = false;
-                    map._component.removeLayer(layer);
-                });
-            }
-
-        },
-
-        /**
-         * map.helpers{}
-         */
-        helpers: {
-
-            /**
-             * map.helpers.layer()
-             */
-            layer: function(segment) {
-                return _.extend(L.featureGroup(), {
-                    segment: segment,
-                    displayed: false
-                });
-            },
-
-            /**
-             * map.helpers.latlng()
-             */
-            latlng: function(pose,info,vshift,hshift) {
-                if (!info.gps) {
-                    pose.lat = vshift * -0.005;
-                    pose.lng = hshift * 0.00005;
-                }
-                return L.latLng(pose.lat,pose.lng);
-            },
-
-            /**
-             * map.helpers.polyline()
-             */
-            polyline: function(segment,info,track) {
-                return L.polyline(track, {
-                    color: info.color,
-                    weight: 3,
-                    smoothFactor: 1,
-                    opacity: 1
-                }).on('click', function() {
-                    timeline.select(segment);
-                });
-            },
-
-            /**
-             * map.cluster{}
-             */
-            cluster: {
-
-                /**
-                 * map.helpers.cluster.group()
-                 */
-                group: function(info) {
-                    return new L.MarkerClusterGroup({
-                        showCoverageOnHover: false,
-                        maxClusterRadius: 25,
-                        singleMarkerMode: false,
-                        spiderfyOnMaxZoom: true,
-                        animateAddingMarkers: false,
-                        iconCreateFunction: function(cluster) {
-                            var c = cluster.getChildCount();
-                            return L.divIcon({
-                                html: '<div><span>'+c+'</span></div>',
-                                className: 'marker-cluster marker-cluster-'
-                                    + (c < 50 ? 'small' : '')+(c >= 50 && c < 100 ? 'medium' : '')+(c >= 100 ? 'large' : '')
-                                    + ' '+info.color.replace('#','seg-'),
-                                iconSize: L.point(40,40)
-                            });
-                        }
-                    });
-                },
-
-                /**
-                 * map.helpers.cluster.marker()
-                 */
-                marker: function(segment,pose,latlng,info,index) {
-                    return L.marker(latlng, {
-                        icon: L.divIcon({
-                            html: '<div><span></span></div>',
-                            className: 'marker-pnt '+info.color.replace('#','seg-')+' type-'+pose.status,
-                            iconSize: L.point(30,30)
-                        })
-                    }).on('click', function() {
-                        information.show(segment,index);
-                    });
-                }
-
-            }
-
-        }
-
-    };
 
     /**
-     * information object
+     * leftpanel object
      */
-    var information = {
+    var leftpanel = this.leftpanel = new Panel();
+    var leftpanel2 = this.leftpanel2 = new Panel({
+        _dom: "#leftpanel2",
+        _pool: "#panels2",
+        _backround_alpha: 1.0
+    });
+    
+    function Panel(options) {
+      if (!(this instanceof Panel)) {
+        return new Panel(options);
+      }
+      $.extend(true,this,options);
+    }
+    
+    
+    $.extend(Panel.prototype,{
 
-        _component: null,
-        _dom: '#info',
+      _dom: "#leftpanel",
+      _pool: "#panels",
+      _width: 660,
+      _background_rgb: "0,0,0",
+      _background_alpha: 0.8,
 
-        _segment: null,
-        _index: null,
-        _layer: null,
+      visible: false,
 
-        /**
-         * information.init()
-         */
-        init: function() {
-            this._component = $(this._dom+' .data');
-            this.events();
-            this.video.init();
-            this.overview.init();
-        },
+    init: function panel_init() {
+        var panel=this;
+        $(window).on('resize',panel.resize);
+        $('.close',panel._dom).on('click',function(e){
+          if (panel.content && panel.content.closebutton_click) {
+            if (panel.content.closebutton_click(e)===false) {
+              return false;
+            }
+          }
+          panel.hide();
+        });
 
-        /**
-         * information.events()
-         */
-        events: function() {
+        if (panel.visible) {
+          panel.show();
+        }
+    }, // panel_init
 
-            // close
-            $(this._dom+' .close a').on('click',function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                information.close();
-            });
+    resize: function panel_resize(e){
+      var panel=this;
+      if (panel.visible){
+        panel.show();
+      }
+    }, // panel_resize
+
+    toggle: function panel_toggle(){
+      var panel=this;
+      if (panel.visible) {
+        panel.hide();
+      } else {
+        panel.show();
+      }
+    }, // panel_toggle
+
+    hide: function panel_hide(){
+      var panel=this;
+      $(panel._dom).css({
+        left: -panel._width,
+        'background-color': 'rbga('+panel._background_rgb+','+panel._background_alpha/2+')'
+      });
+      panel.visible=false;
+    }, // panel_hide
+
+    show: function panel_show(){
+      var panel=this;
+      $(panel._dom).css({
+        left: $(leftbar._dom).outerWidth(true),
+        'background-color': 'rgba('+panel._background_rgb+','+panel._background_alpha+')'
+      });
+      panel.visible=true;
+    }, // panel_show
+
+    setContent: function panel_setContent(content){
+      var panel=this;
+
+      if (panel.content==content){
+        return;
+      }
+
+      // hide previous content 
+      if (panel.content && panel.content._dom) {
+        $(panel._pool).append($(panel.content._dom));
+      }
+
+      // set new content
+      $('.content',panel._dom)
+      .empty()
+      .append($(content._dom).css('visibility','visible'));
+
+      panel.content=content;
+      content.parent=panel;
+
+      // trigger ready event for content._dom
+      $(content._dom).trigger('ready');
+
+    } // panel_setContent
+
+    }); // extend panel prototype
+
+
+  /**
+   * map object
+   */
+  var map = this.map = {
+
+      _offset: [0,0],
+      _component: null,
+      _dom: '#map',
+
+      /**
+       * map.init()
+       */
+      init: function() {
+
+          this.events();
+          this.resize();
+
+          // leaflet
+          this._component = L.map(this._dom.substring(1), {
+              keyboard: true,
+              scrollWheelZoom: true,
+              boxZoom: false,
+              zoomControl: false,
+              scaleControl: false,
+              layersControl: false,
+              zoom: this.zoom.default,
+              minZoom: this.zoom.min,
+              maxZoom: this.zoom.max,
+              center: [46.205007,6.145134]
+          });
+
+          // scale
+          L.control.scale({position: 'bottomleft'}).addTo(this._component);
+
+          // zoom
+          L.control.zoom({position: 'topright'}).addTo(this._component);
+
+          // tiles
+          this.tiles.init();
+
+      },
+
+      /**
+       * map.events()
+       */
+      events: function() {
+          $(window).on('resize',function() {
+              map.resize();
+          });
+      },
+
+      /**
+       * map.resize()
+       */
+      resize: function() {
+        $(this._dom).width($(window).width()-$(leftbar._dom).outerWidth(true)); //-(parseInt($(information._dom).css('left'))>0?$(information._dom).outerWidth(true):0));
+        $(this._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
+
+        // invalidate map size so that the center coords for panTo are updated
+        if (this._component) {
+          this._component.invalidateSize();
+        }
+
+        /*
+        if ($(window).height()<information._minHeight) {
+          $(information._dom).css('zoom',$(window).height()/information._minHeight);
+        } else {
+          $(information._dom).css('zoom',1);
+        }
+        */
+
+
+        $(leftbar._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
+        $(leftpanel._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
+      },
+
+      /**
+       * map.clear()
+       */
+      clear: function() {
+          this.segments.clear();
+          this.tiles.reset();
+      },
+
+      /**
+       * map.zoom{}
+       */
+      zoom: {
+
+          default: 4,
+          min: 3,
+          max: 25,
+          native: 18,
+          bounds: 17,
+
+          /**
+           * map.zoom.fit()
+           */
+          fit: function() {
+
+              var bounds = null;
+              $.each(map.segments.displayed(), function(index,layer) {
+                  _.isNull(bounds) ?
+                      bounds = layer.getBounds() : bounds.extend(layer.getBounds());
+              });
+
+              // empty
+              if (_.isNull(bounds))
+                  return;
+
+              // fit
+              map._component.fitBounds(bounds);
+
+              // zoom
+              this.bounding();
+
+              // center
+              map._component.panToOffset(bounds.getCenter(),map._offset);
+
+          },
+
+          /**
+           * map.zoom.bounding()
+           */
+          bounding: function() {
+              var zoom = map._component.getZoom() > this.bounds ?
+                  this.bounds : map._component.getZoom();
+              map._component.setZoom(zoom);
+          }
+
+      },
+
+      /**
+       * map.tiles{}
+       */
+      tiles: {
+
+          _maps: [],
+          _static: null,
+          _linear: null,
+
+          control: null,
+
+          /**
+           * map.tiles.init()
+           */
+          init: function() {
+
+              this.control = L.control.layers({},{},{position: 'bottomright'}).addTo(map._component);
+
+              this.maps();
+              this.static();
+
+          },
+
+          /**
+           * map.tiles.maps()
+           */
+          maps: function() {
+
+              if (!_.isEmpty(this._maps))
+                  return this._maps;
+
+              // sources
+              var sources = [{
+                  description: 'OpenStreetMap Mapnik',
+                  url: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
+                                  + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>'
+              },
+              /*
+              {
+                  description: 'OpenStreetMap Black and White',
+                  url: 'http://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png',
+                  attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
+                                  + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>'
+              },
+              */
+              {
+                  description: 'Esri World Imagery',
+                  url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                  attribution: 'Tiles &copy; Esri, '
+                                  + 'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+              }];
+
+              // layers
+              $.each(sources, function(index,source) {
+
+                  var layer = _.extend(
+                      L.tileLayer(source.url, {
+                          attribution: source.attribution
+                              + ' &nbsp;::&nbsp; Photogrammetric data &copy; <a href="http://foxel.ch/" target="_blank">FOXEL SA</a>',
+                          minZoom: map.zoom.min,
+                          maxZoom: map.zoom.max,
+                          maxNativeZoom: map.zoom.native
+                      }),{
+                          description:source.description
+                      });
+
+                  // reference
+                  map.tiles._maps.push(layer);
+
+                  // add to map
+                  if (index == 0)
+                      map._component.addLayer(layer);
+
+                  // add to layer control
+                  map.tiles.control.addBaseLayer(layer,source.description);
+
+              });
+
+          },
+
+          /**
+           * map.tiles.static()
+           */
+          static: function() {
+
+              if (!_.isNull(this._static))
+                  return this._static;
+
+              this._static = _.extend(
+                  L.tileLayer('img/tile.png', {
+                      attribution: 'Photogrammetric data &copy; <a href="http://foxel.ch/" target="_blank">FOXEL SA</a>',
+                      minZoom: map.zoom.min,
+                      maxZoom: map.zoom.max
+                  }),{
+                      description:'Timebased Mode'
+                  });
+
+          },
+
+          /**
+           * map.tiles.update()
+           */
+          update: function() {
+
+              var item = _.first(map.segments.displayed());
+              var info = segmentation.info(item.segment);
+
+              if (!_.isNull(this._linear) && !info.gps == this._linear)
+                  return;
+              this._linear = !info.gps;
+
+              // current tiles
+              $.each((!info.gps ? this.maps() : [this.static()]),function(index,layer) {
+                  map._component.removeLayer(layer);
+                  map.tiles.control.removeLayer(layer);
+              });
+
+              // updated tiles
+              $.each((!info.gps ? [this.static()] : this.maps()),function(index,layer) {
+                  if (index == 0)
+                      map._component.addLayer(layer);
+                  map.tiles.control.addBaseLayer(layer,layer.description);
+              });
+
+          },
+
+          /**
+           * map.tiles.reset()
+           */
+          reset: function() {
+              this._linear = null;
+          }
+
+      },
+
+      /**
+       * map.segments{}
+       */
+      segments: {
+
+          /**
+           * map.segments.layers()
+           */
+          layers: function() {
+              var layers = [];
+              $.each(segmentation.items(), function(index,item) {
+                  layers.push(item.layer);
+              });
+              return layers;
+          },
+
+          /**
+           * map.segments.displayed()
+           */
+          displayed: function() {
+              return _.filter(this.layers(), function(layer) {
+                  return layer.displayed;
+              });
+          },
+
+          /**
+           * map.segments.show()
+           */
+          show: function() {
+
+              var segments = _.isEmpty(segmentation.geolocated()) ?
+                  segmentation.linear() : segmentation.geolocated();
+
+              // add to map
+              $.each(segments, function(index,segment) {
+                  segment.layer.displayed = true;
+                  map._component.addLayer(segment.layer);
+              });
+
+              // map
+              map.tiles.update();
+              map.zoom.fit();
+
+          },
+
+          /**
+           * map.segments.selection()
+           */
+          selection: function(items) {
+
+              var geolocated = 0;
+              var linear = 0;
+              var selected = [];
+
+              // filter
+              $.each(segmentation.items(), function(index,segment) {
+                  if (!_.contains(items,index))
+                      return;
+                  segment.info.gps ? geolocated++ : linear++; // detect mixed geolocated+linear selection
+                  selected.push(segment);
+              });
+
+              // add to map
+              $.each(selected, function(index,segment) {
+                  if (geolocated > 0 && linear > 0 && !segment.info.gps) // mixed then filter on geolocated
+                      return;
+                  segment.layer.displayed = true;
+                  map._component.addLayer(segment.layer);
+              });
+
+              // map
+              map.tiles.update();
+              map.zoom.fit();
+
+          },
+
+          /**
+           * map.segments.clear()
+           */
+          clear: function() {
+              $.each(this.layers(), function(index,layer) {
+                  layer.displayed = false;
+                  map._component.removeLayer(layer);
+              });
+          }
+
+      },
+
+      /**
+       * map.helpers{}
+       */
+      helpers: {
+
+          /**
+           * map.helpers.layer()
+           */
+          layer: function(segment) {
+              return _.extend(L.featureGroup(), {
+                  segment: segment,
+                  displayed: false
+              });
+          },
+
+          /**
+           * map.helpers.latlng()
+           */
+          latlng: function(pose,info,vshift,hshift) {
+              if (!info.gps) {
+                  pose.lat = vshift * -0.005;
+                  pose.lng = hshift * 0.00005;
+              }
+              return L.latLng(pose.lat,pose.lng);
+          },
+
+          /**
+           * map.helpers.polyline()
+           */
+          polyline: function(segment,info,track) {
+              return L.polyline(track, {
+                  color: info.color,
+                  weight: 3,
+                  smoothFactor: 1,
+                  opacity: 1
+              }).on('click', function() {
+                  timeline.select(segment);
+              });
+          },
+
+          /**
+           * map.cluster{}
+           */
+          cluster: {
+
+              /**
+               * map.helpers.cluster.group()
+               */
+              group: function(info) {
+                  return new L.MarkerClusterGroup({
+                      showCoverageOnHover: false,
+                      maxClusterRadius: 25,
+                      singleMarkerMode: false,
+                      spiderfyOnMaxZoom: true,
+                      animateAddingMarkers: false,
+                      iconCreateFunction: function(cluster) {
+                          var c = cluster.getChildCount();
+                          return L.divIcon({
+                              html: '<div><span>'+c+'</span></div>',
+                              className: 'marker-cluster marker-cluster-'
+                                  + (c < 50 ? 'small' : '')+(c >= 50 && c < 100 ? 'medium' : '')+(c >= 100 ? 'large' : '')
+                                  + ' '+info.color.replace('#','seg-'),
+                              iconSize: L.point(40,40)
+                          });
+                      }
+                  });
+              },
+
+              /**
+               * map.helpers.cluster.marker()
+               */
+              marker: function(segment,pose,latlng,info,index) {
+                  return L.marker(latlng, {
+                      icon: L.divIcon({
+                          html: '<div><span></span></div>',
+                          className: 'marker-pnt '+info.color.replace('#','seg-')+' type-'+pose.status,
+                          iconSize: L.point(30,30)
+                      })
+                  }).on('click', function() {
+                      information.click=true;
+                      information.show(segment,index);
+                      information.click=false;
+                  });
+              }
+
+          }
+
+      }
+
+  };
+
+  /**
+   * information object
+   */
+  var information = this.information = {
+      _width: 660,
+      _buttonid: '#info_button',
+//        _minHeight: 800,
+      _component: null,
+      _dom: '#pose_info',
+
+      _segment: null,
+      _index: null,
+      _layer: null,
+
+      /**
+       * information.init()
+       */
+      init: function() {
+          this._component = $(this._dom+' .data');
+          this.events();
+          this.video.init();
+          this.overview.init();
+      },
+
+      /**
+       * closebutton_click
+       */
+      closebutton_click: function information_closebutton_click(e){
+          information.close();
+          return false;
+      },
+
+      /**
+       * information.events()
+       */
+      events: function() {
+
+          $(this._buttonid).on('click',function(e){
+             information.showPanel();
+          });
 
             // jump
             $('#jump').on('keyup',function(e) {
@@ -1305,6 +1499,16 @@ var RawDataNavigator = new function() {
             // details
             this.details(segment,index);
 
+            this.showPanel();
+        },
+
+        showPanel: function() {
+            // show info panel
+            $(this._buttonid).hide();
+            leftpanel.setContent(this);
+            leftpanel.show();
+            map._offset=[$(this._dom).outerWidth(true)/2,0];
+            this.visible=true;
         },
 
         /**
@@ -1339,7 +1543,7 @@ var RawDataNavigator = new function() {
             information.overview.marker(segment,pose);
 
             // show
-            $(this._dom).stop(true,false).slideDown('fast',function() {
+            $(this._dom).show(0,function() {
 
                 // fix overview
                 information.overview._component.invalidateSize();
@@ -1391,16 +1595,24 @@ var RawDataNavigator = new function() {
          * information.close()
          */
         close: function() {
+            if (!information.visible) return;
 
             this.video.clear();
-            this.clear();
+//            this.clear();
             timeline.active(null);
 
-            // wait for the player to stop
             setTimeout(function() {
-                $(information._dom).stop(true,false).slideUp('fast');
-            },250);
 
+              leftpanel.hide();
+              map._offset=[0,0];
+              information.visible=false;
+              map._component.panTo(information.overview._marker.getLatLng());
+              setTimeout(function(){
+                $('#info_button').fadeIn();
+              },1000);
+
+            },250);
+            return false;
         },
 
         /**
@@ -1476,6 +1688,14 @@ var RawDataNavigator = new function() {
                     information.details(information._segment,segmentation.vframe(information._segment,frame));
                 });
 
+                this._player.on('pause',function(){
+                    if (information.panTimeout) {
+                      clearTimeout(information.panTimeout);
+                      information.panTimeout=null;
+                    }
+                    map._component.panToOffset(information.overview._marker.getLatLng(),map._offset);
+                });
+
             },
 
             /**
@@ -1499,7 +1719,7 @@ var RawDataNavigator = new function() {
         overview: {
 
             _component: null,
-            _dom: '#overview',
+            _dom: '#map_overview',
 
             _track: null,
             _marker: null,
@@ -1573,11 +1793,11 @@ var RawDataNavigator = new function() {
                 // bounds
                 var bounds = this._track.getBounds();
 
+                // show map
+                $(information.overview._dom).css('visibility','visible');
+
                 // wait a bit (leaflet take some time to be ready)
                 setTimeout(function () {
-
-                    // show map
-                    $(information.overview._dom).css('visibility','visible');
 
                     // fit
                     information.overview._component.fitBounds(bounds);
@@ -1611,6 +1831,21 @@ var RawDataNavigator = new function() {
 
                 // place track marker
                 this._marker.setLatLng(pose.latlng);
+                if (information.click && information.visible==true){
+                  information.panTimeout=null;
+                } else {
+                  information._layer.setLatLng(pose.latlng);
+                  if (!information.panTimeout) {
+                    information.panTimeout=setTimeout(function(){
+                      map._component.panToOffset(pose.latlng,map._offset,{
+                          duration: 0.05,
+                          easeLinearity: 1.0,
+                          noMoveStart: true
+                      });
+                      information.panTimeout=null;
+                    },250);
+                  } 
+                }
 
             }
 
@@ -1621,7 +1856,7 @@ var RawDataNavigator = new function() {
     /**
      * prototyping object
      */
-    var prototyping = {
+    var prototyping = this.prototyping = {
 
         /**
          * prototyping.init()

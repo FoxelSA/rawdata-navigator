@@ -36,27 +36,86 @@
  *      Attribution" section of <http://foxel.ch/license>.
  */
 
-@font-face {
+/*
+ * @font-face {
     font-family:'FontAwesome';
     font-style:normal;
     font-weight:normal;
-    src:url('fonts/FontAwesome/fontawesome-webfont.eot?v=4.0.3');
-    src:url('fonts/FontAwesome/fontawesome-webfont.eot?#iefix&v=4.0.3') format('embedded-opentype'), url('fonts/FontAwesome/fontawesome-webfont.woff?v=4.0.3') format('woff'), url('fonts/FontAwesome/fontawesome-webfont.ttf?v=4.0.3') format('truetype'), url('fonts/FontAwesome/fontawesome-webfont.svg?v=4.0.3#fontawesomeregular') format('svg');
+    src:url('fonts/FontAwesome/fontawesome-webfont.eot?v=4.2.0');
+    src:url('fonts/FontAwesome/fontawesome-webfont.eot?#iefix&v=4.2.0') format('embedded-opentype'), url('fonts/FontAwesome/fontawesome-webfont.woff?v=4.2.0') format('woff'), url('fonts/FontAwesome/fontawesome-webfont.ttf?v=4.2.0') format('truetype'), url('fonts/FontAwesome/fontawesome-webfont.svg?v=4.2.0#fontawesomeregular') format('svg');
 }
+*/
 
 html,body {
     margin:0;
     padding:0;
     font-family:'open sans',arial,helvetica,sans;
     font-size:13px;
+    overflow: hidden;
 }
 
 a, a:link, a:visited, a:hover, a:active {
     text-decoration:none;
 }
 
+#leftbar {
+  z-index: 10000;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  background-color: rgba(0,0,0,1);
+  color: white;
+  font-size: 3.2em;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+}
+
+a.fa {
+  display: block;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  transition: 0.04s all ease-in-out;
+}
+
+a.fa:hover {
+  color: gray;
+  transform: scale(0.95);
+}
+
+a.fa:active {
+  color: yellow;
+  transform: scale(0.8);
+}
+
+#leftbar div.separator {
+  border-bottom: 1px solid gray;
+  margin-bottom: 0.2em;
+}
+
+#info_button {
+  z-index: 1000;
+  position: absolute;
+  top: 0px;
+  left: 5.4em;
+  width: 2.25em;
+  height: 4.5em;
+  background-color: black;
+  border: 1px solid white;
+  display: none;
+  color: white;
+}
+
+    #info_button a {
+      position: relative;
+      margin-top: 0.5em;
+      font-size: 1.75em;
+    }
+
 #map {
-    width:100%;
+  position: fixed;
+  top: 0px;
+  right: 0px;
 }
 
     .leaflet-popup-content-wrapper {
@@ -185,10 +244,9 @@ a, a:link, a:visited, a:hover, a:active {
         }
 
 #allocation {
-    display:none;
-    position:absolute;
-    left:50px;
-    top:10px;
+    position:relative;
+    right:0px;
+    top: 4em;
     width:500px;
 }
 
@@ -243,43 +301,92 @@ a, a:link, a:visited, a:hover, a:active {
             color:#fff;
         }
 
-#info {
-    display:none;
-    position:absolute;
-    bottom:90px; /* see #timeline.height */
-    left:0;
-    width:100%;
-    height:390px;
-    color:#fff;
-    background-color:rgba(0,0,0,0.9);
+#leftpanel {
+    left:-660px;
 }
 
-    #info a {
+#leftpanel {
+    z-index: 100;
+    display:block;
+    position:absolute;
+    bottom:0px; /* see #timeline.height */
+    width: 660px;
+    height: 100%;
+    color: #fff;
+    background-color: #000;
+    transition-duration: 1s;
+    transition-property: left, background-color;
+    transition-timing-function: cubic-bezier(0.25,0.1,0.25,1);
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
+#leftpanel div.views {
+  position: relative;
+  width: 100%;
+  top: 1.0em;
+}
+
+#leftpanel div.views .button {
+  display: inline-block;
+  width: 45%;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 2em;
+  border: 1px outset black;
+  transition: 0.04s all ease-in-out;
+}
+
+#leftpanel div.views a {
+  background: black;
+}
+
+#leftpanel div.views a.current {
+  background: orange;
+}
+
+#leftpanel div.views a:hover {
+  color: gray;
+  transform: scale(0.95);
+}
+
+#leftpanel div.views a.current:hover {
+  color: rgb(240,240,240);
+}
+
+#leftpanel div.views a:active {
+  color: yellow;
+  transform: scale(0.8);
+}
+
+#leftpanel div.views a.current:active {
+  color: black;
+}
+
+#leftpanel div.views .current {
+  background: orange;
+}
+
+    #info a, #leftpanel.content a {
         color:#fff;
     }
 
-    #info .close {
-        position:absolute;
-        top:8px;
-        right:10px;
-        font-size:10px;
-        font-weight:700;
-        text-transform:uppercase;
-    }
-
-        #info .close span {
-            position:relative;
-            top:3px;
+        #leftpanel .close {
+            z-index: 1000;
+            position: absolute;
+            text-transform:uppercase;
+            top: 0px;
+            right: 10px;
             margin-left:6px;
             font-family:'FontAwesome';
-            font-size:20px;
+            font-size: 3.2em;
             font-style:normal;
             font-weight:normal;
         }
 
-            #info .close span:before {
-                content:"\f103";
-            }
+             #info .close span, #leftpanel .close span {
+               padding-right: 0.25em;
+             }
 
     #info .nav {
         position:absolute;
@@ -323,10 +430,9 @@ a, a:link, a:visited, a:hover, a:active {
                 content:"\f104";
             }
 
-    #info .pose {
-        position:absolute;
+    #pose_info .pose {
+        position: relative;
         top:16px;
-        right:175px;
         font-size:10px;
         font-weight:700;
         text-transform:uppercase;
@@ -356,13 +462,6 @@ a, a:link, a:visited, a:hover, a:active {
             background-color:transparent;
         }
 
-    #info .data {
-        position:absolute;
-        top:70px;
-        right:720px;
-        width:300px;
-        font-size:11px;
-    }
 
         #info .data .timestamp {
             padding-bottom:13px;
@@ -393,31 +492,25 @@ a, a:link, a:visited, a:hover, a:active {
                     width:100px;
                 }
 
-    #info .preview {
-        position:absolute;
-        bottom:25px;
-        right:10px;
-        width:650px;
+    #pose_info .preview {
+      position: relative;
+        width:640px;
         text-align:right;
     }
 
-        #info .preview img {
+        #pose_info .preview img {
             border:solid 1px #4f4f4f;
         }
 
-    #info .video {
-        position:absolute;
-        bottom:28px;
-        right:10px;
-        width:640px;
+    #pose_info .video {
+      margin-top: 3em;
+      position: relative;
         border:solid 1px #4f4f4f;
     }
 
-    #overview {
-        position:absolute;
-        bottom:28px;
-        right:1085px;
-        width:400px;
+    #map_overview {
+        left:10px;
+        width:640px;
         height:320px;
         border:solid 1px #4f4f4f;
     }
@@ -462,3 +555,17 @@ a, a:link, a:visited, a:hover, a:active {
     #statistics span {
         margin-left:35px;
     }
+
+
+.panel {
+  visibility: hidden;
+}
+
+#home {
+  padding-left: 10px;
+}
+
+a.fw, .button, * {
+  -webkit-user-select: none;
+  user-select: none;
+}
