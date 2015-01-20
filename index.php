@@ -82,7 +82,7 @@
 
 <div id="map"></div>
 
-<div id="leftpanel" class="panel">
+<div id="leftpanel" class="panel primary">
   <div class="views">
     <a class="button current" id="viewonmap">Voir sur la carte</a>
     <a class="button" id="viewasvignette">Voir vignettes</a>
@@ -101,11 +101,26 @@
   </div>
 </div>
 
-<div id="routingpanel" class="panel">
+<div id="digitizingpanel" class="panel secondary">
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
   <div class="content">
-    <iframe src="http://project-osrm.org/osrm-frontend-v2/" frameborder="no" scrolling="no" seamless="seamless"></iframe>
+    <iframe src="<?php if (true) { echo 'http://project-osrm.org/osrm-frontend-v2/'; } ?>" frameborder="no" scrolling="no" seamless="seamless"></iframe>
   </div>
+</div>
+
+<div id="processingpanel" class="panel secondary">
+  <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
+  <div class="content"></div>
+</div>
+
+<div id="taxonomypanel" class="panel secondary">
+  <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
+  <div class="content"></div>
+</div>
+
+<div id="configurationpanel" class="panel secondary">
+  <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
+  <div class="content"></div>
 </div>
 
 <div id="timeline"></div>
@@ -120,15 +135,15 @@
 
 <div id="leftbar">
   <nav>
-    <a id="panel_main" class="button davicon"></a>
+    <a id="a_leftpanel" class="button panel_button davicon"></a>
     <div class="separator"></div>
-    <a class="button fa fa-cogs fa-fw"></a>
-    <a id="panel_routing" class="button fa fa-download fa-fw"></a>
+    <a id="a_digitizingpanel" class="button panel_button fa fa-download fa-fw"></a>
+    <a id="a_processingpanel" class="button panel_button fa fa-cogs fa-fw"></a>
     <div class="separator"></div>
-    <a class="button fa fa-list-ul fa-fw"></a>
-    <a class="button fa fa-gear fa-fw"></a>
+    <a id="a_taxonomypanel" class="button panel_button fa fa-list-ul fa-fw"></a>
+    <a id="a_configurationpanel" class="button panel_button fa fa-gear fa-fw"></a>
     <div class="separator"></div>
-    <a class="button fa fa-power-off fa-fw"></a>
+    <a id="logout" class="button fa fa-power-off fa-fw"></a>
     <a id="leftbar_fullscreen" class="button fullscreen fa fa-expand fa-fw"></a>
   </nav>
 </div> 

@@ -77,9 +77,28 @@ var RawDataNavigator = new function() {
         overlay.init();
         map.init();
         leftbar.init();
-        leftpanel.init();
-        infopanel.init();
-        routingpanel.init();
+
+        $.each(window._panels,function(){
+          this.init();
+        })
+          // setup panel resize event handler
+          $(window).on('resize.panels',function(e){
+            $.each(window._panels,function(){
+              panel[e.type](e);
+            });
+          });
+
+          $('.panel').on('click.panel_close','.close a',function(e){
+            var id=$(e.target).closest('.panel').attr('id');
+            var panel=window._panels[id];
+            if (panel.content && panel.content.closebutton_click) {
+              if (panel.content.closebutton_click(e)===false) {
+                return false;
+              }
+            }
+            panel.hide();
+          });
+
 
         // update map._offset on panel visibility events
         map.panelState={};
@@ -88,9 +107,10 @@ var RawDataNavigator = new function() {
           var offset_h=0;
           $.each(map.panelState,function(id,visibility){
             if (visibility=="visible") {
-              offset_h=Max($('#'+id).outerWidth(true)/2,offset_h);
+              offset_h=Math.max($('#'+id).outerWidth(true)/2,offset_h);
             }
           });
+          if (offset_h>0) offset_h=330;
           if (offset_h!=map._offset[0]) {
             map._offset=[offset_h,0];
           }
@@ -886,6 +906,7 @@ var RawDataNavigator = new function() {
         });
         $(leftpanel._dom).on('hidden visible',function(e){
           return;
+          /*
           if (e.type=="hidden") {
             $('a#panel_main')
             .addClass('fa-angle-double-right')
@@ -895,6 +916,7 @@ var RawDataNavigator = new function() {
             .addClass('fa-angle-double-left')
             .removeClass('fa-angle-double-right');
           }
+          */
         });
       },
 
@@ -902,12 +924,10 @@ var RawDataNavigator = new function() {
 
         switch(e.target.id) {
 
-        case 'panel_main': 
-          leftpanel.toggle();
-          break;
-
-        case 'panel_routing':
-          routingpanel.toggle();
+        case 'a_digitizingpanel':
+          if (!$('iframe',digitizingpanel._dom).attr('src').length) {
+            $('iframe',digitizingpanel._dom).attr('src',digitizingpanel.url);
+          }
           break;
 
         case 'leftbar_fullscreen':
@@ -915,6 +935,11 @@ var RawDataNavigator = new function() {
           break;
 
         }
+
+        if ($(e.target).hasClass('panel_button')) {
+          window._panels[$(e.target).attr('id').substr(2)].toggle();
+        }
+
       },
 
     }; // leftbar
@@ -924,6 +949,7 @@ var RawDataNavigator = new function() {
         return new Panel(options);
       }
       $.extend(true,this,options);
+      this.register();
     }
 
     $.extend(Panel.prototype,{
@@ -936,17 +962,10 @@ var RawDataNavigator = new function() {
 
       visible: false,
 
+      _base_zIndex: 100,
+
     init: function panel_init() {
         var panel=this;
-        $(window).on('resize',panel.resize);
-        $('.close',panel._dom).on('click',function(e){
-          if (panel.content && panel.content.closebutton_click) {
-            if (panel.content.closebutton_click(e)===false) {
-              return false;
-            }
-          }
-          panel.hide();
-        });
 
         if (panel._expanded) {
           panel.expand();
@@ -955,31 +974,117 @@ var RawDataNavigator = new function() {
         if (panel.visible) {
           panel.show();
         }
+
     }, // panel_init
+
+
+    register: function panel_register() {
+
+        // first panel instantiated ?
+        if (!window._panels) {
+
+          // create panel list
+          window._panels={};
+
+        }
+
+        // register panel
+        window._panels[this._dom.substr(1)]=this;
+    },
 
     resize: function panel_resize(e){
       var panel=this;
+      if (panel._expanded){
+        panel.expand();
+      }
       if (panel.visible){
         panel.show();
       }
     }, // panel_resize
 
     toggle: function panel_toggle(){
+
       var panel=this;
+
+      // panel is visible, close it
       if (panel.visible) {
+
+        // unless the primary panel when secondary panels are open
+        if ($(panel._dom).hasClass('primary')) {
+
+          // in that case close all open secondary panels
+          var closedOne=false;
+          var topp=toppanel();
+          $.each(window._panels,function(){
+            if (this.visible && $(this._dom).hasClass('secondary')) {
+              this.hide((topp && topp._level>this._level));
+              closedOne=true;
+            }
+          });
+
+          // dont hide primary panel in case we just closed some secondary one(s)
+          if (closedOne) {
+            return;
+          }
+        }
+
+        // hide the requested panel
         panel.hide();
-      } else {
+
+
+      } else { 
+        
+        // close secondary panels if the primary one is requested
+        if ($(panel._dom).hasClass('primary')) {
+
+          // close all open secondary panels
+          var closedOne=false;
+          var topp=toppanel();
+          $.each(window._panels,function(){
+            if (this.visible && $(this._dom).hasClass('secondary')) {
+              this.hide((topp && topp._level>this._level));
+              closedOne=true;
+            }
+          });
+        }
+
+        // compute zIndex
+        var toplevel=0;
+        $.each(window._panels,function(){
+          if (this.visible && this!=panel) {
+            toplevel=Math.max(this._level,toplevel); 
+          }
+        });
+        panel._level=++toplevel;
+
+
+        // show panel
+        $(panel._dom).css('zIndex',panel._base_zIndex+panel._level);
         panel.show();
       }
     }, // panel_toggle
 
-    hide: function panel_hide(){
+    hide: function panel_hide(now){
       var panel=this;
+      var transition;
+
+      if (now) {
+        transition=$(panel._dom).css('transition');
+        $(panel._dom).css('transition','none');
+      }
+
       $(panel._dom).css({
         left: -panel._currentWidth,
         'background-color': 'rbga('+panel._background_rgb+','+panel._background_alpha/2+')'
       });
+
+      if (now) {
+        $(panel._dom).css('transition',transition);
+      }
+
       panel.visible=false;
+      panel._level=0;
+
       $(panel._dom).trigger('hidden');
 
     }, // panel_hide
@@ -1073,6 +1178,7 @@ var RawDataNavigator = new function() {
    * leftpanels
    */
   var leftpanel = this.leftpanel = new Panel({
+      _level: 1,
       _dom: "#leftpanel",
       _pool: "#panels",
       _backround_alpha: 0.8,
@@ -1080,16 +1186,37 @@ var RawDataNavigator = new function() {
   });
 
   var infopanel = this.infopanel = new Panel({
+      _level: 2,
       _dom: "#infopanel",
       _pool: "#panels2",
       _background_alpha: 1.0
   });
 
-  var routingpanel = this.routingpanel = new Panel({
+  var digitizingpanel = this.digitizingpanel = new Panel({
       _expanded: true,
-      _dom: "#routingpanel",
+      _dom: "#digitizingpanel",
+      _background_alpha: 1.0,
+      url: 'http://project-osrm.org/osrm-frontend-v2/'
+  });
+
+  var processingpanel = this.processingpanel = new Panel({
+      _expanded: true,
+      _dom: "#processingpanel",
       _background_alpha: 1.0
   });
+
+  var taxonomypanel = this.taxonomypanel = new Panel({
+      _expanded: true,
+      _dom: "#taxonomypanel",
+      _background_alpha: 1.0
+  });
+
+  var configurationpanel = this.configurationpanel = new Panel({
+      _expanded: true,
+      _dom: "#configurationpanel",
+      _background_alpha: 1.0
+  });
+
 
   /**
    * map object
@@ -1211,7 +1338,7 @@ var RawDataNavigator = new function() {
           this._component.invalidateSize();
         }
 
-        $(leftbar._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
+        $(leftbar._dom).height($(window).height());
         $(leftpanel._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
         $(infopanel._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
 
@@ -2169,4 +2296,28 @@ window.nopreview = function nopreview(img) {
   console.log('nopreview',img.src);
   img.src='img/nopreview.png';
 };
+
+window.toppanel = function toppanel(){
+  var toplevel=0;
+  var panel;
+  $.each(window._panels,function(){
+    if (this.visible && this._level>toplevel){
+      toplevel=this._level;
+      panel=this;
+    }
+  });
+  return panel;
+}
+
+window.getpanelstate = function getpanelstate() {
+  var panel_state=[];
+  $.each(window._panels,function(){
+    var panel=this;
+    if (panel.visible){
+      panel_state.push([panel,panel._level]);
+    }
+  });
+  return panel_state;
+}
+
 
