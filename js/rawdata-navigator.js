@@ -10,6 +10,11 @@
  *      Alexandre Kraft <a.kraft@foxel.ch>
  *
  *
+ * Contributor(s):
+ *
+ *      Luc Deschenaux <l.deschenaux@foxel.ch>
+ *
+ *
  * This file is part of the FOXEL project <http://foxel.ch>.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -37,6 +42,10 @@
  */
 
 "use strict";
+
+L.Map.prototype.panToOffset = function (latlng, offset, options) {
+    return this.panTo(latlng,options);
+}
 
 L.Map.prototype.panToOffset = function (latlng, offset, options) {
     var x = this.latLngToContainerPoint(latlng).x - (offset?offset[0]:0);
@@ -84,12 +93,15 @@ var RawDataNavigator = new function() {
           if (offset_h!=map._offset[0]) {
             map._offset=[offset_h,0];
           }
-          map._component.panToOffset(information.overview._marker.getLatLng(),map._offset);
+          // scroll map if marker is displayed
+          if (information.overview._marker) {
+            map._component.panToOffset(information.overview._marker.getLatLng(),map._offset);
+          }
         });
 
         home.init();
         leftpanel.setContent(home);
-        //timeline.init();
+        timeline.init();
         information.init();
 
         // allocation
@@ -101,19 +113,24 @@ var RawDataNavigator = new function() {
 
         _dom: '#home',
 
+        _dom2: '#vignettes',
+
         init: function home_init(){
 
           var home=this;
-          $('.views .button',home._dom).on('click',function(e){
+          $('.views .button',leftpanel._dom).on('click',function(e){
 
             if ($(e.target).hasClass('current')) {
               return;
             }
 
             switch(e.target.id) {
-            case 'viewasvignette':
-            case 'viewonmap':
+            case 'viewasvignette': leftpanel.expand(); break;
+            case 'viewonmap': leftpanel.shrink(); break;
             }
+
+            $('.views .button',leftpanel._dom).toggleClass('current');
+
           });
 
         }
@@ -774,6 +791,8 @@ var RawDataNavigator = new function() {
                 // gui
                 overlay.show('Building layers, please wait...');
 
+                var vignettes_count=0;
+                vignettes.clear();
                 // poses
                 $.each(data.pose, function(index,pose) {
 
@@ -807,6 +826,18 @@ var RawDataNavigator = new function() {
                         guess: pose.guess,
                         status: pose.status
                     };
+
+                    if (vignettes_count<100 && pose.status=="validated") {
+                      ++vignettes_count;
+                      // add to vignettes
+                      vignettes.add({
+                          segment: segment,
+                          segment_info: info,
+                          pose_index: index,
+                          pose: poses[index]
+                      });
+                    }
+
 
                 });
 
@@ -848,12 +879,39 @@ var RawDataNavigator = new function() {
       _dom: "#leftbar",
 
       init: function leftbar_init(){
-        $(leftbar._dom).on('click.leftbar',leftbar.click);
+        $('a, img',leftbar._dom).on('click.leftbar',leftbar.click);
+        $(document).on('fullscreenchange',function(){
+          $('.fullscreen',leftbar._dom).toggleClass('fa-expand fa-compress');
+        });
+        $(leftpanel._dom).on('hidden visible',function(e){
+          return;
+          if (e.type=="hidden") {
+            $('a#panel_main')
+            .addClass('fa-angle-double-right')
+            .removeClass('fa-angle-double-left');
+          } else {
+            $('a#panel_main')
+            .addClass('fa-angle-double-left')
+            .removeClass('fa-angle-double-right');
+          }
+        });
       },
 
       click: function leftbar_click(e){
-        leftpanel.toggle();
-      }
+
+        switch(e.target.id) {
+
+        case 'panel_main': 
+          leftpanel.toggle();
+          return false;
+          break;
+
+        case 'leftbar_fullscreen':
+          $(document).toggleFullScreen();
+          break;
+
+        }
+      },
 
     }; // leftbar
 
@@ -864,6 +922,7 @@ var RawDataNavigator = new function() {
         _dom: "#leftpanel",
         _pool: "#panels",
         _backround_alpha: 0.8,
+
     });
 
     var leftpanel2 = this.leftpanel2 = new Panel({
@@ -925,7 +984,7 @@ var RawDataNavigator = new function() {
     hide: function panel_hide(){
       var panel=this;
       $(panel._dom).css({
-        left: -panel._width,
+        left: -panel._currentWidth,
         'background-color': 'rbga('+panel._background_rgb+','+panel._background_alpha/2+')'
       });
       panel.visible=false;
@@ -939,6 +998,7 @@ var RawDataNavigator = new function() {
         left: $(leftbar._dom).outerWidth(true),
         'background-color': 'rgba('+panel._background_rgb+','+panel._background_alpha+')'
       });
+      panel._currentWidth=$(panel._dom).width();
       panel.visible=true;
       $(panel._dom).trigger('visible');
 
@@ -967,9 +1027,50 @@ var RawDataNavigator = new function() {
       // trigger ready event for content._dom
       $(content._dom).trigger('ready');
 
-    } // panel_setContent
+    }, // panel_setContent
 
-    }); // extend panel prototype
+    setContent2: function panel_setContent2(content){
+      var panel=this;
+
+      if (panel.content2==content){
+        return;
+      }
+
+      // hide previous content
+      if (panel.content2 && panel.content2._dom) {
+        $(panel._pool).append($(panel.content2._dom));
+      }
+
+      // set new content
+      $('.content2',panel._dom)
+      .empty()
+      .append($(content._dom).css('visibility','visible'));
+
+      panel.content2=content;
+      content.parent=panel;
+
+      // trigger ready event for content._dom
+      $(content._dom).trigger('ready');
+
+    }, // panel_setContent2
+
+    // expand panel to full screen width
+    expand: function panel_expand() {
+      var panel=this;
+      panel._currentWidth=$(window).width()-$(leftbar._dom).outerWidth(true);
+      $(panel._dom).css('width',panel._currentWidth);
+      panel.expanded=true;
+    },
+
+    // shrink panel from full screen to normal width
+    shrink: function panel_shrink() {
+      var panel=this;
+      panel._currentWidth=panel._width;
+      $(panel._dom).css('width',panel._currentWidth);
+      panel.expanded=false;
+    }
+
+  }); // extend panel prototype
 
 
   /**
@@ -1021,7 +1122,44 @@ var RawDataNavigator = new function() {
 
               return this.panToOffset(center, RawDataNavigator.map._offset, options);
           }
+/*
+          this._component.getCenter = function () { // (Boolean) -> LatLng                                                                                                                                                                
+              this._checkIfLoaded();
+              if (this._initialCenter && !this._moved()) {
+                  return this._initialCenter;
+              }
+              return this.layerPointToLatLng(this._getCenterLayerPoint());
+          }
 
+          this._component._getCenterLayerPoint = function (vanilla) {
+              var point = this.containerPointToLayerPoint(this.getSize()._divideBy(2));
+              if (map._offset) {
+                  point.x+=map._offset[0];
+                  point.y+=map._offset[1];
+              }
+              return point;
+          }
+
+          // offset of the specified place to the current center in pixels
+          this._component._getCenterOffset = function (latlng) {
+              return this.latLngToLayerPoint(latlng).subtract(this._getCenterLayerPoint());
+          }
+*/
+/*
+          this._component.setZoomAround = function (latlng, zoom, options) {
+              var scale = this.getZoomScale(zoom);
+              var viewHalf = this.getSize().divideBy(2);
+              if (map._offset) {
+                  viewHalf.x-=map._offset[0];
+                  viewHalf.y-=map._offset[1];
+              }
+              
+              var containerPoint = latlng instanceof L.Point ? latlng : this.latLngToContainerPoint(latlng);
+              var centerOffset = containerPoint.subtract(viewHalf).multiplyBy(1 - 1 / scale);
+              var newCenter = this.containerPointToLatLng(viewHalf.add(centerOffset));
+              return this.setView(newCenter, zoom, {zoom: options});
+          };
+*/
 
           // scale
           L.control.scale({position: 'bottomleft'}).addTo(this._component);
@@ -1055,17 +1193,11 @@ var RawDataNavigator = new function() {
           this._component.invalidateSize();
         }
 
-        /*
-        if ($(window).height()<information._minHeight) {
-          $(information._dom).css('zoom',$(window).height()/information._minHeight);
-        } else {
-          $(information._dom).css('zoom',1);
-        }
-        */
-
         $(leftbar._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
         $(leftpanel._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
         $(leftpanel2._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
+
+        leftpanel.resize();
 
       }, // map_resize
 
@@ -1445,6 +1577,7 @@ var RawDataNavigator = new function() {
    */
   var information = this.information = {
       _width: 660,
+      _currentWidth: 660,
       _buttonid: '#info_button',
       _component: null,
       _dom: '#pose_info',
@@ -1596,6 +1729,10 @@ var RawDataNavigator = new function() {
             // track marker
             information.overview.marker(segment,pose);
 
+            // show preview
+            var framepreview=(!info.preview || pose.status!='validated')?'img/nopreview.png':allocation.current.path+'/'+segment+'/preview/'+info.debayer+'/0/'+pose.sec+'_'+pose.usc+'.jpeg';
+            $('div.preview img').attr('src',framepreview);
+
             // show
             $(this._dom).show(0,function() {
 
@@ -1629,9 +1766,6 @@ var RawDataNavigator = new function() {
                 information._component.find('.gmt').html(date.getSimpleLocalDate());
 
                 // html
-                $(information._dom+' .preview').html(
-                    (!info.preview || pose.status!='validated') ? '<img src="img/def.png" alt="" width="640" height="320" />' : ''
-                );
                 $(information._dom+' .nav > div').html(
                     ((index > 0) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index-1)+'\');return false;"><span class="prev"></span>Prev</a>' : '')
                     + ((index+1 < poses.length) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index+1)+'\');return false;">Next<span class="next"></span></a>' : '')
@@ -1659,9 +1793,11 @@ var RawDataNavigator = new function() {
 
               leftpanel2.hide();
               information.visible=false;
+              /*
               setTimeout(function(){
                 $('#info_button').fadeIn();
               },1000);
+              */
 
             },250);
             return false;
@@ -1955,6 +2091,64 @@ var RawDataNavigator = new function() {
 
         }
 
-    };
+    }; // prototyping
 
+    function Vignettes(options) {
+      $.extend(true,this,options);
+      this.init();
+    }
+
+    $.extend(true,Vignettes.prototype,{
+
+        _dom: '#vignettes',
+
+        init: function vignettes_init(){
+          var vignettes=this;
+          $(document).on('click',vignettes._dom+' .wrap',function(e){
+            vignettes.click(e)
+          });
+        }, // vignettes_init
+
+        clear: function vignettes_clear(){
+          $(this._dom).empty();
+        }, // vignettes_clear
+
+        add: function vignettes_add(vignette){
+          var vignettes=this;
+          var date=new Date(vignette.pose.sec*1000);
+          var html='<div class="wrap">';
+          html+='<div class="timestamp">'+date.getSimpleUTCDate();
+          html+='<a class="button fa fa-gear fa-fw"></a></div>';
+          html+='<img class="thumb" alt="n/a" onerror="nopreview(this);" src="'+allocation.current.path+'/'+vignette.segment+'/preview/'+vignette.segment_info.debayer+'/0/'+vignette.pose.sec+'_'+vignette.pose.usc+'.jpeg"></img>';
+          html+='<div class="info">';
+          html+='<div class="what">Poses (RAW DATA)</div>';
+          html+='<div class="footer">INFORMATIONS</div>';
+//          html+=vignette.info;
+          html+='</div>';
+          html+='</div>';
+          $(vignettes._dom).append($('div:first',html).parent().data('info',{
+              segment: vignette.segment,
+              index: vignette.pose_index
+          }));
+        }, // vignettes_add
+
+        click: function vignettes_click(e) {
+          var info=$(e.target).closest('.wrap').data('info');
+          information.click=true;
+          information.show(info.segment,info.index);
+          information.click=false;
+        } // vignettes_click
+    });
+
+    var vignettes = this.vignettes = new Vignettes();
+    
+
+}; // RawDataNavigator
+
+
+window.nopreview = function nopreview(img) {
+  img.onerror=null;
+  console.log('nopreview',img.src);
+  img.src='img/nopreview.png';
 };
+

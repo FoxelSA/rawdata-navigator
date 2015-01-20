@@ -43,6 +43,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=1920">
     <title>Raw data navigator</title>
     <link rel="stylesheet" type="text/css" media="all" href="font-awesome-4.2.0/css/font-awesome.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet/leaflet.css" />
@@ -53,17 +54,21 @@
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/video.js/video-js.min.css" />
     <link rel="stylesheet" type="text/css" media="all" href="css/rawdata-navigator.css" />
     <script type="text/javascript" src="js/thirdparty/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="js/thirdparty/jquery.fullscreen-min.js"></script>
+    <script type="text/javascript" src="js/thirdparty/jquery.cookie-1.4.1.js"></script>
     <script type="text/javascript" src="js/thirdparty/underscore.js/underscore-1.7.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/leaflet/leaflet-0.7.3.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/leaflet.markercluster/leaflet.markercluster-37cdfca01d.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/select2/select2-3.5.2.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/vis.js/vis-3.7.2.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/video.js/video-js-4.11.1.min.js"></script>
-    <script type="text/javascript" src="js/jquery.globalstylesheet.js"></script>
     <script type="text/javascript" src="js/rawdata-navigator.js"></script>
     <script type="text/javascript">
-        $(document).ready(function() {
-            // init
+      function isMobile() {
+          try{ document.createEvent("TouchEvent"); return true; }
+            catch(e){ return false; }
+      }
+      $(document).ready(function() {
             RawDataNavigator.init({
             <?php if (isset($_GET['mountpoint']) && !empty($_GET['mountpoint'])): ?>
                 mountpoint: <?php echo json_encode(rtrim($_GET['mountpoint'],'/')); ?>,
@@ -75,7 +80,6 @@
 
 <body>
 
-
 <div id="map"></div>
 
 <div id="leftpanel" class="panel">
@@ -85,14 +89,19 @@
   </div>
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
   <div class="content"></div>
+  <div class="content2">
+    <div id="vignettes"></div>
+  </div>
 </div>
 
 <div id="leftpanel2" class="panel">
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
   <div class="content"></div>
+  <div class="content2">
+  </div>
 </div>
 
-<!--div id="timeline"></div-->
+<div id="timeline"></div>
 <div id="statistics"><div></div></div>
 
 <div id="overlay">
@@ -104,24 +113,26 @@
 
 <div id="leftbar">
   <nav>
-    <a class="fa fa-angle-double-right fa-fw"></a>
+    <a id="panel_main" class="button davicon"></a>
     <div class="separator"></div>
-    <a class="fa fa-cogs fa-fw"></a>
-    <a class="fa fa-download fa-fw"></a>
+    <a class="button fa fa-cogs fa-fw"></a>
+    <a class="button fa fa-download fa-fw"></a>
     <div class="separator"></div>
-    <a class="fa fa-list-ul fa-fw"></a>
-    <a class="fa fa-gear fa-fw"></a>
+    <a class="button fa fa-list-ul fa-fw"></a>
+    <a class="button fa fa-gear fa-fw"></a>
     <div class="separator"></div>
-    <a class="fa fa-power-off fa-fw"></a>
+    <a class="button fa fa-power-off fa-fw"></a>
+    <a id="leftbar_fullscreen" class="button fullscreen fa fa-expand fa-fw"></a>
   </nav>
 </div> 
 
 <div id="info_button"><a class="fa fa-fw fa-angle-double-right"></a></div>
 
+<!-- panels -->
 <div id="panels" style="visibility: invisible">
 
+<!-- home -->
 <div id="home" class="panel_content">
-
   <div id="allocation">
         <select></select>
   </div>
@@ -129,25 +140,24 @@
   <!--div id="search">
 
     <input type="search" name="search">
-    <select multiple name="keywords" value="Mots clés">
-    </select>
     <button class="button" id="search">SEARCH</button>
 
-  </div-->
+    </div-->
 
 </div>
+<!-- home -->
 
 </div>
+<!-- panels -->
 
+
+<!-- panels2 -->
 <div id="panels2" style="visibility: invisible">
+
+<!-- pose_info -->
 <div id="pose_info" class="panel_content">
     <div class="pose"></div>
-    <div class="video">
-        <video id="vid" class="video-js vjs-default-skin" width="640" height="320">
-            <p class="vjs-no-js">Please consider using a web browser that supports <a href="http://videojs.com/html5-video-support/" target="_blank">HTML5</a>.</p>
-        </video>
-    </div>
-    <div class="preview"></div>
+    <div class="preview"><img onerror="nopreview(this);"></img></div>
     <span class="jump">
         Jump to: <input id="jump" name="jump" type="text" value="" />
     </span>
@@ -175,9 +185,21 @@
         </td></tr></table>
     </div>
     <div id="map_overview"></div>
-</div>
+  </div>
+  <!-- pose_info -->
+
+<!-- video_player -->
+  <div class="video_player" class="panel_content">
+  <div class="video">
+    <video id="vid" class="video-js vjs-default-skin" width="640" height="320">
+        <p class="vjs-no-js">Please consider using a web browser that supports <a href="http://videojs.com/html5-video-support/" target="_blank">HTML5</a>.</p>
+    </video>
+ </div>
+ </div>
+<!-- video_player -->
 
 </div>
+<!-- panels2 -->
 
 </body>
 </html>

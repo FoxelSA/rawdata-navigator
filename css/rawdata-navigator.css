@@ -71,21 +71,55 @@ a, a:link, a:visited, a:hover, a:active {
   padding-right: 0.2em;
 }
 
-a.fa {
+.davicon {
   display: block;
-  padding-top: 0.2em;
-  padding-bottom: 0.2em;
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+  height: 59px;
+  width: 59px;
+  background-image: url(../img/dav-72x72.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.panel .content {
+  top: 3em;
+  height: 100%;
+  width: 660px;
+}
+
+#leftbar a.fa {
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+}
+
+.button {
+  cursor: pointer;
+}
+
+.davicon, a.fa {
+  display: block;
   transition: 0.04s all ease-in-out;
 }
 
-a.fa:hover {
+.davicon:hover, a.fa:hover {
   color: gray;
   transform: scale(0.95);
 }
 
-a.fa:active {
+.davicon:active, a.fa:active {
   color: yellow;
   transform: scale(0.8);
+}
+
+#vignettes a.fa:active {
+  color: black;
+}
+
+.fullscreen {
+  position: absolute;
+  bottom: 0px;
 }
 
 #leftbar div.separator {
@@ -245,8 +279,7 @@ a.fa:active {
 
 #allocation {
     position:relative;
-    right:0px;
-    top: 4em;
+    top: 3em;
     width:500px;
 }
 
@@ -306,16 +339,17 @@ a.fa:active {
 }
 
 .panel {
+    overflow: hidden;
     z-index: 100;
     display:block;
     position:absolute;
-    bottom:0px; /* see #timeline.height */
+    top: 0px; /* see #timeline.height */
     width: 660px;
     height: 100%;
     color: #fff;
     background-color: #000;
     transition-duration: 1s;
-    transition-property: left, background-color;
+    transition-property: left, width, background-color;
     transition-timing-function: cubic-bezier(0.25,0.1,0.25,1);
     padding-left: 0.5em;
     padding-right: 0.5em;
@@ -323,11 +357,12 @@ a.fa:active {
 
 #leftpanel div.views {
   position: relative;
-  width: 100%;
+  width: 660px;
   top: 1.0em;
 }
 
 #leftpanel div.views .button {
+  z-index: 99999;
   display: inline-block;
   width: 45%;
   text-align: center;
@@ -493,23 +528,30 @@ a.fa:active {
                 }
 
     #pose_info .preview {
-      position: relative;
-        width:640px;
+        position: relative;
+        left: 10px;
+        margin-top: 3em;
+        width:480px;
+        height:240px;
         text-align:right;
     }
 
         #pose_info .preview img {
             border:solid 1px #4f4f4f;
+        width:640px;
+        height:320px;
         }
 
-    #pose_info .video {
+    .video {
+      visibility: hidden;
       margin-top: 3em;
       position: relative;
         border:solid 1px #4f4f4f;
     }
 
     #map_overview {
-        left:10px;
+        position: relative;
+        left: 10px;
         width:640px;
         height:320px;
         border:solid 1px #4f4f4f;
@@ -563,9 +605,68 @@ a.fa:active {
 
 #home {
   padding-left: 10px;
+  display: inline;
 }
 
-a.fw, .button, * {
+* {
+  -moz-user-select: none;
   -webkit-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
   user-select: none;
+}
+
+.content2 {
+  position: absolute;
+  height: 100%;
+  left: 700px;
+  top: 4em;
+}
+
+#vignettes {
+  position: relative;
+}
+
+#vignettes .wrap {
+  overflow: hidden;
+  background: black;
+  border: 1px solid orange; 
+  float: left;
+  margin: 5px;
+}
+
+#vignettes .timestamp {
+  background: white;
+  color: black;
+  padding: 2px;
+  padding-left: 8px;
+}
+
+#vignettes .fa-gear {
+  float: right;
+}
+
+
+#vignettes .thumb {
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: top;
+  width: 240px;
+  height: 120px;
+  outline: none;
+  border-width: 0px solid black;
+  cursor: pointer;
+}
+ 
+#vignettes .info {
+  color: white;
+  height: auto;
+  width: 240px;
+  margin: auto;
+  cursor: pointer;
+}
+
+#vignettes .info div {
+  margin: 10px;
+  text-align: center;
 }
