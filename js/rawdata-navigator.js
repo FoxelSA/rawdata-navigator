@@ -78,16 +78,17 @@ var RawDataNavigator = new function() {
         map.init();
         leftbar.init();
         leftpanel.init();
-        leftpanel2.init();
+        infopanel.init();
+        routingpanel.init();
 
         // update map._offset on panel visibility events
         map.panelState={};
-        $(leftpanel._dom+', '+leftpanel2._dom).on('visible hidden',function(e) {
+        $(leftpanel._dom+', '+infopanel._dom).on('visible hidden',function(e) {
           map.panelState[e.target.id]=e.type;
           var offset_h=0;
           $.each(map.panelState,function(id,visibility){
             if (visibility=="visible") {
-              offset_h=Math.max($('#'+id).outerWidth(true)/2,offset_h);
+              offset_h=Max($('#'+id).outerWidth(true)/2,offset_h);
             }
           });
           if (offset_h!=map._offset[0]) {
@@ -903,7 +904,10 @@ var RawDataNavigator = new function() {
 
         case 'panel_main': 
           leftpanel.toggle();
-          return false;
+          break;
+
+        case 'panel_routing':
+          routingpanel.toggle();
           break;
 
         case 'leftbar_fullscreen':
@@ -914,22 +918,6 @@ var RawDataNavigator = new function() {
       },
 
     }; // leftbar
-
-    /**
-     * leftpanel object
-     */
-    var leftpanel = this.leftpanel = new Panel({
-        _dom: "#leftpanel",
-        _pool: "#panels",
-        _backround_alpha: 0.8,
-
-    });
-
-    var leftpanel2 = this.leftpanel2 = new Panel({
-        _dom: "#leftpanel2",
-        _pool: "#panels2",
-        _background_alpha: 1.0
-    });
 
     function Panel(options) {
       if (!(this instanceof Panel)) {
@@ -959,6 +947,10 @@ var RawDataNavigator = new function() {
           }
           panel.hide();
         });
+
+        if (panel._expanded) {
+          panel.expand();
+        }
 
         if (panel.visible) {
           panel.show();
@@ -995,6 +987,7 @@ var RawDataNavigator = new function() {
     show: function panel_show(){
       var panel=this;
       $(panel._dom).css({
+        visibility: 'visible',
         left: $(leftbar._dom).outerWidth(true),
         'background-color': 'rgba('+panel._background_rgb+','+panel._background_alpha+')'
       });
@@ -1058,6 +1051,9 @@ var RawDataNavigator = new function() {
     expand: function panel_expand() {
       var panel=this;
       panel._currentWidth=$(window).width()-$(leftbar._dom).outerWidth(true);
+      if (!panel.visible) {
+        $(panel._dom).css('left',-panel._currentWidth);
+      }
       $(panel._dom).css('width',panel._currentWidth);
       panel.expanded=true;
     },
@@ -1072,6 +1068,28 @@ var RawDataNavigator = new function() {
 
   }); // extend panel prototype
 
+
+  /**
+   * leftpanels
+   */
+  var leftpanel = this.leftpanel = new Panel({
+      _dom: "#leftpanel",
+      _pool: "#panels",
+      _backround_alpha: 0.8,
+
+  });
+
+  var infopanel = this.infopanel = new Panel({
+      _dom: "#infopanel",
+      _pool: "#panels2",
+      _background_alpha: 1.0
+  });
+
+  var routingpanel = this.routingpanel = new Panel({
+      _expanded: true,
+      _dom: "#routingpanel",
+      _background_alpha: 1.0
+  });
 
   /**
    * map object
@@ -1195,7 +1213,7 @@ var RawDataNavigator = new function() {
 
         $(leftbar._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
         $(leftpanel._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
-        $(leftpanel2._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
+        $(infopanel._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
 
         leftpanel.resize();
 
@@ -1689,10 +1707,10 @@ var RawDataNavigator = new function() {
             $(this._buttonid).hide();
 
             // set panel content
-            leftpanel2.setContent(this);
+            infopanel.setContent(this);
 
             // show panel
-            leftpanel2.show();
+            infopanel.show();
 
             this.visible=true;
 
@@ -1791,7 +1809,7 @@ var RawDataNavigator = new function() {
 
             setTimeout(function() {
 
-              leftpanel2.hide();
+              infopanel.hide();
               information.visible=false;
               /*
               setTimeout(function(){

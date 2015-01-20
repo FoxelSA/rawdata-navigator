@@ -94,10 +94,17 @@
   </div>
 </div>
 
-<div id="leftpanel2" class="panel">
+<div id="infopanel" class="panel">
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
   <div class="content"></div>
   <div class="content2">
+  </div>
+</div>
+
+<div id="routingpanel" class="panel">
+  <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
+  <div class="content">
+    <iframe src="http://project-osrm.org/osrm-frontend-v2/" frameborder="no" scrolling="no" seamless="seamless"></iframe>
   </div>
 </div>
 
@@ -116,7 +123,7 @@
     <a id="panel_main" class="button davicon"></a>
     <div class="separator"></div>
     <a class="button fa fa-cogs fa-fw"></a>
-    <a class="button fa fa-download fa-fw"></a>
+    <a id="panel_routing" class="button fa fa-download fa-fw"></a>
     <div class="separator"></div>
     <a class="button fa fa-list-ul fa-fw"></a>
     <a class="button fa fa-gear fa-fw"></a>
