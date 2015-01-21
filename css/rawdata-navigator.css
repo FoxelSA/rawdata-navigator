@@ -400,12 +400,6 @@ a, a:link, a:visited, a:hover, a:active {
   transition: 0.04s all ease-in-out;
 }
 
-#infopanel .viewers .button {
-  width: auto;
-  font-size: 1.5em;
-  display: inline-block;
-}
-
 #leftpanel div.views a {
   background: black;
 }
@@ -434,6 +428,29 @@ a, a:link, a:visited, a:hover, a:active {
 
 #leftpanel div.views .current {
   background: orange;
+}
+
+#infopanel .viewers {
+  margin: 10px;
+  margin-left: 0px;
+}
+
+#infopanel .viewers .button {
+  width: auto;
+  font-size: 1.5em;
+  background: #333;
+  padding: 5px;
+  margin: 5px;
+}
+
+#infopanel .viewers a:hover {
+  color: #ddd;
+  transform: scale(0.95);
+}
+
+#infopanel .viewers a:active {
+  color: #bbb;
+  transform: scale(0.8);
 }
 
     #info a, .panel.content a {
