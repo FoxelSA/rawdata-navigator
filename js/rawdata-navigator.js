@@ -105,13 +105,13 @@ var DAV = new function() {
         $('.panel').on('click.panel_close','.close a',function(e){
           var id=$(e.target).closest('.panel').attr('id');
           var panel=window._panels[id];
-          if (panel.closebutton_click) {
-            if (panel.closebutton_click(e)===false) {
+          if (panel.content && panel.content.closebutton_click) {
+            if (panel.content.closebutton_click(e)===false) {
               return false;
             }
           }
-          if (panel.content && panel.content.closebutton_click) {
-            if (panel.content.closebutton_click(e)===false) {
+          if (panel.closebutton_click) {
+            if (panel.closebutton_click(e)===false) {
               return false;
             }
           }
@@ -1186,7 +1186,10 @@ var DAV = new function() {
       });
 
       if (now) {
-        $(panel._dom).css('transition','');
+        $(panel._dom).css({
+            transition: '',
+            display: 'none'
+        });
       }
 
       panel.visible=false;
@@ -1214,6 +1217,7 @@ var DAV = new function() {
 
       $(panel._dom).css({
         visibility: 'visible',
+        display: 'block',
         left: $(leftbar._dom).outerWidth(true),
         'background-color': 'rgba('+panel._background_rgb+','+panel._background_alpha+')'
       });
@@ -1330,11 +1334,13 @@ var DAV = new function() {
       _backround_alpha: 0.8,
       closebutton_click: function leftpanel_closebutton_click(e){
           var panel=this;
-          information.close();
-          setTimeout(function(){
-            panel.hide();
-          },1000);
-          return false;
+          if (information.visible) {
+            information.close();
+            setTimeout(function(){
+             panel.hide();
+            },1000);
+            return false;
+          }
       },
 
   });
@@ -2003,11 +2009,19 @@ var DAV = new function() {
             // set panel content
             infopanel.setContent(this);
 
+            // show primary panel first, if not already visible
+            if (!leftpanel.visible) {
+              leftpanel.show();
+              $('#infopanel').css('top',$('.views').outerHeight(true)+$('.views').position().top+10);
+              infopanel.show();
+              information.visible=true;
+              return;
+            }
+
             // show panel
             $('#infopanel').css('top',$('.views').outerHeight(true)+$('.views').position().top+10);
             infopanel.show();
-
-            this.visible=true;
+            information.visible=true;
 
         }, // information_showPanel
 
