@@ -1376,7 +1376,6 @@ var DAV = new function() {
   });
 
   var pointcloudpanel = this.pointcloudpanel = new Panel({
-      _title: "Point Cloud",
       _expanded: true,
       _dom: "#pointcloudpanel",
       _background_alpha: 1.0,
@@ -1384,7 +1383,6 @@ var DAV = new function() {
   });
 
   var freepanel = this.freepanel = new Panel({
-      _title: "Panorama",
       _expanded: true,
       _dom: "#freepanel",
       _background_alpha: 1.0,
