@@ -92,6 +92,15 @@ var DAV = new function() {
           });
         });
 
+        // setup infopanel viewer buttons
+        $('.panel').on('click.viewer_button','.viewers a', function(e){
+            var panel=window._panels[e.target.id.substr(2)];
+            if (!$('iframe',panel._dom).attr('src').length) {
+                $('iframe',panel._dom).attr('src',panel.url);
+            }
+            panel.toggle();
+        });
+
         // setup panel close button handler
         $('.panel').on('click.panel_close','.close a',function(e){
           var id=$(e.target).closest('.panel').attr('id');
@@ -1380,14 +1389,6 @@ var DAV = new function() {
       _dom: "#freepanel",
       _background_alpha: 1.0,
       url: 'http://demo.foxel.ch/basic/?s=geneve&p=2&t=set'
-  });
-
-  $('#infopanel .viewers a').on('click', function(e){
-    var panel=window._panels[e.target.substr(2)];
-    if (!$('iframe',panel._dom).attr('src').length) {
-      $('iframe',panel._dom).attr('src',panel.url);
-    }
-    panel.toggle();
   });
 
   /**
