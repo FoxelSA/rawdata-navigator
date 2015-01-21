@@ -43,8 +43,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=1920">
-    <title>Raw data navigator</title>
+    <meta name="viewport" content="width=1920, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <title>DAV</title>
     <link rel="stylesheet" type="text/css" media="all" href="font-awesome-4.2.0/css/font-awesome.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet/leaflet.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet.markercluster/MarkerCluster.css" />
@@ -69,7 +69,7 @@
             catch(e){ return false; }
       }
       $(document).ready(function() {
-            RawDataNavigator.init({
+            DAV.init({
             <?php if (isset($_GET['mountpoint']) && !empty($_GET['mountpoint'])): ?>
                 mountpoint: <?php echo json_encode(rtrim($_GET['mountpoint'],'/')); ?>,
             <?php endif; ?>
@@ -115,13 +115,31 @@
 
 <div id="taxonomypanel" class="panel secondary">
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
-  <div class="content"></div>
+  <div class="content">
+  </div>
 </div>
 
 <div id="configurationpanel" class="panel secondary">
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
-  <div class="content"></div>
+  <div class="content">
+  </div>
 </div>
+
+<div id="pointcloudpanel" class="panel secondary">
+  <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
+  <div class="content">
+    <iframe src="<?php if (false) { echo 'http://wiki.foxel.ch/data/ply/potree/examples/boel.html'; } ?>" frameborder="no" scrolling="no" seamless="seamless"></iframe>
+  </div>
+</div>
+
+<div id="freepanel" class="panel secondary">
+  <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
+  <div class="content">
+    <iframe src="<?php if (false) { echo 'http://demo.foxel.ch/basic/?s=geneve&p=2&t=set'; } ?>" frameborder="no" scrolling="no" seamless="seamless"></iframe>
+  </div>
+</div>
+
+<div class="paneltitle"><div></div></div>
 
 <div id="timeline"></div>
 <div id="statistics"><div></div></div>
@@ -144,7 +162,10 @@
     <a id="a_configurationpanel" class="button panel_button fa fa-gear fa-fw"></a>
     <div class="separator"></div>
     <a id="logout" class="button fa fa-power-off fa-fw"></a>
-    <a id="leftbar_fullscreen" class="button fullscreen fa fa-expand fa-fw"></a>
+    <div id="leftbar_footer">
+      <a id="leftbar_timeline" class="button timeline fa fa-clock-o fa-fw"></a>
+      <a id="leftbar_fullscreen" class="button fullscreen fa fa-expand fa-fw"></a>
+    </div>
   </nav>
 </div> 
 
@@ -180,10 +201,14 @@
 <div id="pose_info" class="panel_content">
     <div class="pose"></div>
     <div class="preview"><img onerror="nopreview(this);"></img></div>
-    <span class="jump">
+    <div class="viewers">
+      <a class="button" id="a_freepanel">Panorama</a>
+      <a class="button" id="a_pointcloudpanel">Point Cloud</a>
+   </div>
+    <div class="jump">
         Jump to: <input id="jump" name="jump" type="text" value="" />
-    </span>
-    <span class="nav"><div></div></span>
+    </div>
+    <div class="nav"><div></div></div>
     <div class="data">
       <div class="timestamp"></div>
         <table class="section date">

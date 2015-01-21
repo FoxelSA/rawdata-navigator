@@ -55,17 +55,17 @@ L.Map.prototype.panToOffset = function (latlng, offset, options) {
 }
 
 /**
- * RawDataNavigator class
- * Constructor of RawDataNavigator.
+ * DAV class
+ * Constructor of DAV.
  */
-var RawDataNavigator = new function() {
+var DAV = new function() {
 
     /**
-     * [public] init()
+     * [public] DAV.init()
      */
     this.init = function(args) {
 
-        var rawdataNavigator=this;
+        var dav=this;
 
         if (!_.isObject(args))
             args = {};
@@ -78,27 +78,36 @@ var RawDataNavigator = new function() {
         map.init();
         leftbar.init();
 
+        // init panels
         $.each(window._panels,function(){
           this.init();
-        })
-          // setup panel resize event handler
-          $(window).on('resize.panels',function(e){
-            $.each(window._panels,function(){
-              panel[e.type](e);
-            });
-          });
+        });
 
-          $('.panel').on('click.panel_close','.close a',function(e){
-            var id=$(e.target).closest('.panel').attr('id');
-            var panel=window._panels[id];
-            if (panel.content && panel.content.closebutton_click) {
-              if (panel.content.closebutton_click(e)===false) {
-                return false;
-              }
+        // setup resize event handlers
+        $(window).on('resize.dav',function(e){
+          // resize panels
+          $.each(window._panels,function(){
+            var panel=this;
+            panel[e.type](e);
+          });
+        });
+
+        // setup panel close button handler
+        $('.panel').on('click.panel_close','.close a',function(e){
+          var id=$(e.target).closest('.panel').attr('id');
+          var panel=window._panels[id];
+          if (panel.closebutton_click) {
+            if (panel.closebutton_click(e)===false) {
+              return false;
             }
-            panel.hide();
-          });
-
+          }
+          if (panel.content && panel.content.closebutton_click) {
+            if (panel.content.closebutton_click(e)===false) {
+              return false;
+            }
+          }
+          panel.hide();
+        });
 
         // update map._offset on panel visibility events
         map.panelState={};
@@ -110,7 +119,7 @@ var RawDataNavigator = new function() {
               offset_h=Math.max($('#'+id).outerWidth(true)/2,offset_h);
             }
           });
-          if (offset_h>0) offset_h=330;
+          if (offset_h>0) offset_h=leftpanel._width/2;
           if (offset_h!=map._offset[0]) {
             map._offset=[offset_h,0];
           }
@@ -259,6 +268,7 @@ var RawDataNavigator = new function() {
 
             // events
             this.events();
+            this.resize();
 
         },
 
@@ -266,9 +276,19 @@ var RawDataNavigator = new function() {
          * timeline.events()
          */
         events: function() {
-            this._component.on('select',function(e) {
+            var timeline=this;
+            timeline._component.on('select',function(e) {
                 timeline.select(e.items);
             });
+            $(timeline._dom).on('resize.timeline',timeline.resize);
+        },
+
+        /**
+         * timeline.resize()
+         */
+        resize: function timeline_resize(e){
+          var timeline=this;
+          $(timeline._dom).width($(window).width-$(leftbar._dom).outerWidth(true));
         },
 
         /**
@@ -900,10 +920,18 @@ var RawDataNavigator = new function() {
       _dom: "#leftbar",
 
       init: function leftbar_init(){
+        this.events();
+      },
+
+      events: function leftbar_events() {
         $('a, img',leftbar._dom).on('click.leftbar',leftbar.click);
-        $(document).on('fullscreenchange',function(){
+
+        $(window).on('resize.leftbar',leftbar.resize);
+
+        $(document).on('fullscreenchange.leftbar',function(){
           $('.fullscreen',leftbar._dom).toggleClass('fa-expand fa-compress');
         });
+
         $(leftpanel._dom).on('hidden visible',function(e){
           return;
           /*
@@ -918,6 +946,10 @@ var RawDataNavigator = new function() {
           }
           */
         });
+      },
+
+      resize: function leftbar_resize(e) {
+        $(leftbar._dom).height($(window).height());
       },
 
       click: function leftbar_click(e){
@@ -967,6 +999,9 @@ var RawDataNavigator = new function() {
     init: function panel_init() {
         var panel=this;
 
+        // set hover title for leftbar icon
+        $('#a_'+panel._dom.substr(1)).attr('title',panel._title);
+
         if (panel._expanded) {
           panel.expand();
         }
@@ -977,39 +1012,63 @@ var RawDataNavigator = new function() {
 
     }, // panel_init
 
-
     register: function panel_register() {
 
         // first panel instantiated ?
         if (!window._panels) {
-
           // create panel list
           window._panels={};
-
         }
 
         // register panel
         window._panels[this._dom.substr(1)]=this;
-    },
+
+    }, // panel register
 
     resize: function panel_resize(e){
+
       var panel=this;
+
+      $(panel._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
+
       if (panel._expanded){
         panel.expand();
       }
       if (panel.visible){
-        panel.show();
+        panel.show('resize');
       }
     }, // panel_resize
+
+    isprimary: function panel_isprimary() {
+      return $(this._dom).hasClass('primary');
+    }, // panel_isprimary
 
     toggle: function panel_toggle(){
 
       var panel=this;
 
-      // panel is visible, close it
+      // panel is visible
       if (panel.visible) {
 
-        // unless the primary panel when secondary panels are open
+        // bring to front if not toplevel and is secondary
+        if (!panel.isprimary() && !panel.istoplevel()) {
+          panel.setTitle();
+          panel._level=panel.gettoplevel()+1;
+          $(panel._dom).css({
+              transition: 'none',
+              opacity: 0.0,
+              zIndex: panel._base_zIndex+panel._level
+          });
+          setTimeout(function(){
+          $(panel._dom).css({
+              transition: '',
+              opacity: 1.0
+          });
+          },100);
+          return;
+        }
+
+        // else show panel, unless the primary panel when secondary panels are open
         if ($(panel._dom).hasClass('primary')) {
 
           // in that case close all open secondary panels
@@ -1026,6 +1085,11 @@ var RawDataNavigator = new function() {
           if (closedOne) {
             return;
           }
+
+          // close information panel first
+          panel.closebutton_click();
+          return
+          
         }
 
         // hide the requested panel
@@ -1048,28 +1112,62 @@ var RawDataNavigator = new function() {
           });
         }
 
-        // compute zIndex
+        // show panel
+        panel.show();
+      }
+    }, // panel_toggle
+
+    updateTitle: function panel_updateTitle() {
+
+        var panel=this;
         var toplevel=0;
+        var panels={};
+
+        $.each(window._panels,function(){
+          if (this.visible && this!=panel) {
+            panels[this._level]=this;
+            toplevel=Math.max(this._level,toplevel); 
+          }
+        });
+
+        if (panels[toplevel]) {
+          panels[toplevel].setTitle();
+        }
+
+    }, // panel_gettoplevel
+
+    gettoplevel: function panel_gettoplevel() {
+
+        var panel=this;
+        var toplevel=0;
+
         $.each(window._panels,function(){
           if (this.visible && this!=panel) {
             toplevel=Math.max(this._level,toplevel); 
           }
         });
-        panel._level=++toplevel;
 
+        return toplevel;
 
-        // show panel
+    }, // panel_gettoplevel
+
+    bringtotop: function panel_bringtotop() {
+
+        var panel=this;
+
+        panel._level=panel.gettoplevel()+1;
         $(panel._dom).css('zIndex',panel._base_zIndex+panel._level);
-        panel.show();
-      }
-    }, // panel_toggle
+
+    }, // panel_bringtotop
+
+    istoplevel: function panel_istoplevel() {
+        return this._level>this.gettoplevel();
+    }, // panel_istoplevel
 
     hide: function panel_hide(now){
       var panel=this;
-      var transition;
 
       if (now) {
-        transition=$(panel._dom).css('transition');
         $(panel._dom).css('transition','none');
       }
 
@@ -1079,28 +1177,67 @@ var RawDataNavigator = new function() {
       });
 
       if (now) {
-        $(panel._dom).css('transition',transition);
+        $(panel._dom).css('transition','');
       }
 
       panel.visible=false;
       panel._level=0;
 
+      panel.updateTitle();
+
       $(panel._dom).trigger('hidden');
 
     }, // panel_hide
 
-    show: function panel_show(){
+    show: function panel_show(resize){
+
       var panel=this;
+
+      if (resize){
+        $(panel._dom).css('transition','none');
+      } else {
+        if (!panel.isprimary()) {
+          // update zindex
+          panel.bringtotop();
+        }
+        panel.setTitle();
+      }
+
       $(panel._dom).css({
         visibility: 'visible',
         left: $(leftbar._dom).outerWidth(true),
         'background-color': 'rgba('+panel._background_rgb+','+panel._background_alpha+')'
       });
+
       panel._currentWidth=$(panel._dom).width();
-      panel.visible=true;
-      $(panel._dom).trigger('visible');
+
+      if (resize){
+        $(panel._dom).css('transition','');
+      } else {
+        panel.visible=true;
+        $(panel._dom).trigger('visible');
+      }
 
     }, // panel_show
+
+    setTitle: function panel_setTitle() {
+      var panel=this;
+      if (panel._title) {
+        $('.paneltitle').css({
+            transition: 'none',
+            opacity: 0
+        });
+        $('.paneltitle div').text(panel._title);
+        setTimeout(function(){
+          $('.paneltitle').css({
+              transition: '',
+              'opacity': 1.0
+          });
+        },500);
+      } else {
+        $('.paneltitle').css('opacity',0);
+      }
+    }, // panel_setTitle
 
     setContent: function panel_setContent(content){
       var panel=this;
@@ -1182,6 +1319,14 @@ var RawDataNavigator = new function() {
       _dom: "#leftpanel",
       _pool: "#panels",
       _backround_alpha: 0.8,
+      closebutton_click: function leftpanel_closebutton_click(e){
+          var panel=this;
+          information.close();
+          setTimeout(function(){
+            panel.hide();
+          },1000);
+          return false;
+      },
 
   });
 
@@ -1193,6 +1338,7 @@ var RawDataNavigator = new function() {
   });
 
   var digitizingpanel = this.digitizingpanel = new Panel({
+      _title: "Digitizing",
       _expanded: true,
       _dom: "#digitizingpanel",
       _background_alpha: 1.0,
@@ -1200,23 +1346,49 @@ var RawDataNavigator = new function() {
   });
 
   var processingpanel = this.processingpanel = new Panel({
+      _title: "Processing",
       _expanded: true,
       _dom: "#processingpanel",
       _background_alpha: 1.0
   });
 
   var taxonomypanel = this.taxonomypanel = new Panel({
+      _title: "Taxonomy",
       _expanded: true,
       _dom: "#taxonomypanel",
       _background_alpha: 1.0
   });
 
   var configurationpanel = this.configurationpanel = new Panel({
+      _title: "Configuration",
       _expanded: true,
       _dom: "#configurationpanel",
-      _background_alpha: 1.0
+      _background_alpha: 1.0,
   });
 
+  var pointcloudpanel = this.pointcloudpanel = new Panel({
+      _title: "Point Cloud",
+      _expanded: true,
+      _dom: "#pointcloudpanel",
+      _background_alpha: 1.0,
+      url: 'http://wiki.foxel.ch/data/ply/potree/examples/boel.html'
+  });
+
+  var freepanel = this.freepanel = new Panel({
+      _title: "Panorama",
+      _expanded: true,
+      _dom: "#freepanel",
+      _background_alpha: 1.0,
+      url: 'http://demo.foxel.ch/basic/?s=geneve&p=2&t=set'
+  });
+
+  $('#infopanel .viewers a').on('click', function(e){
+    var panel=window._panels[e.target.substr(2)];
+    if (!$('iframe',panel._dom).attr('src').length) {
+      $('iframe',panel._dom).attr('src',panel.url);
+    }
+    panel.toggle();
+  });
 
   /**
    * map object
@@ -1265,7 +1437,7 @@ var RawDataNavigator = new function() {
 
               this._zoom = options && options.maxZoom ? Math.min(options.maxZoom, zoom) : zoom;
 
-              return this.panToOffset(center, RawDataNavigator.map._offset, options);
+              return this.panToOffset(center, DAV.map._offset, options);
           }
 /*
           this._component.getCenter = function () { // (Boolean) -> LatLng                                                                                                                                                                
@@ -1321,7 +1493,7 @@ var RawDataNavigator = new function() {
        * map.events()
        */
       events: function map_events() {
-          $(window).on('resize',function() {
+          $(window).on('resize.map',function() {
               map.resize();
           });
       }, // map_events
@@ -1337,12 +1509,6 @@ var RawDataNavigator = new function() {
         if (this._component) {
           this._component.invalidateSize();
         }
-
-        $(leftbar._dom).height($(window).height());
-        $(leftpanel._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
-        $(infopanel._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
-
-        leftpanel.resize();
 
       }, // map_resize
 
@@ -1794,6 +1960,8 @@ var RawDataNavigator = new function() {
             var pose = segmentation.pose(segment,index);
             var videoframe = segmentation.vframeindex(segment,index);
 
+            vignettes.setCurrent(segment,index);
+
             // change source
             if (this._segment != segment && videoframe > -1) {
                 this.video.clear();
@@ -1837,6 +2005,7 @@ var RawDataNavigator = new function() {
             infopanel.setContent(this);
 
             // show panel
+            $('#infopanel').css('top',$('.views').outerHeight(true)+$('.views').position().top+10);
             infopanel.show();
 
             this.visible=true;
@@ -1912,8 +2081,8 @@ var RawDataNavigator = new function() {
 
                 // html
                 $(information._dom+' .nav > div').html(
-                    ((index > 0) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index-1)+'\');return false;"><span class="prev"></span>Prev</a>' : '')
-                    + ((index+1 < poses.length) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index+1)+'\');return false;">Next<span class="next"></span></a>' : '')
+                    ((index > 0) ? '<a href="#" onclick="DAV.info(\''+segment+'\',\''+(index-1)+'\');return false;"><span class="prev"></span>Prev</a>' : '')
+                    + ((index+1 < poses.length) ? '<a href="#" onclick="DAV.info(\''+segment+'\',\''+(index+1)+'\');return false;">Next<span class="next"></span></a>' : '')
                 );
                 $(information._dom+' .pose').html(
                     'Segment '+segment+' &nbsp; &nbsp; &nbsp; '
@@ -2282,13 +2451,25 @@ var RawDataNavigator = new function() {
           information.click=true;
           information.show(info.segment,info.index);
           information.click=false;
-        } // vignettes_click
+        }, // vignettes_click
+
+        setCurrent: function vignettes_setCurrent(segment,index){
+          var vignettes=this;
+          $('.current',vignettes._dom).removeClass('current');
+          $('.wrap',vignettes._dom).each(function(){
+            var info=$(this).data('info');
+            if (info.index==index && info.segment==segment) {
+              $(this).addClass('current');
+            }
+          });
+        }
+
     });
 
     var vignettes = this.vignettes = new Vignettes();
     
 
-}; // RawDataNavigator
+}; // DAV
 
 
 window.nopreview = function nopreview(img) {

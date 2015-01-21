@@ -117,7 +117,7 @@ a, a:link, a:visited, a:hover, a:active {
   color: black;
 }
 
-.fullscreen {
+#leftbar_footer {
   position: absolute;
   bottom: 0px;
 }
@@ -344,16 +344,43 @@ a, a:link, a:visited, a:hover, a:active {
     z-index: 100;
     display:block;
     position:absolute;
-    top: 0px; /* see #timeline.height */
+    top: 0px;
     width: 660px;
     height: 100%;
     color: #fff;
     background-color: #000;
     transition-duration: 1s;
-    transition-property: left, width, background-color;
+    transition-property: left, width, background-color, opacity;
     transition-timing-function: cubic-bezier(0.25,0.1,0.25,1);
     padding-left: 0.5em;
     padding-right: 0.5em;
+}
+
+.paneltitle {
+  opacity: 0;
+  transition-duration: 0.5s;
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.25,0.1,0.25,1);
+  position: absolute;
+  margin: auto;
+  text-align: center;
+  top: 10px;
+  width: 100%;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.paneltitle div {
+  padding: 20px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: rgba(0,0,0,0.4);
+  color: white;
+  width: 110px;
+  margin: auto;
+  font-size: 1em;
+  font-weight: 900;
+  font-variant: small-caps;
 }
 
 #leftpanel div.views {
@@ -362,7 +389,7 @@ a, a:link, a:visited, a:hover, a:active {
   top: 1.0em;
 }
 
-#leftpanel div.views .button {
+#leftpanel div.views .button, #infopanel .viewers .button {
   z-index: 99999;
   display: inline-block;
   width: 45%;
@@ -371,6 +398,12 @@ a, a:link, a:visited, a:hover, a:active {
   font-size: 2em;
   border: 1px outset black;
   transition: 0.04s all ease-in-out;
+}
+
+#infopanel .viewers .button {
+  width: auto;
+  font-size: 1.5em;
+  display: inline-block;
 }
 
 #leftpanel div.views a {
@@ -539,8 +572,8 @@ a, a:link, a:visited, a:hover, a:active {
 
         #pose_info .preview img {
             border:solid 1px #4f4f4f;
-        width:640px;
-        height:320px;
+          : width:480px;
+            height:240px;
         }
 
     .video {
@@ -559,11 +592,10 @@ a, a:link, a:visited, a:hover, a:active {
     }
 
 #timeline {
+    display: none;
     position:absolute;
     bottom:0;
     left:76px;
-    width:100%;
-    height:90px; /* see #info.bottom */
     background-color:#ebebeb;
     font-size:11px;
 }
@@ -636,6 +668,11 @@ a, a:link, a:visited, a:hover, a:active {
   margin: 5px;
 }
 
+#vignettes .wrap.current {
+  box-shadow: 0 0 1.5em yellow;
+}
+
+
 #vignettes .timestamp {
   background: white;
   color: black;
@@ -672,10 +709,14 @@ a, a:link, a:visited, a:hover, a:active {
   text-align: center;
 }
 
-#digitizingpanel iframe {
+.panel iframe {
   position: absolute;
   left: 0px;
   width: 100%;
   height: 100%;
+}
+
+#panels, #panels2 {
+  pointer-events: none;
 }
 
