@@ -1929,6 +1929,7 @@ var DAV = new function() {
        */
       closebutton_click: function information_closebutton_click(e){
           information.close();
+          information.visible=false;
           return false;
       },
 
@@ -2131,7 +2132,6 @@ var DAV = new function() {
             setTimeout(function() {
 
               infopanel.hide();
-              information.visible=false;
               /*
               setTimeout(function(){
                 $('#info_button').fadeIn();
