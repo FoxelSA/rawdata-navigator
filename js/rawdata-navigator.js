@@ -792,6 +792,7 @@ var DAV = new function() {
             load: function() {
                 overlay.show('Loading segments from<br />'+allocation.current.path+'/');
                 this._remaining = allocation.current.segments().length;
+                vignettes.clear();
                 $.each(allocation.current.segments(), function(index,segment) {
                     $.getJSON('php/csps-json.php?json='+allocation.current.path+'/'+segment+'/info/rawdata-autoseg/',function(data) {
                         segmentation.json.success(index,segment,data);
@@ -841,8 +842,6 @@ var DAV = new function() {
                 // gui
                 overlay.show('Building layers, please wait...');
 
-                var vignettes_overflow=false;
-                vignettes.clear();
                 // poses
                 $.each(data.pose, function(index,pose) {
 
@@ -1308,6 +1307,9 @@ var DAV = new function() {
       }
       $(panel._dom).css('width',panel._currentWidth);
       panel.expanded=true;
+      setTimeout(function(){
+        $(panel._dom).trigger('expand');
+      },1000);
     },
 
     // shrink panel from full screen to normal width
@@ -1316,6 +1318,9 @@ var DAV = new function() {
       panel._currentWidth=panel._width;
       $(panel._dom).css('width',panel._currentWidth);
       panel.expanded=false;
+      setTimeout(function(){
+        $(panel._dom).trigger('shrink');
+      },1000);
     }
 
   }); // extend panel prototype
@@ -2435,12 +2440,17 @@ var DAV = new function() {
 
         init: function vignettes_init(){
           var vignettes=this;
+          vignettes.clear();
           $(document).on('click',vignettes._dom+' .wrap',function(e){
             vignettes.click(e)
           });
-          $(document).on('resize',vignettes._dom,function(e){
-            vignettes.onresize(e);
+          $(window).on('resize',function(e){
+            vignettes.update(e);
           });
+          $(document).on('expand',leftpanel._dom,function(e){
+            vignettes.update(e);
+          });
+
         }, // vignettes_init
 
         clear: function vignettes_clear(){
@@ -2478,8 +2488,8 @@ var DAV = new function() {
           }
           vignettes.last=index;
           if (vignettes.overflow()){
-            vignette._overflow=true;
-            vignettes.onresize();
+            vignettes._overflow=true;
+            vignettes.update();
           }
         }, // vignettes_show
 
@@ -2509,16 +2519,20 @@ var DAV = new function() {
           return (container.prop('scrollHeight') > container.height());
         }, // vignettes_overflow
 
-        onresize: function vignettes_onresize(e) {
+        update: function vignettes_update(e) {
+          console.log('vignettes_update');
           var vignettes=this;
           var container=$(this._dom);
-          var height=container.height();
+
+          var height=container.parent().height();
+          container.height(height);
 
           // remove items overflowing and compute line length
           vignettes._overflow=false;
           vignettes._itemsperline=0;
           var firstop;
           $('.wrap',container).each(function(_index,div){
+            div=$(div);
             if (vignettes._overflow){
               div.remove();
             } else {
@@ -2549,13 +2563,13 @@ var DAV = new function() {
 
           // else fill empty space
           for (var i=vignettes.last+1; i<vignettes.list.length; ++i) {
-            vignettes.show(vignettes.list[i]);
+            vignettes.show(i);
             if (vignettes._overflow) {
               return;
             }
           }
 
-        } // vignettes_onresize
+        } // vignettes_update
 
     });  // Vignettes
 
