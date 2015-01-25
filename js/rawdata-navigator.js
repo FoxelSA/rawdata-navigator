@@ -1342,6 +1342,8 @@ var DAV = new function() {
              panel.hide();
             },1000);
             return false;
+          } else {
+            panel.hide();
           }
       },
 
