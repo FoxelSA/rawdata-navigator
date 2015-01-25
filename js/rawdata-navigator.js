@@ -1117,9 +1117,9 @@ var DAV = new function() {
           });
 
           // show also information if any vignette is selected
-          if ($('.current',vignettes._dom).length) {
+          if (information.visible && $('.current',vignettes._dom).length) {
             setTimeout(function(){
-              information.show();
+              infopanel.show();
             },1000);
           }
         }
