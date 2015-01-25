@@ -841,7 +841,7 @@ var DAV = new function() {
                 // gui
                 overlay.show('Building layers, please wait...');
 
-                var vignettes_count=0;
+                var vignettes_overflow=false;
                 vignettes.clear();
                 // poses
                 $.each(data.pose, function(index,pose) {
@@ -877,18 +877,15 @@ var DAV = new function() {
                         status: pose.status
                     };
 
-                    if (vignettes_count<100 && pose.status=="validated") {
-                      ++vignettes_count;
-                      // add to vignettes
-                      vignettes.add({
-                          segment: segment,
-                          segment_info: info,
-                          pose_index: index,
-                          pose: poses[index]
-                      });
+                    if (pose.status=="validated") {
+                        // add to vignettes
+                        vignettes.add({
+                            segment: segment,
+                            segment_info: info,
+                            pose_index: index,
+                            pose: poses[index]
+                        });
                     }
-
-
                 });
 
                 // add on layer
@@ -2057,7 +2054,7 @@ var DAV = new function() {
             information.overview.marker(segment,pose);
 
             // show preview
-            var framepreview=(!info.preview || pose.status!='validated')?'img/nopreview.png':allocation.current.path+'/'+segment+'/preview/'+info.debayer+'/0/'+pose.sec+'_'+pose.usc+'.jpeg';
+            var framepreview=(!info.preview || pose.status!='validated')?'img/nopreview.png':document.location.origin+allocation.current.path+'/'+segment+'/preview/'+info.debayer+'/0/'+pose.sec+'_'+pose.usc+'.jpeg';
             $('div.preview img').attr('src',framepreview);
 
             // show
@@ -2429,55 +2426,131 @@ var DAV = new function() {
 
         _dom: '#vignettes',
 
+        _initialvalues: {
+          list: [],
+          first: -1,
+          last: -1,
+          _overflow: false
+        },
+
         init: function vignettes_init(){
           var vignettes=this;
           $(document).on('click',vignettes._dom+' .wrap',function(e){
             vignettes.click(e)
           });
+          $(document).on('resize',vignettes._dom,function(e){
+            vignettes.onresize(e);
+          });
         }, // vignettes_init
 
         clear: function vignettes_clear(){
-          $(this._dom).empty();
+          var vignettes=this;
+          $(vignettes._dom).empty();
+          $.extend(vignettes, vignettes._initialvalues);
         }, // vignettes_clear
 
         add: function vignettes_add(vignette){
           var vignettes=this;
+          vignettes.list.push(vignette);
+          if (vignettes._overflow) {
+            return;
+          }
+          vignettes.show(vignettes.list.length-1);
+        }, // vignettes_add
+
+        show: function vignettes_show(index){
+          var vignettes=this;
+          var vignette=vignettes.list[index];
           var date=new Date(vignette.pose.sec*1000);
           var html='<div class="wrap">';
           html+='<div class="timestamp">'+date.getSimpleUTCDate();
           html+='<a class="button fa fa-gear fa-fw"></a></div>';
-          html+='<img class="thumb" alt="n/a" onerror="nopreview(this);" src="'+allocation.current.path+'/'+vignette.segment+'/preview/'+vignette.segment_info.debayer+'/0/'+vignette.pose.sec+'_'+vignette.pose.usc+'.jpeg"></img>';
+          html+='<img class="thumb" alt="n/a" onerror="nopreview(this);" src="'+document.location.origin+allocation.current.path+'/'+vignette.segment+'/preview/'+vignette.segment_info.debayer+'/0/'+vignette.pose.sec+'_'+vignette.pose.usc+'.jpeg"></img>';
           html+='<div class="info">';
           html+='<div class="what">Poses (RAW DATA)</div>';
           html+='<div class="footer">INFORMATIONS</div>';
 //          html+=vignette.info;
           html+='</div>';
           html+='</div>';
-          $(vignettes._dom).append($('div:first',html).parent().data('info',{
-              segment: vignette.segment,
-              index: vignette.pose_index
-          }));
-        }, // vignettes_add
+          $(vignettes._dom).append($('div:first',html).parent().data('index',index));
+          if (vignettes.first<0) {
+            vignettes.first=index;
+          }
+          vignettes.last=index;
+          if (vignettes.overflow()){
+            vignette._overflow=true;
+            vignettes.onresize();
+          }
+        }, // vignettes_show
 
         click: function vignettes_click(e) {
-          var info=$(e.target).closest('.wrap').data('info');
+          var index=$(e.target).closest('.wrap').data('index');
+          var info=vignettes.list[index];
           information.click=true;
           information.show(info.segment,info.index);
           information.click=false;
         }, // vignettes_click
 
-        setCurrent: function vignettes_setCurrent(segment,index){
+        setCurrent: function vignettes_setCurrent(segment,pose_index){
           var vignettes=this;
           $('.current',vignettes._dom).removeClass('current');
           $('.wrap',vignettes._dom).each(function(){
-            var info=$(this).data('info');
-            if (info.index==index && info.segment==segment) {
+            var index=$(this).data('index');
+            var info=vignettes.list[index];
+            if (info.pose_index==pose_index && info.segment==segment) {
               $(this).addClass('current');
             }
           });
-        }
+        },
 
-    });
+        // check for container overflow;
+        overflow: function vignettes_overflow() {
+          var container=$(this._dom);
+          return (container.prop('scrollHeight') > container.height());
+        }, // vignettes_overflow
+
+        onresize: function vignettes_onresize(e) {
+          var vignettes=this;
+          var container=$(this._dom);
+          var height=container.height();
+
+          // remove items overflowing
+          vignettes._overflow=false;
+          $('.wrap',container).each(function(_index,div){
+            if (vignettes._overflow){
+              div.remove();
+            } else {
+              var top=div.offset().top;
+              if (top>height) {
+                div.remove();
+                vignettes._overflow=true;
+                var index=div.data('index');
+                if (vignettes.last>=index) {
+                  vignettes.last=index-1;
+                  if (vignettes.first==index) {
+                    vignettes.first=-1;
+                    vignettes.last=-1;
+                    $(container).empty();
+                    return;
+                  }
+                }
+              }
+            }
+          });
+
+          if (vignettes._overflow) return;
+
+          // else fill empty space
+          for (var i=vignettes.last+1; i<vignettes.list.length; ++i) {
+            vignettes.show(vignettes.list[i]);
+            if (vignettes._overflow) {
+              return;
+            }
+          }
+
+        } // vignettes_onresize
+
+    });  // Vignettes
 
     var vignettes = this.vignettes = new Vignettes();
     
@@ -2503,6 +2576,7 @@ window.toppanel = function toppanel(){
   return panel;
 }
 
+/*
 window.getpanelstate = function getpanelstate() {
   var panel_state=[];
   $.each(window._panels,function(){
@@ -2513,5 +2587,6 @@ window.getpanelstate = function getpanelstate() {
   });
   return panel_state;
 }
+*/
 
 
