@@ -2514,8 +2514,10 @@ var DAV = new function() {
           var container=$(this._dom);
           var height=container.height();
 
-          // remove items overflowing
+          // remove items overflowing and compute line length
           vignettes._overflow=false;
+          vignettes._itemsperline=0;
+          var firstop;
           $('.wrap',container).each(function(_index,div){
             if (vignettes._overflow){
               div.remove();
@@ -2531,9 +2533,14 @@ var DAV = new function() {
                     vignettes.first=-1;
                     vignettes.last=-1;
                     $(container).empty();
-                    return;
+                    return false;
                   }
                 }
+              } else {
+                if (!firstop || top==firstop) {
+                   ++vignettes._itemsperline;
+                   firstop=top;
+                 }
               }
             }
           });
