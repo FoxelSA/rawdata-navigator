@@ -1073,7 +1073,7 @@ var DAV = new function() {
           return;
         }
 
-        // else show panel, unless the primary panel when secondary panels are open
+        // if we clicked on the dav button
         if ($(panel._dom).hasClass('primary')) {
 
           // in that case close all open secondary panels
@@ -1115,10 +1115,18 @@ var DAV = new function() {
               closedOne=true;
             }
           });
+
+          // show also information if any vignette is selected
+          if ($('.current',vignettes._dom).length) {
+            setTimeout(function(){
+              information.show();
+            },1000);
+          }
         }
 
         // show panel
         panel.show();
+
       }
     }, // panel_toggle
 
