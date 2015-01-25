@@ -2497,7 +2497,7 @@ var DAV = new function() {
           var index=$(e.target).closest('.wrap').data('index');
           var info=vignettes.list[index];
           information.click=true;
-          information.show(info.segment,info.index);
+          information.show(info.segment,info.pose_index);
           information.click=false;
         }, // vignettes_click
 
