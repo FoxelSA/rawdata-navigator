@@ -1293,6 +1293,10 @@ var DAV = new function() {
         $(panel._pool).append($(panel.content2._dom));
       }
 
+      if (!content) {
+        return;
+      }
+
       // set new content
       $('.content2',panel._dom)
       .empty()
@@ -1951,7 +1955,13 @@ var DAV = new function() {
 
           $(infopanel._dom).on('click.preview','.preview img',function(e){
             console.log('click');
-            infopanel.expand();
+            if (infopanel.expanded){
+              information.video._player.pause();
+              infopanel.shrink();
+              return;
+            } else {
+              infopanel.expand();
+            }
 
             information.video.resize();
             infopanel.setContent2(information.video);
