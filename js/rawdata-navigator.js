@@ -1397,14 +1397,14 @@ var DAV = new function() {
       _expand: true,
       _dom: "#pointcloudpanel",
       _background_alpha: 1.0,
-      url: 'http://wiki.foxel.ch/data/ply/potree/examples/boel.html'
+      url: document.location.origin+'/potree'
   });
 
   var freepanel = this.freepanel = new Panel({
       _expand: true,
       _dom: "#freepanel",
       _background_alpha: 1.0,
-      url: 'http://demo.foxel.ch/basic/?s=geneve&p=2&t=set'
+      url: document.location.origin+'/freepano'
   });
 
   /**
