@@ -84,7 +84,7 @@
 
 <div id="leftpanel" class="panel primary">
   <div class="views">
-    <a class="button current" id="viewonmap">Voir sur la carte</a>
+    <a class="button current" id="viewonmap">Voir carte</a>
     <a class="button" id="viewasvignette">Voir vignettes</a>
   </div>
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
@@ -128,14 +128,14 @@
 <div id="pointcloudpanel" class="panel secondary">
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
   <div class="content">
-    <iframe src="<?php if (false) { echo 'http://wiki.foxel.ch/data/ply/potree/examples/boel.html'; } ?>" frameborder="no" scrolling="no" seamless="seamless"></iframe>
+    <iframe src="<?php if (false) { echo '/potree'; } ?>" frameborder="no" scrolling="no" seamless="seamless"></iframe>
   </div>
 </div>
 
 <div id="freepanel" class="panel secondary">
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
   <div class="content">
-    <iframe src="<?php if (false) { echo 'http://demo.foxel.ch/basic/?s=geneve&p=2&t=set'; } ?>" frameborder="no" scrolling="no" seamless="seamless"></iframe>
+    <iframe src="<?php if (false) { echo '/freepano'; } ?>" frameborder="no" scrolling="no" seamless="seamless"></iframe>
   </div>
 </div>
 
@@ -236,9 +236,9 @@
   <!-- pose_info -->
 
 <!-- video_player -->
-  <div class="video_player" class="panel_content">
+  <div id="video_player" class="panel_content">
   <div class="video">
-    <video id="vid" class="video-js vjs-default-skin" width="640" height="320">
+    <video id="vid" class="video-js vjs-default-skin">
         <p class="vjs-no-js">Please consider using a web browser that supports <a href="http://videojs.com/html5-video-support/" target="_blank">HTML5</a>.</p>
     </video>
  </div>

@@ -86,7 +86,7 @@ a, a:link, a:visited, a:hover, a:active {
 .panel .content {
   top: 3em;
   height: 100%;
-  width: 660px;
+  width: 512px;
 }
 
 #leftbar a.fa {
@@ -336,7 +336,7 @@ a, a:link, a:visited, a:hover, a:active {
 
 .panel {
     visibility: hidden;
-    left:-660px;
+    left:-512px;
 }
 
 .panel {
@@ -345,7 +345,7 @@ a, a:link, a:visited, a:hover, a:active {
     display:block;
     position:absolute;
     top: 0px;
-    width: 660px;
+    width: 512px;
     height: 100%;
     color: #fff;
     background-color: #000;
@@ -385,7 +385,7 @@ a, a:link, a:visited, a:hover, a:active {
 
 #leftpanel div.views {
   position: relative;
-  width: 660px;
+  width: 512px;
   top: 1.0em;
 }
 
@@ -477,7 +477,7 @@ a, a:link, a:visited, a:hover, a:active {
     #info .nav {
         position:absolute;
         top:8px;
-        right:660px;
+        right:512px;
         font-size:10px;
         font-weight:700;
         text-transform:uppercase;
@@ -589,16 +589,21 @@ a, a:link, a:visited, a:hover, a:active {
 
         #pose_info .preview img {
             border:solid 1px #4f4f4f;
-          : width:480px;
+            width:480px;
             height:240px;
         }
 
     .video {
-      visibility: hidden;
-      margin-top: 3em;
+      margin: auto;
       position: relative;
         border:solid 1px #4f4f4f;
     }
+
+    video {
+      width: 100%;
+      height: 100%;
+    }
+
 
     #map_overview {
         position: relative;
@@ -669,7 +674,7 @@ a, a:link, a:visited, a:hover, a:active {
 .content2 {
   position: absolute;
   height: 100%;
-  left: 700px;
+  left: 544px;
   top: 4em;
 }
 
