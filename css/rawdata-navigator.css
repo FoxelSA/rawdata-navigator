@@ -608,8 +608,8 @@ a, a:link, a:visited, a:hover, a:active {
     #map_overview {
         position: relative;
         left: 10px;
-        width:640px;
-        height:320px;
+        width:480px;
+        height:240px;
         border:solid 1px #4f4f4f;
     }
 
