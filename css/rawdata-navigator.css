@@ -675,9 +675,11 @@ a, a:link, a:visited, a:hover, a:active {
 
 #vignettes {
   position: relative;
+  overflow-y: scroll;
 }
 
 #vignettes .wrap {
+  position: relative;
   overflow: hidden;
   background: black;
   border: 1px solid orange; 

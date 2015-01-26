@@ -1007,7 +1007,7 @@ var DAV = new function() {
         // set hover title for leftbar icon
         $('#a_'+panel._dom.substr(1)).attr('title',panel._title);
 
-        if (panel._expanded) {
+        if (panel._expand) {
           panel.expand();
         }
 
@@ -1036,7 +1036,7 @@ var DAV = new function() {
 
       $(panel._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
 
-      if (panel._expanded){
+      if (panel.expanded){
         panel.expand();
       }
       if (panel.visible){
@@ -1366,7 +1366,7 @@ var DAV = new function() {
 
   var digitizingpanel = this.digitizingpanel = new Panel({
       _title: "Digitizing",
-      _expanded: true,
+      _expand: true,
       _dom: "#digitizingpanel",
       _background_alpha: 1.0,
       url: 'http://project-osrm.org/osrm-frontend-v2/'
@@ -1374,34 +1374,34 @@ var DAV = new function() {
 
   var processingpanel = this.processingpanel = new Panel({
       _title: "Processing",
-      _expanded: true,
+      _expand: true,
       _dom: "#processingpanel",
       _background_alpha: 1.0
   });
 
   var taxonomypanel = this.taxonomypanel = new Panel({
       _title: "Taxonomy",
-      _expanded: true,
+      _expand: true,
       _dom: "#taxonomypanel",
       _background_alpha: 1.0
   });
 
   var configurationpanel = this.configurationpanel = new Panel({
       _title: "Configuration",
-      _expanded: true,
+      _expand: true,
       _dom: "#configurationpanel",
       _background_alpha: 1.0,
   });
 
   var pointcloudpanel = this.pointcloudpanel = new Panel({
-      _expanded: true,
+      _expand: true,
       _dom: "#pointcloudpanel",
       _background_alpha: 1.0,
       url: 'http://wiki.foxel.ch/data/ply/potree/examples/boel.html'
   });
 
   var freepanel = this.freepanel = new Panel({
-      _expanded: true,
+      _expand: true,
       _dom: "#freepanel",
       _background_alpha: 1.0,
       url: 'http://demo.foxel.ch/basic/?s=geneve&p=2&t=set'
@@ -1978,7 +1978,7 @@ var DAV = new function() {
             var pose = segmentation.pose(segment,index);
             var videoframe = segmentation.vframeindex(segment,index);
 
-            vignettes.setCurrent(segment,index);
+            vignettes.select(segment,index);
 
             // change source
             if (this._segment != segment && videoframe > -1) {
@@ -2445,7 +2445,8 @@ var DAV = new function() {
           list: [],
           first: -1,
           last: -1,
-          _overflow: false
+          _overflow: false,
+          height: 0
         },
 
         init: function vignettes_init(){
@@ -2467,6 +2468,9 @@ var DAV = new function() {
           var vignettes=this;
           $(vignettes._dom).empty();
           $.extend(vignettes, vignettes._initialvalues);
+          $(vignettes._dom).off('scroll').on('scroll',function(e){
+            vignettes.onscroll(e);
+          });
         }, // vignettes_clear
 
         add: function vignettes_add(vignette){
@@ -2479,6 +2483,7 @@ var DAV = new function() {
         }, // vignettes_add
 
         show: function vignettes_show(index){
+          if (!leftpanel.expanded) return;
           var vignettes=this;
           var vignette=vignettes.list[index];
           var date=new Date(vignette.pose.sec*1000);
@@ -2492,16 +2497,29 @@ var DAV = new function() {
 //          html+=vignette.info;
           html+='</div>';
           html+='</div>';
-          $(vignettes._dom).append($('div:first',html).parent().data('index',index));
+          var div;
+          $(vignettes._dom).append(div=$('div:first',html).parent().data('index',index));
           if (vignettes.first<0) {
             vignettes.first=index;
+            vignettes.height=div.outerHeight(true);
           }
           vignettes.last=index;
-          if (vignettes.overflow()){
+          if (!vignettes._overflow && vignettes.overflow()){
             vignettes._overflow=true;
+            vignettes.remove_overflow=true;
             vignettes.update();
+            vignettes.remove_overflow=false;
           }
         }, // vignettes_show
+
+        onscroll: function vignettes_onscroll(e) {
+          console.log('scroll');
+          var vignettes=this;
+          var container=$(vignettes._dom);
+          if (container.innerHeight() + container.scrollTop() >= container.prop('scrollHeight')) {
+            vignettes.addRow();
+          }
+        },
 
         click: function vignettes_click(e) {
           var index=$(e.target).closest('.wrap').data('index');
@@ -2511,7 +2529,7 @@ var DAV = new function() {
           information.click=false;
         }, // vignettes_click
 
-        setCurrent: function vignettes_setCurrent(segment,pose_index){
+        select: function vignettes_select(segment,pose_index){
           var vignettes=this;
           $('.current',vignettes._dom).removeClass('current');
           $('.wrap',vignettes._dom).each(function(){
@@ -2525,19 +2543,34 @@ var DAV = new function() {
 
         // check for container overflow;
         overflow: function vignettes_overflow() {
-          var container=$(this._dom);
-          return (container.prop('scrollHeight') > container.height());
+          var vignettes=this;
+          var container=$(vignettes._dom);
+          return (container.prop('scrollHeight') > (container.height() + vignettes.height));
         }, // vignettes_overflow
 
-        update: function vignettes_update(e) {
-          console.log('vignettes_update');
+        resize: function vignettes_resize(e) {
+          console.log('resize');
           var vignettes=this;
-          var container=$(this._dom);
+          var container=$(vignettes._dom);
 
-          var height=container.parent().height();
-          container.height(height);
+          container.height(container.parent().height()-container.offset().top*2);
+          container.width($(window).width()-container.offset().left+16);
 
-          // remove items overflowing and compute line length
+        }, // vignettes_resize
+
+        update: function vignettes_update(e) {
+
+          if (!leftpanel.expanded) return;
+
+          var vignettes=this;
+
+          vignettes.resize();
+          var container=$(vignettes._dom);
+
+          var limit=container.height()+vignettes.height;
+
+          // compute line length
+          // and remove items overflowing (if remove_overflow is true)
           vignettes._overflow=false;
           vignettes._itemsperline=0;
           var firstop;
@@ -2547,9 +2580,12 @@ var DAV = new function() {
               div.remove();
             } else {
               var top=div.offset().top;
-              if (top>height) {
-                div.remove();
+              if (top>limit) {
                 vignettes._overflow=true;
+                if (!vignettes.remove_overflow) {
+                  return false;
+                }
+                div.remove();
                 var index=div.data('index');
                 if (vignettes.last>=index) {
                   vignettes.last=index-1;
@@ -2579,7 +2615,22 @@ var DAV = new function() {
             }
           }
 
-        } // vignettes_update
+        }, // vignettes_update
+
+        addRow: function vignettes_addRow() {
+          console.log('addrow');
+          var vignettes=this;
+          var container=$(vignettes._dom);
+          var sol=vignettes.last+1;
+          var eol=vignettes.last+vignettes._itemsperline;
+          if (sol>=vignettes.list.length) {
+            return;
+          }
+          for (var i=sol; i<vignettes.list.length && i<=eol; ++i) {
+            vignettes.show(i);
+          }
+        } // vignettes_addRow
+
 
     });  // Vignettes
 
