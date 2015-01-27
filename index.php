@@ -52,8 +52,10 @@
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/select2/select2.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/vis.js/vis.min.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/video.js/video-js.min.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css" />
     <link rel="stylesheet" type="text/css" media="all" href="css/rawdata-navigator.css" />
     <script type="text/javascript" src="js/thirdparty/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="js/thirdparty/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/jquery.fullscreen-min.js"></script>
     <script type="text/javascript" src="js/thirdparty/jquery.cookie-1.4.1.js"></script>
     <script type="text/javascript" src="js/thirdparty/underscore.js/underscore-1.7.min.js"></script>

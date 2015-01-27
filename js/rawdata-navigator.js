@@ -2490,11 +2490,31 @@ var DAV = new function() {
           first: -1,
           last: -1,
           _overflow: false,
-          height: 0
+          height: 0,
+          firstop: 0,
+          itemsperline: 0,
+          _itemsperline: 0
+        },
+
+        mCustomScrollbarOptions:{
+              axis: 'y',
+              theme: 'light',
+              callbacks: {
+                onTotalScroll: function() {
+                  console.log('totalscroll')
+                  DAV.vignettes.addRow();
+                }
+              }
         },
 
         init: function vignettes_init(){
           var vignettes=this;
+          $(document).ready(function(){
+            $(vignettes._dom).mCustomScrollbar(vignettes.mCustomScrollbarOptions,{
+                onTotalScrollOffset: vignettes.height/2 || 100,
+                alwaysTriggerOffsets:true
+            });
+          });
           vignettes.clear();
           $(document).on('click',vignettes._dom+' .wrap',function(e){
             vignettes.click(e)
@@ -2506,15 +2526,15 @@ var DAV = new function() {
             vignettes.update(e);
           });
 
+
         }, // vignettes_init
 
         clear: function vignettes_clear(){
           var vignettes=this;
-          $(vignettes._dom).empty();
+          $('.mCSB_container',vignettes._dom).empty();
+          $(vignettes._dom).mCustomScrollbar('update');
           $.extend(vignettes, vignettes._initialvalues);
-          $(vignettes._dom).off('scroll').on('scroll',function(e){
-            vignettes.onscroll(e);
-          });
+          vignettes.list=[];
         }, // vignettes_clear
 
         add: function vignettes_add(vignette){
@@ -2524,7 +2544,22 @@ var DAV = new function() {
             return;
           }
           vignettes.show(vignettes.list.length-1);
+
         }, // vignettes_add
+
+        getItemsperline: function vignette_getItemsperline(div) {
+          var vignettes=this;
+          if (vignettes.itemsperline) return vignettes.itemsperline;
+          var top=div.offset().top;
+          if (top==vignettes.firstop || !vignettes.firstop) {
+            ++vignettes._itemsperline;
+            vignettes.firstop=top;
+          } else {
+            if (top>vignettes.firstop) {
+              vignettes.itemsperline=vignettes._itemsperline;
+            }
+          }
+        },
 
         show: function vignettes_show(index){
           if (!leftpanel.expanded) return;
@@ -2542,27 +2577,22 @@ var DAV = new function() {
           html+='</div>';
           html+='</div>';
           var div;
-          $(vignettes._dom).append(div=$('div:first',html).parent().data('index',index));
+          var container=$('.mCSB_container',vignettes._dom);
+          $(container).append(div=$('div:first',html).parent().data('index',index)).mCustomScrollbar('update');
           if (vignettes.first<0) {
             vignettes.first=index;
             vignettes.height=div.outerHeight(true);
           }
           vignettes.last=index;
-          if (!vignettes._overflow && vignettes.overflow()){
-            vignettes._overflow=true;
-            vignettes.remove_overflow=true;
-            vignettes.update();
-            vignettes.remove_overflow=false;
+          if (vignettes.getItemsperline(div)) {
+            if (div.offset().top>$(vignettes._dom).height()) {
+              if (vignettes.list.length%vignettes.itemsperline==0) {
+                vignettes._overflow=true;
+              }
+            }
           }
+          return div;
         }, // vignettes_show
-
-        onscroll: function vignettes_onscroll(e) {
-          var vignettes=this;
-          var container=$(vignettes._dom);
-          if (container.innerHeight() + container.scrollTop() >= container.prop('scrollHeight')) {
-            vignettes.addRow();
-          }
-        },
 
         click: function vignettes_click(e) {
           var index=$(e.target).closest('.wrap').data('index');
@@ -2584,70 +2614,31 @@ var DAV = new function() {
           });
         },
 
-        // check for container overflow;
-        overflow: function vignettes_overflow() {
-          var vignettes=this;
-          var container=$(vignettes._dom);
-          return (container.prop('scrollHeight') > (container.height() + vignettes.height));
-        }, // vignettes_overflow
-
         resize: function vignettes_resize(e) {
           var vignettes=this;
           var container=$(vignettes._dom);
 
           container.height(container.parent().height()-container.offset().top*2);
-          container.width($(window).width()-container.offset().left+16);
+          container.width($(window).width()-container.offset().left);
 
         }, // vignettes_resize
 
         update: function vignettes_update(e) {
+          var vignettes=this;
+          vignettes.do_update(e);
+          $(vignettes._dom).mCustomScrollbar('update');
+        },
 
-          if (!leftpanel.expanded) return;
+        do_update: function vignettes_doupdate(e) {
 
           var vignettes=this;
-
-          vignettes.resize();
           var container=$(vignettes._dom);
 
-          var limit=container.height()+vignettes.height;
+          vignettes.resize();
+          var last=$('.wrap:last',container);
+          vignettes._overflow=last.length?(last.offset().top>container.height()):false;
 
-          // compute line length
-          // and remove items overflowing (if remove_overflow is true)
-          vignettes._overflow=false;
-          vignettes._itemsperline=0;
-          var firstop;
-          $('.wrap',container).each(function(_index,div){
-            div=$(div);
-            if (vignettes._overflow){
-              div.remove();
-            } else {
-              var top=div.offset().top;
-              if (top>limit) {
-                vignettes._overflow=true;
-                if (!vignettes.remove_overflow) {
-                  return false;
-                }
-                div.remove();
-                var index=div.data('index');
-                if (vignettes.last>=index) {
-                  vignettes.last=index-1;
-                  if (vignettes.first==index) {
-                    vignettes.first=-1;
-                    vignettes.last=-1;
-                    $(container).empty();
-                    return false;
-                  }
-                }
-              } else {
-                if (!firstop || top==firstop) {
-                   ++vignettes._itemsperline;
-                   firstop=top;
-                 }
-              }
-            }
-          });
-
-          if (vignettes._overflow) return;
+          if (!leftpanel.expanded || vignettes._overflow) return;
 
           // else fill empty space
           for (var i=vignettes.last+1; i<vignettes.list.length; ++i) {
@@ -2661,15 +2652,15 @@ var DAV = new function() {
 
         addRow: function vignettes_addRow() {
           var vignettes=this;
-          var container=$(vignettes._dom);
           var sol=vignettes.last+1;
-          var eol=vignettes.last+vignettes._itemsperline;
+          var eol=vignettes.last+vignettes.itemsperline;
           if (sol>=vignettes.list.length) {
             return;
           }
           for (var i=sol; i<vignettes.list.length && i<=eol; ++i) {
             vignettes.show(i);
           }
+          $(vignettes._dom).mCustomScrollbar('update');
         } // vignettes_addRow
 
 

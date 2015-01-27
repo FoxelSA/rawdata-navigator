@@ -680,7 +680,7 @@ a, a:link, a:visited, a:hover, a:active {
 
 #vignettes {
   position: relative;
-  overflow-y: scroll;
+  overflow: hidden;
 }
 
 #vignettes .wrap {

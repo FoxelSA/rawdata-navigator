@@ -82,3 +82,8 @@ Public License and/or a compatible license and other copyright notices.
     <[http://fontawesome.io](http://fontawesome.io)><br />
     Font Awesome by Dave Gandy - http://fontawesome.io<br />
     Font Awesome is licensed under the [SIL OFL 1.1 license](http://scripts.sil.org/OFL).
+
+*   __Malihu custom scrollbar plugin__<br />
+    <[http://manos.malihu.gr](http://manos.malihu.gr)><br />
+    Copyright (c) 2014 Manos Malihutsakis, http://manos.malihu.gr<br />
+    The Malihu custom scrollbar plugin is licensed under the [MIT license](http://opensource.org/licenses/MIT).
