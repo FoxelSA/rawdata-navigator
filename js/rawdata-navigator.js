@@ -2661,7 +2661,7 @@ var DAV = new function() {
           vignettes.last=index;
           if (vignettes.getItemsperline(div)) {
             if (div.offset().top>$(vignettes._dom).height()) {
-              if (vignettes.list.length%vignettes.itemsperline==0) {
+              if ((vignettes.last-vignettes.first+1)%vignettes.itemsperline==0) {
                 vignettes._overflow=true;
               }
             }
