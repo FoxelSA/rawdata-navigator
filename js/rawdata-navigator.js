@@ -2568,7 +2568,8 @@ var DAV = new function() {
           height: 0,
           firstop: 0,
           itemsperline: 0,
-          _itemsperline: 0
+          _itemsperline: 0,
+          rowIncrement: 5
         },
 
         mCustomScrollbarOptions:{
@@ -2577,7 +2578,7 @@ var DAV = new function() {
               callbacks: {
                 onTotalScroll: function() {
                   console.log('totalscroll')
-                  DAV.vignettes.addRow();
+                  DAV.vignettes.addRows(vignettes.rowIncrement);
                 }
               }
         },
@@ -2689,12 +2690,14 @@ var DAV = new function() {
           });
         },
 
-        resize: function vignettes_resize(e) {
+        resize: function vignettes_resize(callback) {
           var vignettes=this;
           var container=$(vignettes._dom);
 
           container.height(container.parent().height()-container.offset().top*2);
           container.width($(window).width()-container.offset().left);
+
+          setTimeout(callback,1000);
 
         }, // vignettes_resize
 
@@ -2707,28 +2710,49 @@ var DAV = new function() {
         do_update: function vignettes_doupdate(e) {
 
           var vignettes=this;
-          var container=$(vignettes._dom);
 
-          vignettes.resize();
-          var last=$('.wrap:last',container);
-          vignettes._overflow=last.length?(last.offset().top>container.height()):false;
+          vignettes.resize(function(){
+            var container=$(vignettes._dom);
+            var last=$('.wrap:last',container);
+            vignettes._overflow=last.length?(last.offset().top>container.height()):false;
 
-          if (!leftpanel.expanded || vignettes._overflow) return;
+            if (!leftpanel.expanded) return;
 
-          // else fill empty space
-          for (var i=vignettes.last+1; i<vignettes.list.length; ++i) {
-            vignettes.show(i);
-            if (vignettes._overflow) {
-              return;
+            // update itemsperline and overflow
+            vignettes.itemsperline=0;
+            vignettes._itemsperline=0;
+            vignettes._overflow=false;
+            vignettes.firstop=0;
+            $('.wrap',container).each(function(){
+              var div=$(this);
+              if (vignettes.getItemsperline(div)) {
+                if (div.offset().top>$(vignettes._dom).height()) {
+                  if ((vignettes.last-vignettes.first+1)%vignettes.itemsperline==0) {
+                    vignettes._overflow=true;
+                    return false;
+                  }
+                }
+              }
+            });
+
+
+            if (vignettes._overflow) return;
+
+            // fill empty space (or last line)
+            for (var i=vignettes.last+1; i<vignettes.list.length; ++i) {
+              vignettes.show(i);
+              if (vignettes._overflow) {
+                return;
+              }
             }
-          }
+          });
 
         }, // vignettes_update
 
-        addRow: function vignettes_addRow() {
+        addRows: function vignettes_addRows(n) {
           var vignettes=this;
           var sol=vignettes.last+1;
-          var eol=vignettes.last+vignettes.itemsperline;
+          var eol=vignettes.last+vignettes.itemsperline*n;
           if (sol>=vignettes.list.length) {
             return;
           }
@@ -2736,7 +2760,7 @@ var DAV = new function() {
             vignettes.show(i);
           }
           $(vignettes._dom).mCustomScrollbar('update');
-        } // vignettes_addRow
+        } // vignettes_addRows
 
 
     });  // Vignettes
