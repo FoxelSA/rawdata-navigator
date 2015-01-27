@@ -167,7 +167,7 @@
       <a id="leftbar_fullscreen" class="button fullscreen fa fa-expand fa-fw"></a>
     </div>
   </nav>
-</div> 
+</div>
 
 <div id="info_button"><a class="fa fa-fw fa-angle-double-right"></a></div>
 
@@ -177,7 +177,8 @@
 <!-- home -->
 <div id="home" class="panel_content">
   <div id="allocation">
-        <select></select>
+        <h2>Recherche de données</h2>
+        <select multiple="multiple"></select>
   </div>
 
   <!--div id="search">

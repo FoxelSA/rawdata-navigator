@@ -480,14 +480,42 @@ var DAV = new function() {
 
             // select2
             this._component.select2({
-                placeholder: 'Select a dataset...',
-                formatResult: this.formatters.item,
-                formatSelection: this.formatters.selection,
-                sortResults: this.formatters.sorting
+                placeholder: 'Recherche par mots-clés...',
+                //formatResult: this.formatters.item,
+                //formatSelection: this.formatters.selection,
+                //sortResults: this.formatters.sorting
             });
 
             // events
             this.events();
+
+            // add options
+            var group1 = $('<optgroup>',{'label':'Région'});
+            var group2 = $('<optgroup>',{'label':'Projet'});
+
+            /*
+            this._component.append($('<option>',{'value':'dufour'}).text('Statue Dufour'));
+            this._component.append($('<option>',{'value':'both'}).text('Genève'));
+            this._component.append($('<option>',{'value':'reformateurs'}).text('Mur des Réformateurs'));
+            this._component.append($('<option>',{'value':'reformateurs'}).text('Parc des Bastions'));
+            this._component.append($('<option>',{'value':'dufour'}).text('Place de Neuve'));
+            this._component.append($('<option>',{'value':'both'}).text('SITG'));
+            */
+
+
+            group1.append($('<option>',{'value':'both'}).text('Genève'));
+            group1.append($('<option>',{'value':'reformateurs'}).text('Mur des Réformateurs'));
+            group1.append($('<option>',{'value':'reformateurs'}).text('Parc des Bastions'));
+            group1.append($('<option>',{'value':'dufour'}).text('Place de Neuve'));
+            group2.append($('<option>',{'value':'both'}).text('3D'));
+            group2.append($('<option>',{'value':'both'}).text('POI'));
+            group2.append($('<option>',{'value':'both'}).text('SITG'));
+            group2.append($('<option>',{'value':'dufour'}).text('Statue Dufour'));
+            group2.append($('<option>',{'value':'both'}).text('Street View'));
+
+            this._component.append(group2);
+            this._component.append(group1);
+
 
             // load
             this.json.load();
@@ -520,9 +548,11 @@ var DAV = new function() {
             this._tree[mac][master] = obj.segments;
 
             // selector
+            /*
             this._component.append(
                 $('<option>',{'value':mac+'/'+master})
                     .text(JSON.stringify({master:master,mac:mac,name:obj.name})));
+            */
 
         },
 
@@ -530,19 +560,22 @@ var DAV = new function() {
          * allocation.select()
          */
         select: function() {
-            this.clear();
-            this.set();
-            segmentation.json.load();
+            if (_.isArray(this._component.val())) {
+                this.clear();
+                this.set();
+                segmentation.json.load();
+            }
         },
 
         /**
          * allocation.set()
          */
         set: function() {
-            var val = this._component.val().split('/');
-            this.current.mac = val[0];
-            this.current.master = val[1];
+            //var val = this._component.val().split('/');
+            this.current.mac = '00-0E-64-08-1C-D2';//val[0];
+            this.current.master = '1403185204';//val[1];
             this.current.path = storage.mountpoint+'/camera/'+this.current.mac+'/raw/segment/'+this.current.master;
+            this.current.val = this._component.val();
         },
 
         /**
@@ -570,6 +603,7 @@ var DAV = new function() {
             mac: null,
             master: null,
             path: null,
+            val: null,
 
             /**
              * allocation.current.segments()
@@ -819,6 +853,47 @@ var DAV = new function() {
              * segmentation.json.parse()
              */
             parse: function(call,segment,data) {
+
+                if (allocation.current.master == '1403185204') {
+
+                    if (segment != '1404383663' && segment != '1404381299') {
+                        this._remaining--;
+                        if (this._remaining == 0)
+                            this.done();
+                        return;
+                    }
+
+                    var hasDufour = false;
+                    var hasReformateurs = false;
+
+                    if (allocation.current.val.indexOf('both') > -1) {
+                        hasDufour = true;
+                        hasReformateurs = true;
+                    }
+
+                    if (allocation.current.val.indexOf('dufour') > -1) {
+                        hasDufour = true;
+                    }
+
+                    if (allocation.current.val.indexOf('reformateurs') > -1) {
+                        hasReformateurs = true;
+                    }
+
+                    if (segment == '1404383663' && !hasDufour) {
+                        this._remaining--;
+                        if (this._remaining == 0)
+                            this.done();
+                        return;
+                    }
+
+                    if (segment == '1404381299' && !hasReformateurs) {
+                        this._remaining--;
+                        if (this._remaining == 0)
+                            this.done();
+                        return;
+                    }
+
+                }
 
                 var poses = [];
                 var vframes = [];
@@ -1094,15 +1169,15 @@ var DAV = new function() {
           // close information panel first
           panel.closebutton_click();
           return
-          
+
         }
 
         // hide the requested panel
         panel.hide();
 
 
-      } else { 
-        
+      } else {
+
         // close secondary panels if the primary one is requested
         if ($(panel._dom).hasClass('primary')) {
 
@@ -1139,7 +1214,7 @@ var DAV = new function() {
         $.each(window._panels,function(){
           if (this.visible && this!=panel) {
             panels[this._level]=this;
-            toplevel=Math.max(this._level,toplevel); 
+            toplevel=Math.max(this._level,toplevel);
           }
         });
 
@@ -1156,7 +1231,7 @@ var DAV = new function() {
 
         $.each(window._panels,function(){
           if (this.visible && this!=panel) {
-            toplevel=Math.max(this._level,toplevel); 
+            toplevel=Math.max(this._level,toplevel);
           }
         });
 
@@ -1466,7 +1541,7 @@ var DAV = new function() {
               return this.panToOffset(center, DAV.map._offset, options);
           }
 /*
-          this._component.getCenter = function () { // (Boolean) -> LatLng                                                                                                                                                                
+          this._component.getCenter = function () { // (Boolean) -> LatLng
               this._checkIfLoaded();
               if (this._initialCenter && !this._moved()) {
                   return this._initialCenter;
@@ -1496,7 +1571,7 @@ var DAV = new function() {
                   viewHalf.x-=map._offset[0];
                   viewHalf.y-=map._offset[1];
               }
-              
+
               var containerPoint = latlng instanceof L.Point ? latlng : this.latLngToContainerPoint(latlng);
               var centerOffset = containerPoint.subtract(viewHalf).multiplyBy(1 - 1 / scale);
               var newCenter = this.containerPointToLatLng(viewHalf.add(centerOffset));
@@ -2248,7 +2323,7 @@ var DAV = new function() {
                 });
 
                 $(window).on('resize.video',function(){
-                  if (!DAV.information.video._player.isFullscreen()) 
+                  if (!DAV.information.video._player.isFullscreen())
                     DAV.information.video.resize();
                 });
 
@@ -2676,7 +2751,7 @@ var DAV = new function() {
     });  // Vignettes
 
     var vignettes = this.vignettes = new Vignettes();
-    
+
 
 }; // DAV
 

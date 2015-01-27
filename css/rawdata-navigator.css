@@ -280,7 +280,7 @@ a, a:link, a:visited, a:hover, a:active {
 #allocation {
     position:relative;
     top: 3em;
-    width:500px;
+    width:400px;
 }
 
     .allocation {
@@ -687,7 +687,7 @@ a, a:link, a:visited, a:hover, a:active {
   position: relative;
   overflow: hidden;
   background: black;
-  border: 1px solid orange; 
+  border: 1px solid orange;
   float: left;
   margin: 5px;
 }
@@ -719,7 +719,7 @@ a, a:link, a:visited, a:hover, a:active {
   border-width: 0px solid black;
   cursor: pointer;
 }
- 
+
 #vignettes .info {
   color: white;
   height: auto;
