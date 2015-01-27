@@ -157,18 +157,25 @@ var DAV = new function() {
         init: function home_init(){
 
           var home=this;
-          $('.views .button',leftpanel._dom).on('click',function(e){
-
-            if ($(e.target).hasClass('current')) {
-              return;
-            }
-
+          $('a.views.button',leftbar._dom).on('click',function(e){
             switch(e.target.id) {
-            case 'viewasvignette': leftpanel.expand(); break;
-            case 'viewonmap': leftpanel.shrink(); break;
+            case 'viewasvignette': 
+                leftpanel.expand();
+                setTimeout(function(){
+                  e.target.id="viewonmap";
+                  $(e.target).addClass('fa-globe').removeClass('fa-th');
+                  e.target.title="Carte";
+                },1000);
+                break;
+            case 'viewonmap':
+                 leftpanel.shrink();
+                setTimeout(function(){
+                  e.target.id="viewasvignette";
+                  $(e.target).addClass('fa-th').removeClass('fa-globe');
+                  e.target.title="Vignettes";
+                },1000);
+                break;
             }
-
-            $('.views .button',leftpanel._dom).toggleClass('current');
 
           });
 
@@ -2124,14 +2131,14 @@ var DAV = new function() {
             // show primary panel first, if not already visible
             if (!leftpanel.visible) {
               leftpanel.show();
-              $(infopanel._dom).css('top',$('.views').outerHeight(true)+$('.views').position().top+10);
+//              $(infopanel._dom).css('top',$('.views').outerHeight(true)+$('.views').position().top+10);
               infopanel.show();
               information.visible=true;
               return;
             }
 
             // show panel
-            $(infopanel._dom).css('top',$('.views').outerHeight(true)+$('.views').position().top+10);
+//            $(infopanel._dom).css('top',$('.views').outerHeight(true)+$('.views').position().top+10);
             infopanel.show();
             information.visible=true;
 
@@ -2574,7 +2581,7 @@ var DAV = new function() {
 
         mCustomScrollbarOptions:{
               axis: 'y',
-              theme: 'light',
+              theme: '3d-thick',
               callbacks: {
                 onTotalScroll: function() {
                   console.log('totalscroll')
@@ -2695,7 +2702,7 @@ var DAV = new function() {
           var container=$(vignettes._dom);
 
           container.height(container.parent().height()-container.offset().top*2);
-          container.width($(window).width()-container.offset().left);
+          container.width($(window).width()-container.offset().left-16);
 
           setTimeout(callback,1000);
 

@@ -86,10 +86,6 @@
 <div id="map"></div>
 
 <div id="leftpanel" class="panel primary">
-  <div class="views">
-    <a class="button current" id="viewonmap">Voir carte</a>
-    <a class="button" id="viewasvignette">Voir vignettes</a>
-  </div>
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
   <div class="content"></div>
   <div class="content2">
@@ -157,8 +153,7 @@
 <div id="leftbar">
   <nav>
     <a id="a_leftpanel" class="button panel_button davicon"></a>
-    <a id="viewonmap" class="button panel_button fa fa-globe fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#333;"></a>
-    <a id="viewonmap" class="button panel_button fa fa-th fa-fw" style="width:auto;padding:7px;margin-bottom:40px;border:none;border-radius:7px;background-color:#333;"></a>
+    <a id="viewasvignette" class="button views fa fa-th fa-fw" title="Vignettes"></a>
 
     <a id="a_digitizingpanel" class="button panel_button fa fa-download fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
     <a id="a_processingpanel" class="button panel_button fa fa-cubes fa-fw" style="width:auto;padding:7px;margin-bottom:40px;border:none;border-radius:7px;background-color:#222;"></a>
@@ -213,10 +208,6 @@
       <a class="button" id="a_freepanel">Panorama</a>
       <a class="button" id="a_pointcloudpanel">Point Cloud</a>
    </div>
-    <div class="jump">
-        Jump to: <input id="jump" name="jump" type="text" value="" />
-    </div>
-    <div class="nav"><div></div></div>
     <div class="data">
       <div class="timestamp"></div>
         <table class="section date">
@@ -245,11 +236,15 @@
 
 <!-- video_player -->
   <div id="video_player" class="panel_content">
-  <div class="video">
-    <video id="vid" class="video-js vjs-default-skin">
-        <p class="vjs-no-js">Please consider using a web browser that supports <a href="http://videojs.com/html5-video-support/" target="_blank">HTML5</a>.</p>
-    </video>
- </div>
+    <div class="video">
+      <video id="vid" class="video-js vjs-default-skin">
+          <p class="vjs-no-js">Please consider using a web browser that supports <a href="http://videojs.com/html5-video-support/" target="_blank">HTML5</a>.</p>
+      </video>
+   </div>
+    <div class="jump">
+        Jump to: <input id="jump" name="jump" type="text" value="" />
+    </div>
+    <div class="nav"><div></div></div>
  </div>
 <!-- video_player -->
 

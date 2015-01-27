@@ -383,13 +383,7 @@ a, a:link, a:visited, a:hover, a:active {
   font-variant: small-caps;
 }
 
-#leftpanel div.views {
-  position: relative;
-  width: 512px;
-  top: 1.0em;
-}
-
-#leftpanel div.views .button, #infopanel .viewers .button {
+#infopanel .viewers .button {
   z-index: 99999;
   display: inline-block;
   width: 45%;
@@ -398,36 +392,6 @@ a, a:link, a:visited, a:hover, a:active {
   font-size: 2em;
   border: 1px outset black;
   transition: 0.04s all ease-in-out;
-}
-
-#leftpanel div.views a {
-  background: black;
-}
-
-#leftpanel div.views a.current {
-  background: #ecb100;
-}
-
-#leftpanel div.views a:hover {
-  color: gray;
-  transform: scale(0.95);
-}
-
-#leftpanel div.views a.current:hover {
-  color: rgb(240,240,240);
-}
-
-#leftpanel div.views a:active {
-  color: #ecb100;
-  transform: scale(0.8);
-}
-
-#leftpanel div.views a.current:active {
-  color: black;
-}
-
-#leftpanel div.views .current {
-  background: #ecb100;
 }
 
 #infopanel .viewers {
@@ -674,7 +638,7 @@ a, a:link, a:visited, a:hover, a:active {
 .content2 {
   position: absolute;
   height: 100%;
-  left: 544px;
+  left: 528px;
   top: 4em;
 }
 
@@ -744,3 +708,18 @@ a, a:link, a:visited, a:hover, a:active {
   pointer-events: none;
 }
 
+#leftbar a.panel_button.open {
+  color: #ecb100;
+}
+
+#viewonmap, #viewasvignette {
+  width:auto;
+  padding:7px;
+  border:none;
+  border-radius:7px;
+  background-color:#333;
+}
+
+#leftbar a.fa.button.views {
+  margin-bottom: 40px;
+}
