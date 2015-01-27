@@ -405,7 +405,7 @@ a, a:link, a:visited, a:hover, a:active {
 }
 
 #leftpanel div.views a.current {
-  background: orange;
+  background: #ecb100;
 }
 
 #leftpanel div.views a:hover {
@@ -427,7 +427,7 @@ a, a:link, a:visited, a:hover, a:active {
 }
 
 #leftpanel div.views .current {
-  background: orange;
+  background: #ecb100;
 }
 
 #infopanel .viewers {
@@ -687,7 +687,7 @@ a, a:link, a:visited, a:hover, a:active {
   position: relative;
   overflow: hidden;
   background: black;
-  border: 1px solid orange;
+  border: 1px solid #ecb100;
   float: left;
   margin: 5px;
 }
