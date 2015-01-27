@@ -154,17 +154,21 @@
 <div id="leftbar">
   <nav>
     <a id="a_leftpanel" class="button panel_button davicon"></a>
-    <div class="separator"></div>
-    <a id="a_digitizingpanel" class="button panel_button fa fa-download fa-fw"></a>
-    <a id="a_processingpanel" class="button panel_button fa fa-cogs fa-fw"></a>
-    <div class="separator"></div>
-    <a id="a_taxonomypanel" class="button panel_button fa fa-list-ul fa-fw"></a>
-    <a id="a_configurationpanel" class="button panel_button fa fa-gear fa-fw"></a>
+    <a id="viewonmap" class="button panel_button fa fa-globe fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#333;"></a>
+    <a id="viewonmap" class="button panel_button fa fa-th fa-fw" style="width:auto;padding:7px;margin-bottom:40px;border:none;border-radius:7px;background-color:#333;"></a>
+
+    <a id="a_digitizingpanel" class="button panel_button fa fa-download fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
+    <a id="a_processingpanel" class="button panel_button fa fa-cogs fa-fw" style="width:auto;padding:7px;margin-bottom:40px;border:none;border-radius:7px;background-color:#222;"></a>
+
+    <a id="a_taxonomypanel" class="button panel_button fa fa-list-ul fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
+    <a id="a_configurationpanel" class="button panel_button fa fa-gear fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
+    <!--
     <div class="separator"></div>
     <a id="logout" class="button fa fa-power-off fa-fw"></a>
+    -->
     <div id="leftbar_footer">
-      <a id="leftbar_timeline" class="button timeline fa fa-clock-o fa-fw"></a>
-      <a id="leftbar_fullscreen" class="button fullscreen fa fa-expand fa-fw"></a>
+      <a id="leftbar_timeline" class="button timeline fa fa-clock-o fa-fw" style="width:auto;margin-left:6px;margin-bottom:8px;padding:7px;border:none;border-radius:7px;background-color:#111;font-size:28px;"></a>
+      <a id="leftbar_fullscreen" class="button fullscreen fa fa-expand fa-fw" style="width:auto;margin-left:6px;padding:7px;border:none;border-radius:7px;background-color:#111;font-size:28px;"></a>
     </div>
   </nav>
 </div>

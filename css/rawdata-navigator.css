@@ -109,7 +109,7 @@ a, a:link, a:visited, a:hover, a:active {
 }
 
 .davicon:active, a.fa:active {
-  color: yellow;
+  color: #ecb100;
   transform: scale(0.8);
 }
 
@@ -418,7 +418,7 @@ a, a:link, a:visited, a:hover, a:active {
 }
 
 #leftpanel div.views a:active {
-  color: yellow;
+  color: #ecb100;
   transform: scale(0.8);
 }
 
@@ -693,7 +693,7 @@ a, a:link, a:visited, a:hover, a:active {
 }
 
 #vignettes .wrap.current {
-  box-shadow: 0 0 1.5em yellow;
+  box-shadow: 0 0 1.5em #ecb100;
 }
 
 
