@@ -159,7 +159,7 @@
     <a id="viewonmap" class="button panel_button fa fa-th fa-fw" style="width:auto;padding:7px;margin-bottom:40px;border:none;border-radius:7px;background-color:#333;"></a>
 
     <a id="a_digitizingpanel" class="button panel_button fa fa-download fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
-    <a id="a_processingpanel" class="button panel_button fa fa-cogs fa-fw" style="width:auto;padding:7px;margin-bottom:40px;border:none;border-radius:7px;background-color:#222;"></a>
+    <a id="a_processingpanel" class="button panel_button fa fa-cubes fa-fw" style="width:auto;padding:7px;margin-bottom:40px;border:none;border-radius:7px;background-color:#222;"></a>
 
     <a id="a_taxonomypanel" class="button panel_button fa fa-server fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
     <a id="a_configurationpanel" class="button panel_button fa fa-gear fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
