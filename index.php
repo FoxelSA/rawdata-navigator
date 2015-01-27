@@ -45,7 +45,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=1920, user-scalable=no">
     <title>DAV</title>
-    <link rel="stylesheet" type="text/css" media="all" href="font-awesome-4.2.0/css/font-awesome.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" type="text/css" media="all" href="font-awesome-4.3.0/css/font-awesome.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet/leaflet.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet.markercluster/MarkerCluster.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet.markercluster/MarkerCluster.Default.css" />
@@ -156,20 +157,24 @@
 <div id="leftbar">
   <nav>
     <a id="a_leftpanel" class="button panel_button davicon"></a>
-    <div class="separator"></div>
-    <a id="a_digitizingpanel" class="button panel_button fa fa-download fa-fw"></a>
-    <a id="a_processingpanel" class="button panel_button fa fa-cogs fa-fw"></a>
-    <div class="separator"></div>
-    <a id="a_taxonomypanel" class="button panel_button fa fa-list-ul fa-fw"></a>
-    <a id="a_configurationpanel" class="button panel_button fa fa-gear fa-fw"></a>
+    <a id="viewonmap" class="button panel_button fa fa-globe fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#333;"></a>
+    <a id="viewonmap" class="button panel_button fa fa-th fa-fw" style="width:auto;padding:7px;margin-bottom:40px;border:none;border-radius:7px;background-color:#333;"></a>
+
+    <a id="a_digitizingpanel" class="button panel_button fa fa-download fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
+    <a id="a_processingpanel" class="button panel_button fa fa-cubes fa-fw" style="width:auto;padding:7px;margin-bottom:40px;border:none;border-radius:7px;background-color:#222;"></a>
+
+    <a id="a_taxonomypanel" class="button panel_button fa fa-server fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
+    <a id="a_configurationpanel" class="button panel_button fa fa-gear fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
+    <!--
     <div class="separator"></div>
     <a id="logout" class="button fa fa-power-off fa-fw"></a>
+    -->
     <div id="leftbar_footer">
-      <a id="leftbar_timeline" class="button timeline fa fa-clock-o fa-fw"></a>
-      <a id="leftbar_fullscreen" class="button fullscreen fa fa-expand fa-fw"></a>
+      <a id="leftbar_timeline" class="button timeline fa fa-clock-o fa-fw" style="width:auto;margin-left:6px;margin-bottom:8px;padding:7px;border:none;border-radius:7px;background-color:#111;font-size:28px;"></a>
+      <a id="leftbar_fullscreen" class="button fullscreen fa fa-expand fa-fw" style="width:auto;margin-left:6px;padding:7px;border:none;border-radius:7px;background-color:#111;font-size:28px;"></a>
     </div>
   </nav>
-</div> 
+</div>
 
 <div id="info_button"><a class="fa fa-fw fa-angle-double-right"></a></div>
 
@@ -179,7 +184,8 @@
 <!-- home -->
 <div id="home" class="panel_content">
   <div id="allocation">
-        <select></select>
+        <h2>Recherche de données</h2>
+        <select multiple="multiple"></select>
   </div>
 
   <!--div id="search">
