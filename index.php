@@ -45,7 +45,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=1920, user-scalable=no">
     <title>DAV</title>
-    <link rel="stylesheet" type="text/css" media="all" href="font-awesome-4.2.0/css/font-awesome.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="font-awesome-4.3.0/css/font-awesome.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet/leaflet.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet.markercluster/MarkerCluster.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet.markercluster/MarkerCluster.Default.css" />
@@ -160,7 +160,7 @@
     <a id="a_digitizingpanel" class="button panel_button fa fa-download fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
     <a id="a_processingpanel" class="button panel_button fa fa-cogs fa-fw" style="width:auto;padding:7px;margin-bottom:40px;border:none;border-radius:7px;background-color:#222;"></a>
 
-    <a id="a_taxonomypanel" class="button panel_button fa fa-list-ul fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
+    <a id="a_taxonomypanel" class="button panel_button fa fa-server fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
     <a id="a_configurationpanel" class="button panel_button fa fa-gear fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
     <!--
     <div class="separator"></div>
