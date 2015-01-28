@@ -2286,9 +2286,10 @@ var DAV = new function() {
                 $(information._dom+' .download_panorama').attr('href',download_panorama_link);
                 var view_panorama_link = document.location.origin+'/dav/freepano/example/';
                 if (segment == '1404381299')
-                    view_panorama_link += 'reformateurs.html';
+                    view_panorama_link += 'reformateurs.php';
                 else if (segment == '1404383663')
-                    view_panorama_link += 'dufour.html';
+                    view_panorama_link += 'dufour.php';
+                view_panorama_link += '?initial='+(pose.sec-7200)+'_'+pose.usc;
                 $(information._dom+' .view_panorama').attr('href',view_panorama_link);
 
                 // test panorama

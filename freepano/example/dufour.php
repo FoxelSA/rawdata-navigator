@@ -52,6 +52,11 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <title>Freepano Example - https://github.com/FoxelSA/freepano</title>
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimum-scale=1,maximum-scale=1" />
+    <script type="text/javascript">
+        <?php if (isset($_GET['initial'])): ?>
+            var initialImage = '<?php print ($_GET['initial']); ?>';
+        <?php endif; ?>
+    </script>
     <script type="text/javascript" src="../js/thirdparty/jquery-2.1.3.min.js"></script>
     <script type="text/javascript" src="../js/thirdparty/jquery.easing-1.3.min.js"></script>
     <script type="text/javascript" src="../js/thirdparty/jquery.mousewheel-3.1.12.min.js"></script>
