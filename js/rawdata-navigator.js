@@ -1177,11 +1177,19 @@ var DAV = new function() {
 
           // dont hide primary panel in case we just closed some secondary one(s)
           if (closedOne) {
+
+            // but show map/vignettes toggle
+            $('.views',leftbar._dom).css({
+                visibility: 'visible'
+            });
             return;
           }
 
           // close information panel first
           panel.closebutton_click();
+          $('.views',leftbar._dom).css({
+              visibility: 'hidden'
+          });
           return
 
         }
@@ -1203,6 +1211,11 @@ var DAV = new function() {
               this.hide((topp && topp._level>this._level));
               closedOne=true;
             }
+          });
+
+          // show map/vignettes toggle
+          $('.views',leftbar._dom).css({
+              visibility: 'visible'
           });
 
           // show also information if any vignette is selected
@@ -2084,7 +2097,7 @@ var DAV = new function() {
 
         /**
          * information.show()
-         */
+             */
         show: function information_show(segment,index) {
 
             var info = segmentation.info(segment);
@@ -2219,7 +2232,7 @@ var DAV = new function() {
                 information._component.find('.gmt').html(date.getSimpleLocalDate());
 
                 // html
-                $(information._dom+' .nav > div').html(
+                $('.nav div',information.video._dom).html(
                     ((index > 0) ? '<a href="#" onclick="DAV.info(\''+segment+'\',\''+(index-1)+'\');return false;"><span class="prev"></span>Prev</a>' : '')
                     + ((index+1 < poses.length) ? '<a href="#" onclick="DAV.info(\''+segment+'\',\''+(index+1)+'\');return false;">Next<span class="next"></span></a>' : '')
                 );
@@ -2323,12 +2336,16 @@ var DAV = new function() {
                     information.video._changed = false;
                 });
 
-                if (false) this._player.on('timeupdate',function() {
-                    var frame = parseInt((information.video._player.currentTime()*information.video._fps).toPrecision(6),10);
-                    information.details(information._segment,segmentation.vframe(information._segment,frame));
+                this._player.on('timeupdate',function() {
+                    information.video.frame = parseInt((information.video._player.currentTime()*information.video._fps).toPrecision(6),10);
+                    $('input#pose',information.video._dom).val(information.video.frame);
+
+                    if (information.video.follow) information.details(information._segment,segmentation.vframe(information._segment,frame));
                 });
 
                 this._player.on('pause',function(){
+                    information.video.frame = parseInt((information.video._player.currentTime()*information.video._fps).toPrecision(6),10);
+                    $('input#pose',information.video._dom).val(information.video.frame);
                     if (information.panTimeout) {
                       clearTimeout(information.panTimeout);
                       information.panTimeout=null;
@@ -2336,10 +2353,36 @@ var DAV = new function() {
                     map._component.panToOffset(information.overview._marker.getLatLng(),map._offset);
                 });
 
-                $(window).on('resize.video',function(){
+                $(window).off('.video').on('resize.video',function(){
                   if (!DAV.information.video._player.isFullscreen())
                     DAV.information.video.resize();
                 });
+
+                $('input#pose',information.video._dom).off('.video').on('change.video',function(){
+                  var frame=$(this).val();
+                  var time=(frame/information.video._fps).toPrecision(6);
+                  information.video._player.currentTime(time);
+                });
+
+                $('#prev',information.video._dom).off('.video').on('click.video',function(){
+                  var time=(--information.video.frame/information.video._fps).toPrecision(6);
+                  $('input#pose',information.video._dom).val(information.video.frame);
+                  information.video._player.currentTime(time);
+                });
+
+                $('#next',information.video._dom).off('.video').on('click.video',function(){
+                  var time=(++information.video.frame/information.video._fps).toPrecision(6);
+                  $('input#pose',information.video._dom).val(information.video.frame);
+                  information.video._player.currentTime(time);
+                });
+
+                $('#select',information.video._dom).off('.video').on('click.video',function(){
+                  information.video.frame=$('input#pose',information.video._dom).val();
+                  var time=(information.video.frame/information.video._fps).toPrecision(6);
+                  information.video._player.currentTime(time);
+                  information.details(information._segment,segmentation.vframe(information._segment,information.video.frame));
+                });
+
 
             },
 
@@ -2601,8 +2644,8 @@ var DAV = new function() {
           var vignettes=this;
           $(document).ready(function(){
             $(vignettes._dom).mCustomScrollbar(vignettes.mCustomScrollbarOptions,{
-                onTotalScrollOffset: vignettes.height/2 || 100,
-                alwaysTriggerOffsets:true
+                onTotalScrollOffset: vignettes.height || 120,
+                alwaysTriggerOffsets: false
             });
           });
           vignettes.clear();
@@ -2672,6 +2715,7 @@ var DAV = new function() {
           if (vignettes.first<0) {
             vignettes.first=index;
             vignettes.height=div.outerHeight(true);
+            $(vignettes._dom).mCustomScrollbar({onTotalScrollOffset: vignettes.height});
           }
           vignettes.last=index;
           if (vignettes.getItemsperline(div)) {

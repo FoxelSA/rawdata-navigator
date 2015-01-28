@@ -245,9 +245,14 @@
       </video>
    </div>
     <div class="jump">
-        Jump to: <input id="jump" name="jump" type="text" value="" />
+      <span>Pose:</span>
+      <input id="pose" name="pose" type="number" min="0" />
+      <a class="button" id="select">Select</a>
+      <span class="nav">
+        <a id="prev" class="button"><span class="fa fa-angle-double-left fa-fw"></span>Prev</a>
+        <a id="next" class="button">Next<span class="fa fa-angle-double-right fa-fw"></span></a>
+      </span>
     </div>
-    <div class="nav"><div></div></div>
  </div>
 <!-- video_player -->
 
