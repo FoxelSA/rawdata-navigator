@@ -2714,7 +2714,10 @@ var DAV = new function() {
 
         mCustomScrollbarOptions:{
               axis: 'y',
-              theme: '3d-thick',
+              theme: 'light-thin',
+              mouseWheel: {
+                scrollAmount: 250
+              },
               callbacks: {
                 onTotalScroll: function() {
                   console.log('totalscroll')
