@@ -206,11 +206,22 @@
 <!-- pose_info -->
 <div id="pose_info" class="panel_content">
     <div class="pose"></div>
+    <!--
     <div class="viewers">
       <a class="button" id="a_freepanel">Panorama</a>
       <a class="button" id="a_pointcloudpanel">Point Cloud</a>
    </div>
+   -->
    <div id="usages" class="data">
+       <div class="usage posepreview">
+            <div class="title">Preview</div>
+            <div class="nocloseable">
+                <div class="preview"><img onerror="nopreview(this);"></img></div>
+                <div class="actions">
+                    <div class="action"><a href="" class="download_tiles">Download RAW tiles...</a></div>
+                </div>
+            </div>
+        </div>
         <div class="usage posemap">
             <div class="title">Overview</div>
             <div class="nocloseable">
@@ -242,21 +253,12 @@
                 </table>
             </div>
         </div>
-        <div class="usage posepreview">
-            <div class="title pointer">Preview</div>
-            <div class="closeable">
-                <div class="preview"><img onerror="nopreview(this);"></img></div>
-                <div class="actions">
-                    <div class="action"><a href="" class="download_tiles">Download RAW tiles...</a></div>
-                </div>
-            </div>
-        </div>
         <div class="usage posepanorama">
             <div class="title pointer">Panorama</div>
             <div class="closeable">
                 <div><img width="430" /></div>
                 <div class="actions">
-                    <div class="action"><a href="" class="view_panorama" >View in WebGL Freepano viewer...</a></div>
+                    <div class="action"><a href="" class="view_panorama" onclick="DAV.viewFreepano(this);return false;">View in WebGL Freepano viewer...</a></div>
                     <div class="action"><a href="" class="download_panorama">Download EQR image...</a></div>
                 </div>
             </div>
@@ -266,7 +268,7 @@
             <div class="closeable">
                 <div><img width="430" /></div>
                 <div class="actions">
-                    <div class="action"><a href="" class="view_pointcloud">View in WebGL PointCloud viewer...</a></div>
+                    <div class="action"><a href="" class="view_pointcloud" onclick="DAV.viewPotree(this);return false;">View in WebGL PointCloud viewer...</a></div>
                     <div class="action"><a href="" class="download_pointcloud">Download PLY pointcloud...</a></div>
                 </div>
             </div>

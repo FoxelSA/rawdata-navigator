@@ -93,6 +93,7 @@ var DAV = new function() {
         });
 
         // setup infopanel viewer buttons
+        /*
         $('.panel').on('click.viewer_button','.viewers a', function(e){
             var panel=window._panels[e.target.id.substr(2)];
             if (!$('iframe',panel._dom).attr('src').length) {
@@ -100,6 +101,7 @@ var DAV = new function() {
             }
             panel.toggle();
         });
+        */
 
         // setup panel close button handler
         $('.panel').on('click.panel_close','.close a',function(e){
@@ -2905,6 +2907,24 @@ var DAV = new function() {
     });  // Vignettes
 
     var vignettes = this.vignettes = new Vignettes();
+
+    /*
+     * viewer
+     */
+    this.viewFreepano = function(item) {
+        var panel=window._panels['freepanel'];
+        $('iframe',panel._dom).attr('src',$(item).attr('href'));
+        panel.toggle();
+    };
+
+    /*
+     * viewer
+     */
+    this.viewPotree = function(item) {
+        var panel=window._panels['pointcloudpanel'];
+        $('iframe',panel._dom).attr('src',$(item).attr('href'));
+        panel.toggle();
+    };
 
 
 }; // DAV
