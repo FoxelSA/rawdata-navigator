@@ -2787,11 +2787,12 @@ var DAV = new function() {
           var date=new Date(vignette.pose.sec*1000);
           var html='<div class="wrap">';
           html+='<div class="timestamp">'+date.getSimpleUTCDate();
-          html+='<a class="button fa fa-gear fa-fw"></a></div>';
+          //html+='<a class="button fa fa-gear fa-fw"></a></div>';
+          html+='</div>';
           html+='<img class="thumb" alt="n/a" onerror="nopreview(this);" src="'+document.location.origin+allocation.current.path+'/'+vignette.segment+'/preview/'+vignette.segment_info.debayer+'/0/'+vignette.pose.sec+'_'+vignette.pose.usc+'.jpeg"></img>';
           html+='<div class="info">';
           html+='<div class="what">Poses (RAW DATA)</div>';
-          html+='<div class="footer">INFORMATIONS</div>';
+          //html+='<div class="footer">INFORMATIONS</div>';
 //          html+=vignette.info;
           html+='</div>';
           html+='</div>';
