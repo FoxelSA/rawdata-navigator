@@ -220,26 +220,26 @@
         <div class="usage poseinformation">
             <div class="title pointer">Information</div>
             <div class="closeable">
-                <div class="timestamp"></div>
+                <div class="section" style="margin-top:15px;">Date</div>
                 <table class="section date">
-                  <tr>
-                    <td class="attr">UTC</td><td class="utc"></td>
-                    <td class="attr">Local time</td><td class="gmt"></td>
-                  </tr>
+                  <tr><td class="attr">UTC</td><td class="utc"></td></tr>
+                  <tr><td class="attr">Local time</td><td class="gmt"></td></tr>
                 </table>
-              <table><tr><td>
+                <div class="section">Géoposition</div>
                 <table class="section geo">
-                    <tr><td class="attr">Latitude</td><td class="lat"></td></tr>
-                    <tr><td class="attr">Longitude</td><td class="lng"></td></tr>
-                    <tr><td class="attr">Altitude</td><td class="lat"></td></tr>
-                  </table>
-                </td><td>
-                <table class="section status">
-                    <tr><td class="attr">GPS</td><td class="gps"></td></tr>
-                    <tr><td class="attr">JP4</td><td class="jp4"></td></tr>
-                    <tr><td class="attr">Splitted</td><td class="split"></td></tr>
-                  </table>
-                </td></tr></table>
+                  <tr><td class="attr">Latitude</td><td class="lat"></td></tr>
+                  <tr><td class="attr">Longitude</td><td class="lng"></td></tr>
+                  <tr><td class="attr">Altitude</td><td class="lat"></td></tr>
+                  <tr><td class="attr">GPS</td><td class="gps"></td></tr>
+                </table>
+                <div class="section">Acquisition</div>
+                <table class="section digitizing">
+                  <tr><td class="attr">Run</td><td class="run"></td></tr>
+                  <tr><td class="attr">Segment</td><td class="segment"></td></tr>
+                  <tr><td class="attr">Trigger</td><td class="sec"></td></tr>
+                  <tr><td class="attr">μSec</td><td class="usc"></td></tr>
+                  <tr><td class="attr">Pose</td><td class="item"></td></tr>
+                </table>
             </div>
         </div>
         <div class="usage posepreview">
@@ -254,7 +254,7 @@
         <div class="usage posepanorama">
             <div class="title pointer">Panorama</div>
             <div class="closeable">
-                <div><img width="470" /></div>
+                <div><img width="430" /></div>
                 <div class="actions">
                     <div class="action"><a href="" class="view_panorama" >View in WebGL Freepano viewer...</a></div>
                     <div class="action"><a href="" class="download_panorama">Download EQR image...</a></div>
@@ -264,7 +264,7 @@
         <div class="usage posepointcloud">
             <div class="title pointer">Point Cloud</div>
             <div class="closeable">
-                <div><img width="470" /></div>
+                <div><img width="430" /></div>
                 <div class="actions">
                     <div class="action"><a href="" class="view_pointcloud">View in WebGL PointCloud viewer...</a></div>
                     <div class="action"><a href="" class="download_pointcloud">Download PLY pointcloud...</a></div>

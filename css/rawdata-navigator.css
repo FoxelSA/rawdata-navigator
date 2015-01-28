@@ -590,11 +590,11 @@ a, a:link, a:visited, a:hover, a:active {
                 }
 
     #pose_info .preview {
-        width:470px;
+        width:430px;
     }
 
         #pose_info .preview img {
-            width:470px;
+            width:430px;
             height:235px;
         }
 
@@ -609,9 +609,10 @@ a, a:link, a:visited, a:hover, a:active {
       height: 100%;
     }
 
-
     #map_overview {
-        width:470px;
+        position:relative;
+        left:10px;
+        width:430px;
         height:240px;
     }
 
@@ -781,23 +782,47 @@ a, a:link, a:visited, a:hover, a:active {
 }
 
 #usages {
-    width:490px;
+    width:450px;
+    margin-left:25px;
     margin-top:50px;
 }
 
     #usages .usage {
-        padding:10px;
         color:#fff;
         background-color:#111;
-        margin-bottom:5px;
+        margin-bottom:10px;
     }
 
-    #usages .usage .title.pointer {
-        cursor:pointer;
+        #usages .usage img {
+            position:relative;
+            left:10px;
+        }
+
+    #usages .usage .title {
+        padding:10px;
+        font-weight:bold;
     }
+
+        #usages .usage .title.pointer {
+            cursor:pointer;
+        }
+
+            #usages .usage .title.pointer:hover {
+                color:#ecb100;
+            }
 
     #usages .usage .closeable {
         display:none;
+    }
+
+    #usages .usage.posemap .nocloseable {
+        padding-bottom:10px;
+    }
+
+    #usages .usage.poseinformation .closeable {
+        padding:10px;
+        padding-top:0;
+        padding-bottom:10px;
     }
 
     #usages .usage .closeable,
@@ -822,3 +847,21 @@ a, a:link, a:visited, a:hover, a:active {
             #usages .usage .actions .action:hover a {
                 color:#ecb100;
             }
+
+.poseinformation div.section {
+    padding-bottom:3px;
+    margin-top:20px;
+    margin-bottom:10px;
+    font-size:10px;
+    font-weight:700;
+    text-transform:uppercase;
+    border-bottom:solid 1px #fff;
+}
+
+.poseinformation table.section {
+    font-size:11px;
+}
+    .poseinformation table.section td.attr {
+        width:130px;
+        padding-left:30px;
+    }

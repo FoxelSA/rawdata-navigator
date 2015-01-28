@@ -1612,7 +1612,7 @@ var DAV = new function() {
 */
 
           // scale
-          L.control.scale({position: 'bottomleft'}).addTo(this._component);
+          //L.control.scale({position: 'bottomleft'}).addTo(this._component);
 
           // zoom
           L.control.zoom({position: 'topright'}).addTo(this._component);
@@ -2211,7 +2211,12 @@ var DAV = new function() {
                 information.overview._component.invalidateSize();
 
                 // timestamp
-                information._component.find('.timestamp').html(pose.sec+'.'+pose.usc);
+                //information._component.find('.timestamp').html(pose.sec+'.'+pose.usc);
+                information._component.find('.run').html(allocation.current.master);
+                information._component.find('.segment').html(segment);
+                information._component.find('.sec').html(pose.sec);
+                information._component.find('.usc').html(pose.usc);
+                information._component.find('.item').html('Pose '+(index+1)+' of '+poses.length);
 
                 // geo
                 if (info.gps) {
@@ -2254,6 +2259,13 @@ var DAV = new function() {
                 var thumb_panorama_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/small/result_'+(pose.sec-7200)+'_'+pose.usc+'-0-25-1.jpeg';
                 var download_panorama_link = 'php/download.php?file='+storage.mountpoint+'/footage/demodav/'+segment+'/result_'+(pose.sec-7200)+'_'+pose.usc+'-0-25-1.jpeg';
                 $(information._dom+' .download_panorama').attr('href',download_panorama_link);
+                var view_panorama_link = document.location.origin+'/dav/freepano/example/';
+                if (segment == '1404381299')
+                    view_panorama_link += 'reformateurs.html';
+                else if (segment == '1404383663')
+                    view_panorama_link += 'dufour.html';
+                $(information._dom+' .view_panorama').attr('href',view_panorama_link);
+
                 // test panorama
                 $.ajax({
                     url:test_download_panorama_link,
@@ -2268,20 +2280,26 @@ var DAV = new function() {
                 });
 
                 // download pointcloud
-                var download_pointcloud_link = 'php/download.php?file='+storage.mountpoint+'/footage/demodav/pointcloud-'+segment+'.ply';
-                var thumb_pointclound_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/pointcloud-'+segment+'.jpg';
+                var download_pointcloud_link = 'php/download.php?file='+storage.mountpoint+'/footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.ply';
+                var thumb_pointclound_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.jpg';
                 $(information._dom+' .download_pointcloud').attr('href',download_pointcloud_link);
                 $('#usages .usage.posepointcloud img').attr('src',thumb_pointclound_src);
+                var view_pointcloud_link = document.location.origin+'/dav/potree/';
+                if (segment == '1404381299')
+                    view_pointcloud_link += 'reformateurs.html';
+                else if (segment == '1404383663')
+                    view_pointcloud_link += 'dufour.html';
+                $(information._dom+' .view_pointcloud').attr('href',view_pointcloud_link);
 
                 // html
                 $('.nav div',information.video._dom).html(
                     ((index > 0) ? '<a href="#" onclick="DAV.info(\''+segment+'\',\''+(index-1)+'\');return false;"><span class="prev"></span>Prev</a>' : '')
                     + ((index+1 < poses.length) ? '<a href="#" onclick="DAV.info(\''+segment+'\',\''+(index+1)+'\');return false;">Next<span class="next"></span></a>' : '')
                 );
-                $(information._dom+' .pose').html(
-                    'Segment '+segment+' &nbsp; &nbsp; &nbsp; '
-                    + 'Pose '+(index+1)+' of '+poses.length
-                );
+                //$(information._dom+' .pose').html(
+                //    'Segment '+segment+' &nbsp; &nbsp; &nbsp; '
+                //    + 'Pose '+(index+1)+' of '+poses.length
+                //);
 
             });
 
