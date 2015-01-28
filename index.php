@@ -206,38 +206,71 @@
 <!-- pose_info -->
 <div id="pose_info" class="panel_content">
     <div class="pose"></div>
-    <div class="preview"><img onerror="nopreview(this);"></img></div>
     <div class="viewers">
       <a class="button" id="a_freepanel">Panorama</a>
       <a class="button" id="a_pointcloudpanel">Point Cloud</a>
    </div>
-    <div class="data">
-      <div class="timestamp"></div>
-        <table class="section date">
-          <tr>
-            <td class="attr">UTC</td><td class="utc"></td>
-            <td class="attr">Local time</td><td class="gmt"></td>
-          </tr>
-        </table>
-      <table><tr><td>
-        <table class="section geo">
-            <tr><td class="attr">Latitude</td><td class="lat"></td></tr>
-            <tr><td class="attr">Longitude</td><td class="lng"></td></tr>
-            <tr><td class="attr">Altitude</td><td class="lat"></td></tr>
-          </table>
-        </td><td>
-        <table class="section status">
-            <tr><td class="attr">GPS</td><td class="gps"></td></tr>
-            <tr><td class="attr">JP4</td><td class="jp4"></td></tr>
-            <tr><td class="attr">Splitted</td><td class="split"></td></tr>
-          </table>
-        </td></tr></table>
-    </div>
-    <div id="map_overview"></div>
-    <div class="usages">
-      <a href="" class="download_tiles">Download RAW tiles...</a>
-      <a href="" class="download_panorama" style="display:none;">Download panorama...</a>
-      <a href="" class="download_pointcloud" style="display:none;">Download point cloud...</a>
+   <div id="usages" class="data">
+        <div class="usage posemap">
+            <div class="title">Overview</div>
+            <div class="nocloseable">
+                <div id="map_overview"></div>
+            </div>
+        </div>
+        <div class="usage poseinformation">
+            <div class="title pointer">Information</div>
+            <div class="closeable">
+                <div class="timestamp"></div>
+                <table class="section date">
+                  <tr>
+                    <td class="attr">UTC</td><td class="utc"></td>
+                    <td class="attr">Local time</td><td class="gmt"></td>
+                  </tr>
+                </table>
+              <table><tr><td>
+                <table class="section geo">
+                    <tr><td class="attr">Latitude</td><td class="lat"></td></tr>
+                    <tr><td class="attr">Longitude</td><td class="lng"></td></tr>
+                    <tr><td class="attr">Altitude</td><td class="lat"></td></tr>
+                  </table>
+                </td><td>
+                <table class="section status">
+                    <tr><td class="attr">GPS</td><td class="gps"></td></tr>
+                    <tr><td class="attr">JP4</td><td class="jp4"></td></tr>
+                    <tr><td class="attr">Splitted</td><td class="split"></td></tr>
+                  </table>
+                </td></tr></table>
+            </div>
+        </div>
+        <div class="usage posepreview">
+            <div class="title pointer">Preview</div>
+            <div class="closeable">
+                <div class="preview"><img onerror="nopreview(this);"></img></div>
+                <div class="actions">
+                    <div class="action"><a href="" class="download_tiles">Download RAW tiles...</a></div>
+                </div>
+            </div>
+        </div>
+        <div class="usage posepanorama">
+            <div class="title pointer">Panorama</div>
+            <div class="closeable">
+                <div><img width="470" /></div>
+                <div class="actions">
+                    <div class="action"><a href="" class="view_panorama" >View in WebGL Freepano viewer...</a></div>
+                    <div class="action"><a href="" class="download_panorama">Download EQR image...</a></div>
+                </div>
+            </div>
+        </div>
+        <div class="usage posepointcloud">
+            <div class="title pointer">Point Cloud</div>
+            <div class="closeable">
+                <div><img width="470" /></div>
+                <div class="actions">
+                    <div class="action"><a href="" class="view_pointcloud">View in WebGL PointCloud viewer...</a></div>
+                    <div class="action"><a href="" class="download_pointcloud">Download PLY pointcloud...</a></div>
+                </div>
+            </div>
+        </div>
     </div>
   </div>
   <!-- pose_info -->

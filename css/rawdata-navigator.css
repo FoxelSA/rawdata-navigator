@@ -577,18 +577,12 @@ a, a:link, a:visited, a:hover, a:active {
                 }
 
     #pose_info .preview {
-        position: relative;
-        left: 10px;
-        margin-top: 3em;
-        width:480px;
-        height:240px;
-        text-align:right;
+        width:470px;
     }
 
         #pose_info .preview img {
-            border:solid 1px #4f4f4f;
-            width:480px;
-            height:240px;
+            width:470px;
+            height:235px;
         }
 
     .video {
@@ -604,11 +598,8 @@ a, a:link, a:visited, a:hover, a:active {
 
 
     #map_overview {
-        position: relative;
-        left: 10px;
-        width:480px;
+        width:470px;
         height:240px;
-        border:solid 1px #4f4f4f;
     }
 
 #timeline {
@@ -773,3 +764,46 @@ a, a:link, a:visited, a:hover, a:active {
 #leftbar a.fa.button.views {
   margin-bottom: 40px;
 }
+
+#usages {
+    width:490px;
+    margin-top:50px;
+}
+
+    #usages .usage {
+        padding:10px;
+        color:#fff;
+        background-color:#111;
+        margin-bottom:5px;
+    }
+
+    #usages .usage .title.pointer {
+        cursor:pointer;
+    }
+
+    #usages .usage .closeable {
+        display:none;
+    }
+
+    #usages .usage .closeable,
+    #usages .usage .nocloseable {
+        margin-top:10px;
+    }
+
+    #usages .usage .actions .action {
+        padding:10px;
+        background-color:#222;
+        margin-top:5px;
+    }
+
+        #usages .usage .actions .action a {
+            color:#fff;
+        }
+
+        #usages .usage .actions .action:hover {
+            background-color:#333;
+        }
+
+            #usages .usage .actions .action:hover a {
+                color:#ecb100;
+            }
