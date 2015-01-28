@@ -153,6 +153,7 @@ var DAV = new function() {
             $(this).siblings('.closeable').slideToggle();
         });
         // info scroll
+        $('#pose_info #usages').height($('#leftpanel').height()-100);
         $('#pose_info #usages').mCustomScrollbar({
             axis: 'y',
             theme: 'light-thin',
@@ -1062,6 +1063,7 @@ var DAV = new function() {
 
       resize: function leftbar_resize(e) {
         $(leftbar._dom).height($(window).height());
+        $('#pose_info #usages').height($('#leftpanel').height()-100);
       },
 
       click: function leftbar_click(e){
