@@ -256,9 +256,8 @@
         <div class="usage posepanorama">
             <div class="title pointer">Panorama</div>
             <div class="closeable">
-                <div><img width="430" /></div>
+              <div><a class="view_panorama" onclick="DAV.viewFreepano(this);return false;"><img width="430" /></a></div>
                 <div class="actions">
-                    <div class="action"><a href="" class="view_panorama" onclick="DAV.viewFreepano(this);return false;">View in WebGL Freepano viewer...</a></div>
                     <div class="action"><a href="" class="download_panorama">Download EQR image...</a></div>
                 </div>
             </div>
@@ -266,9 +265,8 @@
         <div class="usage posepointcloud">
             <div class="title pointer">Point Cloud</div>
             <div class="closeable">
-                <div><img width="430" /></div>
+              <div><a class="view_pointcloud" onclick="DAV.viewPotree(this);return false;"><img width="430" /></a></div>
                 <div class="actions">
-                    <div class="action"><a href="" class="view_pointcloud" onclick="DAV.viewPotree(this);return false;">View in WebGL PointCloud viewer...</a></div>
                     <div class="action"><a href="" class="download_pointcloud">Download PLY pointcloud...</a></div>
                 </div>
             </div>

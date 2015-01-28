@@ -2917,7 +2917,7 @@ var DAV = new function() {
     this.viewFreepano = function(item) {
         var panel=window._panels['freepanel'];
         if ($('iframe',panel._dom).attr('src')!=$(item).attr('href')) {
-          $('iframe',panel._dom).attr('src',$(item).attr('href'));
+            $('iframe',panel._dom).attr('src',$(item).attr('href'));
         }
         panel.toggle();
     };
@@ -2928,7 +2928,7 @@ var DAV = new function() {
     this.viewPotree = function(item) {
         var panel=window._panels['pointcloudpanel'];
         if ($('iframe',panel._dom).attr('src')!=$(item).attr('href')) {
-          $('iframe',panel._dom).attr('src',$(item).attr('href'));
+            $('iframe',panel._dom).attr('src',$(item).attr('href'));
         }
         panel.toggle();
     };
