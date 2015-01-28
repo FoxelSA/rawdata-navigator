@@ -122,6 +122,17 @@ a, a:link, a:visited, a:hover, a:active {
   bottom: 0px;
 }
 
+#leftbar_footer a.button {
+    width:auto;
+    margin-left:12px;
+    margin-bottom:8px;
+    padding:7px;
+    border:none;
+    border-radius:7px;
+    background-color:#111;
+    font-size:28px;
+}
+
 #leftbar div.separator {
   border-bottom: 1px solid gray;
   margin-bottom: 0.2em;
@@ -708,8 +719,24 @@ a, a:link, a:visited, a:hover, a:active {
   pointer-events: none;
 }
 
+#leftbar a.panel_button {
+  width:auto;
+  padding:7px;
+  border:none;
+  border-radius:7px;
+  background-color:#222;
+}
+
+#leftbar a.panel_button.spacer {
+  margin-top:40px;
+}
+
 #leftbar a.panel_button.open {
   color: #ecb100;
+}
+
+#leftbar a.panel_button.davicon {
+  background-color:transparent !important;
 }
 
 #viewonmap, #viewasvignette {

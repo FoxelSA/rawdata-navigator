@@ -155,18 +155,18 @@
     <a id="a_leftpanel" class="button panel_button davicon"></a>
     <a id="viewasvignette" class="button views fa fa-th fa-fw" title="Vignettes"></a>
 
-    <a id="a_digitizingpanel" class="button panel_button fa fa-download fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
-    <a id="a_processingpanel" class="button panel_button fa fa-cubes fa-fw" style="width:auto;padding:7px;margin-bottom:40px;border:none;border-radius:7px;background-color:#222;"></a>
+    <a id="a_digitizingpanel" class="button panel_button fa fa-download fa-fw"></a>
+    <a id="a_processingpanel" class="button panel_button fa fa-cubes fa-fw"></a>
 
-    <a id="a_taxonomypanel" class="button panel_button fa fa-server fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
-    <a id="a_configurationpanel" class="button panel_button fa fa-gear fa-fw" style="width:auto;padding:7px;border:none;border-radius:7px;background-color:#222;"></a>
+    <a id="a_taxonomypanel" class="button panel_button spacer fa fa-server fa-fw"></a>
+    <a id="a_configurationpanel" class="button panel_button fa fa-gear fa-fw"></a>
     <!--
     <div class="separator"></div>
     <a id="logout" class="button fa fa-power-off fa-fw"></a>
     -->
     <div id="leftbar_footer">
-      <a id="leftbar_timeline" class="button timeline fa fa-clock-o fa-fw" style="width:auto;margin-left:6px;margin-bottom:8px;padding:7px;border:none;border-radius:7px;background-color:#111;font-size:28px;"></a>
-      <a id="leftbar_fullscreen" class="button fullscreen fa fa-expand fa-fw" style="width:auto;margin-left:6px;padding:7px;border:none;border-radius:7px;background-color:#111;font-size:28px;"></a>
+      <a id="leftbar_timeline" class="button timeline fa fa-clock-o fa-fw"></a>
+      <a id="leftbar_fullscreen" class="button fullscreen fa fa-expand fa-fw"></a>
     </div>
   </nav>
 </div>
