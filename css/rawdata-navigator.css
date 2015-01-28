@@ -782,12 +782,14 @@ a, a:link, a:visited, a:hover, a:active {
 }
 
 #usages {
-    width:450px;
+    width:480px;
+    height:800px;
     margin-left:25px;
     margin-top:50px;
 }
 
     #usages .usage {
+        width:450px;
         color:#fff;
         background-color:#111;
         margin-bottom:10px;
@@ -865,3 +867,7 @@ a, a:link, a:visited, a:hover, a:active {
         width:130px;
         padding-left:30px;
     }
+
+#usages .mCustomScrollBox .mCSB_container {
+    margin-right:0;
+}

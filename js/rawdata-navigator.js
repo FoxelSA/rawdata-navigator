@@ -150,6 +150,17 @@ var DAV = new function() {
         $('#usages .usage .title').on('click',function() {
             $(this).siblings('.closeable').slideToggle();
         });
+        // info scroll
+        $('#pose_info #usages').mCustomScrollbar({
+            axis: 'y',
+            theme: 'light-thin',
+            mouseWheel: {
+                scrollAmount: 250
+            },
+            advanced: {
+                updateOnContentResize: true
+            }
+        },{});
 
     };
 
