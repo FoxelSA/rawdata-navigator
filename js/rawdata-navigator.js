@@ -159,7 +159,7 @@ var DAV = new function() {
           var home=this;
           $('a.views.button',leftbar._dom).on('click',function(e){
             switch(e.target.id) {
-            case 'viewasvignette': 
+            case 'viewasvignette':
                 leftpanel.expand();
                 setTimeout(function(){
                   e.target.id="viewonmap";
@@ -487,7 +487,7 @@ var DAV = new function() {
 
             // select2
             this._component.select2({
-                placeholder: 'Recherche par mots-clés...',
+                placeholder: 'Recherche par mots-clés'
                 //formatResult: this.formatters.item,
                 //formatSelection: this.formatters.selection,
                 //sortResults: this.formatters.sorting
@@ -510,13 +510,13 @@ var DAV = new function() {
             */
 
 
+            group2.append($('<option>',{'value':'both'}).text('SITG'));
             group1.append($('<option>',{'value':'both'}).text('Genève'));
             group1.append($('<option>',{'value':'reformateurs'}).text('Mur des Réformateurs'));
             group1.append($('<option>',{'value':'reformateurs'}).text('Parc des Bastions'));
             group1.append($('<option>',{'value':'dufour'}).text('Place de Neuve'));
             group2.append($('<option>',{'value':'both'}).text('3D'));
             group2.append($('<option>',{'value':'both'}).text('POI'));
-            group2.append($('<option>',{'value':'both'}).text('SITG'));
             group2.append($('<option>',{'value':'dufour'}).text('Statue Dufour'));
             group2.append($('<option>',{'value':'both'}).text('Street View'));
 
@@ -561,6 +561,13 @@ var DAV = new function() {
                     .text(JSON.stringify({master:master,mac:mac,name:obj.name})));
             */
 
+        },
+
+        /**
+         * allocation.quicksearch()
+         */
+        quicksearch: function(item) {
+            this._component.val([item]).trigger('change');
         },
 
         /**

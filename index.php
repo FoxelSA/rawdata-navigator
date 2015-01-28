@@ -181,6 +181,9 @@
   <div id="allocation">
         <h2>Recherche de données</h2>
         <select multiple="multiple"></select>
+        <h3>Recherche rapide</h3>
+        <a href="#" class="quick" onclick="DAV.allocation.quicksearch('both');return false;">Projet SITG</a>
+        <a href="#" class="quick" onclick="DAV.allocation.quicksearch('reformateurs');return false;">Mur des Réformateurs</a>
   </div>
 
   <!--div id="search">
