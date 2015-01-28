@@ -1224,6 +1224,11 @@ var DAV = new function() {
               infopanel.show();
             },1000);
           }
+        } else {
+          // hide map/vignettes toggle
+          $('.views',leftbar._dom).css({
+              visibility: 'hidden'
+          });
         }
 
         // show panel
