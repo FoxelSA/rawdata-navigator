@@ -402,7 +402,8 @@ $(document).on('filesloaded', function(){
 
         // initial image
         // default is the first element of 'images' below
-//      initialImage: '1403179809_224762',
+        //initialImage: '1403179809_224762',
+        initialImage: window.initialImage,
 
         // panorama list
         images: {

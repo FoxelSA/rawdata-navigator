@@ -153,6 +153,7 @@ var DAV = new function() {
             $(this).siblings('.closeable').slideToggle();
         });
         // info scroll
+        $('#pose_info #usages').height($('#leftpanel').height()-100);
         $('#pose_info #usages').mCustomScrollbar({
             axis: 'y',
             theme: 'light-thin',
@@ -1062,6 +1063,7 @@ var DAV = new function() {
 
       resize: function leftbar_resize(e) {
         $(leftbar._dom).height($(window).height());
+        $('#pose_info #usages').height($('#leftpanel').height()-100);
       },
 
       click: function leftbar_click(e){
@@ -1106,7 +1108,7 @@ var DAV = new function() {
 
       visible: false,
 
-      _base_zIndex: 100,
+      _base_zIndex: 1000,
 
     init: function panel_init() {
         var panel=this;
@@ -2284,9 +2286,10 @@ var DAV = new function() {
                 $(information._dom+' .download_panorama').attr('href',download_panorama_link);
                 var view_panorama_link = document.location.origin+'/dav/freepano/example/';
                 if (segment == '1404381299')
-                    view_panorama_link += 'reformateurs.html';
+                    view_panorama_link += 'reformateurs.php';
                 else if (segment == '1404383663')
-                    view_panorama_link += 'dufour.html';
+                    view_panorama_link += 'dufour.php';
+                view_panorama_link += '?initial='+(pose.sec-7200)+'_'+pose.usc;
                 $(information._dom+' .view_panorama').attr('href',view_panorama_link);
 
                 // test panorama
@@ -2787,11 +2790,12 @@ var DAV = new function() {
           var date=new Date(vignette.pose.sec*1000);
           var html='<div class="wrap">';
           html+='<div class="timestamp">'+date.getSimpleUTCDate();
-          html+='<a class="button fa fa-gear fa-fw"></a></div>';
+          //html+='<a class="button fa fa-gear fa-fw"></a></div>';
+          html+='</div>';
           html+='<img class="thumb" alt="n/a" onerror="nopreview(this);" src="'+document.location.origin+allocation.current.path+'/'+vignette.segment+'/preview/'+vignette.segment_info.debayer+'/0/'+vignette.pose.sec+'_'+vignette.pose.usc+'.jpeg"></img>';
           html+='<div class="info">';
           html+='<div class="what">Poses (RAW DATA)</div>';
-          html+='<div class="footer">INFORMATIONS</div>';
+          //html+='<div class="footer">INFORMATIONS</div>';
 //          html+=vignette.info;
           html+='</div>';
           html+='</div>';

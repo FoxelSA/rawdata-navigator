@@ -375,7 +375,7 @@ a, a:link, a:visited, a:hover, a:active {
 
 .panel {
     overflow: hidden;
-    z-index: 100;
+    z-index: 1000;
     display:block;
     position:absolute;
     top: 0px;
@@ -679,6 +679,8 @@ a, a:link, a:visited, a:hover, a:active {
   height: 100%;
   left: 528px;
   top: 4em;
+  padding-left:25px;
+  padding-right:10px;
 }
 
 #vignettes {
@@ -690,9 +692,9 @@ a, a:link, a:visited, a:hover, a:active {
   position: relative;
   overflow: hidden;
   background: black;
-  border: 1px solid #ecb100;
+  border: 1px solid #666;
   float: left;
-  margin: 5px;
+  margin: 10px;
 }
 
 #vignettes .wrap.current {
@@ -701,10 +703,11 @@ a, a:link, a:visited, a:hover, a:active {
 
 
 #vignettes .timestamp {
-  background: white;
-  color: black;
-  padding: 2px;
-  padding-left: 8px;
+  background: #111;
+  color: #fff;
+  padding: 5px;
+  text-align:center;
+  font-size:11px;
 }
 
 #vignettes .fa-gear {
