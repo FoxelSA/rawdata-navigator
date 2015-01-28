@@ -1108,7 +1108,7 @@ var DAV = new function() {
 
       visible: false,
 
-      _base_zIndex: 100,
+      _base_zIndex: 1000,
 
     init: function panel_init() {
         var panel=this;

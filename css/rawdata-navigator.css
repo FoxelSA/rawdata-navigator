@@ -375,7 +375,7 @@ a, a:link, a:visited, a:hover, a:active {
 
 .panel {
     overflow: hidden;
-    z-index: 100;
+    z-index: 1000;
     display:block;
     position:absolute;
     top: 0px;
