@@ -283,7 +283,7 @@
       </video>
    </div>
     <div class="jump">
-      <span>Pose:</span>
+      <span>Frame:</span>
       <input id="pose" name="pose" type="number" min="0" />
       <a class="button" id="select">Select</a>
       <span class="nav">

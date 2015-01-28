@@ -1229,6 +1229,11 @@ var DAV = new function() {
               infopanel.show();
             },1000);
           }
+        } else {
+          // hide map/vignettes toggle
+          $('.views',leftbar._dom).css({
+              visibility: 'hidden'
+          });
         }
 
         // show panel
@@ -2044,6 +2049,11 @@ var DAV = new function() {
        * closebutton_click
        */
       closebutton_click: function information_closebutton_click(e){
+          if (infopanel.expanded){
+            infopanel.shrink();
+            return false;
+          }
+
           information.close();
           information.visible=false;
           return false;
