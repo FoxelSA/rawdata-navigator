@@ -2231,6 +2231,51 @@ var DAV = new function() {
                 information._component.find('.utc').html(date.getSimpleUTCDate());
                 information._component.find('.gmt').html(date.getSimpleLocalDate());
 
+                // download raw tiles
+                var download_tiles_link = 'php/raw.php?file='+allocation.current.path+'/'+segment+'/jp4/0/'+pose.sec+'_'+pose.usc;
+                $(information._dom+' .download_tiles').attr('href',download_tiles_link);
+
+                // download panorama
+                var test_download_panorama_link = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/result_'+(pose.sec-7200)+'_'+pose.usc+'-0-25-1.jpeg';
+                var download_panorama_link = 'php/download.php?file='+storage.mountpoint+'/footage/demodav/'+segment+'/result_'+(pose.sec-7200)+'_'+pose.usc+'-0-25-1.jpeg';
+                $(information._dom+' .download_panorama').attr('href',download_panorama_link);
+                // test panorama
+                $.ajax({
+                    url:test_download_panorama_link,
+                    type:'HEAD',
+                    error: function() {
+                        //file not exists
+                    },
+                    success: function() {
+                        $(information._dom+' .download_panorama').css('display','inline');
+                    }
+                });
+
+                // download pointcloud
+                var test_download_pointcloud_link = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'.ply';
+                var download_pointcloud_link = 'php/download.php?file='+storage.mountpoint+'/footage/demodav/'+segment+'.ply';
+                $(information._dom+' .download_pointcloud').attr('href',download_pointcloud_link);
+                // test pointcloud
+                $.ajax({
+                    url:test_download_pointcloud_link,
+                    type:'HEAD',
+                    error: function() {
+                        //file not exists
+                    },
+                    success: function() {
+                        $(information._dom+' .download_pointcloud').css('display','inline');
+                    }
+                });
+
+                // hide item if pose is invalid...
+                if (pose.status!='validated') {
+                    $('#pose_info .viewers').css('display','none');
+                    $('#pose_info .usages').css('display','none');
+                } else {
+                    $('#pose_info .viewers').css('display','block');
+                    $('#pose_info .usages').css('display','block');
+                }
+
                 // html
                 $('.nav div',information.video._dom).html(
                     ((index > 0) ? '<a href="#" onclick="DAV.info(\''+segment+'\',\''+(index-1)+'\');return false;"><span class="prev"></span>Prev</a>' : '')

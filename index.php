@@ -234,6 +234,11 @@
         </td></tr></table>
     </div>
     <div id="map_overview"></div>
+    <div class="usages">
+      <a href="" class="download_tiles">Download RAW tiles...</a>
+      <a href="" class="download_panorama" style="display:none;">Download panorama...</a>
+      <a href="" class="download_pointcloud" style="display:none;">Download point cloud...</a>
+    </div>
   </div>
   <!-- pose_info -->
 
