@@ -441,12 +441,20 @@ a, a:link, a:visited, a:hover, a:active {
   margin: 5px;
 }
 
-#infopanel .viewers a:hover {
+#video_player a.button {
+  width: auto;
+  background: #333;
+  padding: 5px;
+  display: inline-block;
+  transition: 0.04s all ease-in-out;
+}
+
+#infopanel .viewers a:hover, #video_player a.button:hover {
   color: #ddd;
   transform: scale(0.95);
 }
 
-#infopanel .viewers a:active {
+#infopanel .viewers a:active, #video_player a.button:active {
   color: #bbb;
   transform: scale(0.8);
 }
@@ -472,23 +480,15 @@ a, a:link, a:visited, a:hover, a:active {
                padding-right: 0.25em;
              }
 
-    #info .nav {
-        position:absolute;
-        top:8px;
-        right:512px;
-        font-size:10px;
+    #video_player .nav {
+        margin-right: 20px;
+        font-size:14px;
         font-weight:700;
         text-transform:uppercase;
     }
 
-        #info .nav > div {
-            position:absolute;
-            top:0;
-            left:10px;
-        }
-
-        #info .nav a {
-            margin-right:20px;
+        #video_player .nav a {
+            margin-right:10px;
         }
 
         #info .nav span {
@@ -522,29 +522,42 @@ a, a:link, a:visited, a:hover, a:active {
         text-transform:uppercase;
     }
 
-    #info .jump {
-        position:absolute;
+    #video_player .jump {
+        position:relative;
         top:14px;
-        right:425px;
-        font-size:10px;
+        font-size:14px;
         font-weight:700;
         text-transform:uppercase;
     }
 
-        #jump {
-            position:relative;
-            top:-1px;
-            width:30px;
-            height:12px;
-            padding-left:3px;
-            padding-right:3px;
-            font-size:10px;
-            font-weight:700;
-            text-transform:uppercase;
-            color:#fff;
-            border:solid 1px #4f4f4f;
-            background-color:transparent;
-        }
+     #video_player .jump #select {
+        margin-left: 10px;
+        margin-right: 30px;
+        padding-left: 14px;
+        padding-right: 14px;
+     }
+
+     #video_player .jump #pose {
+        position:relative;
+        width:76px;
+        height:16px;
+        padding-left:3px;
+        padding-right:3px;
+        margin-left: 5px;
+        font-size:14px;
+        text-transform:uppercase;
+        color:#fff;
+        border:solid 1px #4f4f4f;
+        background-color:transparent;
+     }
+
+     #video_player .jump #prev {
+       padding-right: 14px;
+     }
+
+     #video_player .jump #next {
+       padding-left: 14px;
+     }
 
 
         #info .data .timestamp {
@@ -762,7 +775,9 @@ a, a:link, a:visited, a:hover, a:active {
 }
 
 #leftbar a.fa.button.views {
+  visibility: hidden;
   margin-bottom: 40px;
+  transition: 0.04s all ease-in-out;
 }
 
 #usages {
