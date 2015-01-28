@@ -78,7 +78,7 @@ Public License and/or a compatible license and other copyright notices.
     Copyright (c) 2014 tuxxin<br />
     MP4Streaming is licensed under the [MIT license](http://opensource.org/licenses/MIT).
 
-*   __Font Awesome 4.2.0__<br />
+*   __Font Awesome 4.3.0__<br />
     <[http://fontawesome.io](http://fontawesome.io)><br />
     Font Awesome by Dave Gandy - http://fontawesome.io<br />
     Font Awesome is licensed under the [SIL OFL 1.1 license](http://scripts.sil.org/OFL).
@@ -86,4 +86,9 @@ Public License and/or a compatible license and other copyright notices.
 *   __Malihu custom scrollbar plugin__<br />
     <[http://manos.malihu.gr](http://manos.malihu.gr)><br />
     Copyright (c) 2014 Manos Malihutsakis, http://manos.malihu.gr<br />
-    The Malihu custom scrollbar plugin is licensed under the [MIT license](http://opensource.org/licenses/MIT).
+    Malihu custom scrollbar plugin is licensed under the [MIT license](http://opensource.org/licenses/MIT).
+
+*   __Potree 1.0RC__<br />
+    <[http://potree.org](http://potree.org)><br />
+    Copyright (c) 2011-2014, Markus Schütz<br />
+    Potree is licensed under the [BSD 2-Clause license](http://opensource.org/licenses/BSD-2-Clause).
