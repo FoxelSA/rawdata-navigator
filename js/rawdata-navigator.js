@@ -2044,6 +2044,11 @@ var DAV = new function() {
        * closebutton_click
        */
       closebutton_click: function information_closebutton_click(e){
+          if (infopanel.expanded){
+            infopanel.shrink();
+            return false;
+          }
+
           information.close();
           information.visible=false;
           return false;
