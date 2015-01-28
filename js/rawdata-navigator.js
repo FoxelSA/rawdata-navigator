@@ -2305,7 +2305,7 @@ var DAV = new function() {
                 var thumb_pointclound_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.jpg';
                 $(information._dom+' .download_pointcloud').attr('href',download_pointcloud_link);
                 $('#usages .usage.posepointcloud img').attr('src',thumb_pointclound_src);
-                var view_pointcloud_link = document.location.origin+'/dav/potree/';
+                var view_pointcloud_link = document.location.origin+'/dav/potree/examples/';
                 if (segment == '1404381299')
                     view_pointcloud_link += 'reformateurs.html';
                 else if (segment == '1404383663')
