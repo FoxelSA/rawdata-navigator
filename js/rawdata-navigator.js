@@ -166,6 +166,14 @@ var DAV = new function() {
             }
         },{});
 
+        // processing effect
+        $('#processingpanel table tr:not(.space) td').on('mouseenter',function() {
+            $(this).parent().addClass('hover');
+        });
+        $('#processingpanel table tr:not(.space) td').on('mouseleave',function() {
+            $(this).parent().removeClass('hover');
+        });
+
     };
 
     var home = this.home = {
@@ -1110,7 +1118,7 @@ var DAV = new function() {
       _pool: "#panels",
       _width: 512,
       _background_rgb: "0,0,0",
-      _background_alpha: 0.8,
+      _background_alpha: 0.9,
 
       visible: false,
 
@@ -1795,6 +1803,12 @@ var DAV = new function() {
 
               // sources
               var sources = [{
+                  description: 'Mapbox Bright',
+                  url: 'https://{s}.tiles.mapbox.com/v3/dennisl.4e2aab76/{z}/{x}/{y}.png',
+                  attribution: '&copy; <a href="https://www.mapbox.com/about/maps">Mapbox</a>, '
+                                  + '<a href="http://openstreetmap.org/copyright">OpenStreetMap</a>'
+              },
+              {
                   description: 'OpenStreetMap Mapnik',
                   url: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                   attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
@@ -1813,6 +1827,12 @@ var DAV = new function() {
                   url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
                   attribution: 'Tiles &copy; Esri, '
                                   + 'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+              },
+              {
+                  description: 'Mapbox Labelled Satellite',
+                  url: 'https://{s}.tiles.mapbox.com/v3/dennisl.map-6g3jtnzm/{z}/{x}/{y}.png',
+                  attribution: '&copy; <a href="https://www.mapbox.com/about/maps">Mapbox</a>, '
+                                  + '<a href="http://openstreetmap.org/copyright">OpenStreetMap</a>'
               }];
 
               // layers
@@ -2616,7 +2636,7 @@ var DAV = new function() {
                 L.control.scale().addTo(this._component);
 
                 // tiles
-                var tiles = _.first(map.tiles.maps());
+                var tiles = _.last(map.tiles.maps());
 
                 // add tiles on map
                 this._component.addLayer(
@@ -2872,7 +2892,7 @@ var DAV = new function() {
           html+='</div>';
           html+='<img class="thumb" alt="n/a" onerror="nopreview(this);" src="'+document.location.origin+allocation.current.path+'/'+vignette.segment+'/preview/'+vignette.segment_info.debayer+'/0/'+vignette.pose.sec+'_'+vignette.pose.usc+'.jpeg"></img>';
           html+='<div class="info">';
-          html+='<div class="what">Poses (RAW DATA)</div>';
+          html+='<div class="what">Pose (RAW)</div>';
           //html+='<div class="footer">INFORMATIONS</div>';
 //          html+=vignette.info;
           html+='</div>';

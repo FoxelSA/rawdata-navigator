@@ -291,7 +291,7 @@ a, a:link, a:visited, a:hover, a:active {
 
 #allocation {
     position:relative;
-    top: 3em;
+    top:100px;
     width:430px;
     padding:30px;
 }
@@ -670,6 +670,12 @@ a, a:link, a:visited, a:hover, a:active {
   display: inline;
 }
 
+#home .logo {
+    position:absolute;
+    top:60px;
+    left:38px;
+}
+
 * {
   -moz-user-select: none;
   -webkit-user-select: none;
@@ -809,7 +815,7 @@ a, a:link, a:visited, a:hover, a:active {
             left:10px;
         }
 
-    #usages .usage .title {
+    #usages .title {
         padding:10px;
         font-weight:bold;
     }
@@ -824,10 +830,6 @@ a, a:link, a:visited, a:hover, a:active {
 
     #usages .usage .closeable {
         display:none;
-    }
-
-    #usages .usage.posemap .nocloseable {
-        padding-bottom:10px;
     }
 
     #usages .usage.poseinformation .closeable {
@@ -893,3 +895,37 @@ a.reload {
   background-color:#222;
   padding: 7px;
 }
+
+#processingpanel .content {
+    padding:80px;
+    width:1024px;
+}
+
+#processingpanel table {
+    margin-top:40px;
+    border-collapse:collapse;
+}
+
+    #processingpanel th,
+    #processingpanel td {
+        padding:10px 25px;
+        text-align:center;
+    }
+
+    #processingpanel .left {
+        text-align:left;
+    }
+
+    #processingpanel tbody tr td {
+        background-color:#111;
+    }
+
+        #processingpanel tbody tr.hover td {
+            background-color:#222;
+        }
+
+        #processingpanel tbody tr.space td {
+            padding:0;
+            height:10px;
+            background-color:transparent;
+        }

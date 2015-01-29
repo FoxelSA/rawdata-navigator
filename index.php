@@ -109,7 +109,78 @@
 
 <div id="processingpanel" class="panel secondary">
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
-  <div class="content"></div>
+  <div class="content">
+    <h1>Journal de processing</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th width="400" class="left">Description</th>
+                <th class="left">Module</th>
+                <th>Éléments</th>
+                <th>État</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="space">
+                <td colspan="6"></td>
+            </tr>
+            <tr>
+                <td>0005</td>
+                <td>28.01.2015</td>
+                <td class="left">Calcul de nuage de points</td>
+                <td class="left">PointCloud</td>
+                <td>249</td>
+                <td>En attente</td>
+            </tr>
+            <tr class="space">
+                <td colspan="6"></td>
+            </tr>
+            <tr>
+                <td>0004</td>
+                <td>28.01.2015</td>
+                <td class="left">Calcul de nuage de points</td>
+                <td class="left">PointCloud</td>
+                <td>312</td>
+                <td><span style="color:yellow;font-weight:700;">65%</span></td>
+            </tr>
+            <tr class="space">
+                <td colspan="6"></td>
+            </tr>
+            <tr>
+                <td>0003</td>
+                <td>11.12.2014</td>
+                <td class="left">Compilation d'images panoramiques</td>
+                <td class="left">Panorama</td>
+                <td>768</td>
+                <td><span style="color:#0f0;font-weight:700;">100%</span></td>
+            </tr>
+            <tr class="space">
+                <td colspan="6"></td>
+            </tr>
+            <tr>
+                <td>0002</td>
+                <td>09.11.2014</td>
+                <td class="left">Compilation d'images panoramiques</td>
+                <td class="left">Panorama</td>
+                <td>64</td>
+                <td><span style="color:#0f0;font-weight:700;">100%</span></td>
+            </tr>
+            <tr class="space">
+                <td colspan="6"></td>
+            </tr>
+            <tr>
+                <td>0001</td>
+                <td>09.11.2014</td>
+                <td class="left">Compilation d'images panoramiques</td>
+                <td class="left">Panorama</td>
+                <td>35</td>
+                <td><span style="color:#0f0;font-weight:700;">100%</span></td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
 </div>
 
 <div id="taxonomypanel" class="panel secondary">
@@ -199,6 +270,9 @@
 
 <!-- home -->
 <div id="home" class="panel_content">
+
+  <img class="logo" src="img/foxel.png" width="150" alt="FOXEL" />
+
   <div id="allocation">
         <h2>Recherche de données</h2>
         <select multiple="multiple"></select>
@@ -243,11 +317,9 @@
                 </div>
             </div>
         </div>
-        <div class="usage posemap">
+        <div style="width:450px;color:#fff;background-color:#111;margin-bottom:10px;padding-bottom:10px;">
             <div class="title">Overview</div>
-            <div class="nocloseable">
-                <div id="map_overview"></div>
-            </div>
+            <div id="map_overview"></div>
         </div>
         <div class="usage poseinformation">
             <div class="title pointer">Information</div>
