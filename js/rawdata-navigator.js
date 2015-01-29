@@ -2874,7 +2874,7 @@ var DAV = new function() {
           html+='</div>';
           html+='<img class="thumb" alt="n/a" onerror="nopreview(this);" src="'+document.location.origin+allocation.current.path+'/'+vignette.segment+'/preview/'+vignette.segment_info.debayer+'/0/'+vignette.pose.sec+'_'+vignette.pose.usc+'.jpeg"></img>';
           html+='<div class="info">';
-          html+='<div class="what">Poses (RAW DATA)</div>';
+          html+='<div class="what">Pose (RAW)</div>';
           //html+='<div class="footer">INFORMATIONS</div>';
 //          html+=vignette.info;
           html+='</div>';
