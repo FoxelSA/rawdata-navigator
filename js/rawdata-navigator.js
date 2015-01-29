@@ -3019,9 +3019,10 @@ var DAV = new function() {
     this.viewFreepano = function(item) {
         var panel=window._panels['freepanel'];
         if ($('iframe',panel._dom).attr('src')!=$(item).data('href')) {
-            $('iframe',panel._dom).attr('src',$(item).data('href'));
+          $('iframe',panel._dom).attr('src',$(item).data('href')).off('load').on('load',function(){panel.toggle()});
+        } else {
+          panel.toggle();
         }
-        panel.toggle();
     };
 
     /*
@@ -3030,9 +3031,10 @@ var DAV = new function() {
     this.viewPotree = function(item) {
         var panel=window._panels['pointcloudpanel'];
         if ($('iframe',panel._dom).attr('src')!=$(item).data('href')) {
-            $('iframe',panel._dom).attr('src',$(item).data('href'));
+          $('iframe',panel._dom).attr('src',$(item).data('href')).off('load').on('load',function(){panel.toggle()});
+        } else {
+          panel.toggle();
         }
-        panel.toggle();
     };
 
     var poiEditor = this.poiEditor = new Panel({
@@ -3041,11 +3043,18 @@ var DAV = new function() {
         _background_alpha: 1.0,
         open: function poiEditor_open(elem) {
           var panel=this;
-          panel.resize();
+          $('iframe',panel._dom).height($('.content2',panel._dom).height());
+          $('iframe',panel._dom).width($(window).width()-$('.content2',panel._dom).offset().left);
           if ($('iframe',panel._dom).attr('src')!=$(elem).data('href')) {
-              $('iframe',panel._dom).attr('src',$(elem).data('href'));
+            $('iframe',panel._dom).attr('src',$(elem).data('href')).off('load').on('load',function(){
+              setTimeout(function(){
+              $('iframe',panel._dom).width($(window).width()-$('.content2',panel._dom).offset().left);
+              panel.toggle();
+              });
+            });
+          } else {
+            panel.toggle();
           }
-          panel.toggle();
         },
         _panel_resize: Panel.prototype.resize,
         resize: function poiEditor_resize(e){
