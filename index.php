@@ -242,11 +242,9 @@
                 </div>
             </div>
         </div>
-        <div class="usage posemap">
+        <div style="width:450px;color:#fff;background-color:#111;margin-bottom:10px;padding-bottom:10px;">
             <div class="title">Overview</div>
-            <div class="nocloseable">
-                <div id="map_overview"></div>
-            </div>
+            <div id="map_overview"></div>
         </div>
         <div class="usage poseinformation">
             <div class="title pointer">Information</div>

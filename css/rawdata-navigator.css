@@ -804,7 +804,7 @@ a, a:link, a:visited, a:hover, a:active {
             left:10px;
         }
 
-    #usages .usage .title {
+    #usages .title {
         padding:10px;
         font-weight:bold;
     }
@@ -819,10 +819,6 @@ a, a:link, a:visited, a:hover, a:active {
 
     #usages .usage .closeable {
         display:none;
-    }
-
-    #usages .usage.posemap .nocloseable {
-        padding-bottom:10px;
     }
 
     #usages .usage.poseinformation .closeable {

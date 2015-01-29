@@ -1794,7 +1794,7 @@ var DAV = new function() {
 
               // sources
               var sources = [{
-                  description: 'Mapbox bright',
+                  description: 'Mapbox Bright',
                   url: 'https://{s}.tiles.mapbox.com/v3/dennisl.4e2aab76/{z}/{x}/{y}.png',
                   attribution: '&copy; <a href="https://www.mapbox.com/about/maps">Mapbox</a>, '
                                   + '<a href="http://openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -2618,7 +2618,7 @@ var DAV = new function() {
                 L.control.scale().addTo(this._component);
 
                 // tiles
-                var tiles = _.first(map.tiles.maps());
+                var tiles = _.last(map.tiles.maps());
 
                 // add tiles on map
                 this._component.addLayer(
