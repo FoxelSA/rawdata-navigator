@@ -5,10 +5,18 @@ if (isset($_GET['initial'])) {
   $json=$poi_path.$_GET['initial'].".json";
 }
 
-if (isset($_GET['action']) && $_GET['action']=='poi_list') {
-  header('Content-Type: application/json');
+if (isset($_GET['action']) && $_GET['action']=="poi_list") {
+
+  if (isset($_GET['download'])) {
+    header('Content-Type: application/octet-stream');
+    header("Content-Transfer-Encoding: Binary"); 
+    header("Content-disposition: attachment; filename=\"" . basename($json) . "\""); 
+  } else {
+    header('Content-Type: application/json');
+  }
+
   if (isset($json) && file_exists($json)) {
-    passthru($json);
+    print(file_get_contents($json));
   } else {
     echo '{}';
   }
@@ -69,7 +77,7 @@ if (isset($_GET['action']) && $_GET['action']=='poi_list') {
     <title>Freepano Example - https://github.com/FoxelSA/freepano</title>
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimum-scale=1,maximum-scale=1" />
     <script type="text/javascript">
-            var poi_path='<?php echo $poi_path; ?>';
+            var poi_path='<?php print($poi_path); ?>';
         <?php if (isset($_GET['initial'])): ?>
             var initialImage = '<?php print ($_GET['initial']); ?>';
         <?php endif; ?>

@@ -1570,6 +1570,7 @@ var DAV = new function() {
   });
 
   var pointcloudpanel = this.pointcloudpanel = new Panel({
+      _title: "Point cloud viewer",
       _expand: true,
       _dom: "#pointcloudpanel",
       _background_alpha: 1.0,
@@ -2382,21 +2383,30 @@ var DAV = new function() {
           $('#usages .usage.posepoi').css('display','block');
           $('#usages .usage.posepoi .edit_poi').data('href',view_panorama_link+'&action=poi_edit');
           $.ajax({
-              url: view_panorama_link+'&action=poi_list_as_html',
+              url: view_panorama_link+'&action=poi_list',
               error: function() {
                 $('#usages .usage.posepoi .download_poidata').css('display','none');
                 $('#usages .usage.posepoi .list').css('display','none');
               },
-              success: function(html) {
-                if (!html.length) {
+              success: function(json) {
+                if (!json.list) {
                   $('#usages .usage.posepoi .download_poidata').css('display','none');
                   return;
                 }
-                $('#usages .usage.posepoi .list').html(html);
-                $('#usages .usage.posepoi .list').css('display','block');
+                $('#usages .usage.posepoi .download_poidata').css('display','block').attr('href',view_panorama_link+'&action=poi_list&download');
+                $('#usages .usage.posepoi .poilist').html(information.parsepoilist(json));
+                $('#usages .usage.posepoi .poilist').css('display','block');
               }
           });
 
+        },
+
+        parsepoilist: function information_parsepoilist(json) {
+          var html='';
+          $.each(json.list,function(name,details){
+            html+='<a class="poi"><div class="action">'+details.name+'</div></a>';
+          });
+          return html;
         },
 
         /**
@@ -2910,8 +2920,8 @@ var DAV = new function() {
           var vignettes=this;
           var container=$(vignettes._dom);
 
-          container.height(container.parent().height()-container.offset().top*2);
-          container.width($(window).width()-container.offset().left-16);
+          container.height($(window).height()-16);
+          container.width($(window).width()-container.offset().left);
 
           setTimeout(callback,1000);
 
@@ -3011,10 +3021,18 @@ var DAV = new function() {
         _background_alpha: 1.0,
         open: function poiEditor_open(elem) {
           var panel=this;
+          panel.resize();
           if ($('iframe',panel._dom).attr('src')!=$(elem).data('href')) {
               $('iframe',panel._dom).attr('src',$(elem).data('href'));
           }
           panel.toggle();
+        },
+        _panel_resize: Panel.prototype.resize,
+        resize: function poiEditor_resize(e){
+          var panel=this;
+          this._panel_resize(e);
+          $('iframe',panel._dom).height($('.content2',panel._dom).height());
+          $('iframe',panel._dom).width($(window).width()-$('iframe',panel._dom).offset().left);
         }
     });
 

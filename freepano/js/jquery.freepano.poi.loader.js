@@ -66,8 +66,8 @@ $.extend(POI_loader.prototype,{
             // propagate panorama 'ready' event
             poiLoader.panorama_prototype_callback.apply(e.target,[e]);
           },
-          success: function(json) {
-            panorama.poi=JSON.parse(json);
+          success: function(poi_list) {
+            panorama.poi=$.extend(true,{},panorama.defaults.poi,poi_list);
             // propagate panorama 'ready' event
             poiLoader.panorama_prototype_callback.apply(e.target,[e]);
           }

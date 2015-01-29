@@ -140,8 +140,9 @@
 
 <div id="poipanel" class="panel secondary">
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
-  <div class="content">
-    <iframe src="<?php if (false) { echo '/freepano'; } ?>" frameborder="no" scrolling="no" seamless="seamless"></iframe>
+  <div class="content"></div>
+  <div class="content2" >
+    <iframe frameborder="no" scrolling="no" seamless="seamless"></iframe>
   </div>
 </div>
 
@@ -287,8 +288,9 @@
             <div class="closeable">
                 <div class="actions">
                   <a class="edit_poi" onclick="DAV.poiEditor.open(this);return false;"><div class="action">Editer les POIs...</div></a>
-                  <a href="" class="download_poidata"><div class="action">Download POI data...</div></a>
+                  <a class="download_poidata"><div class="action">Download POI data...</div></a>
                 </div>
+                <div class="actions poilist"></div>
             </div>
         </div>
         <div class="usage posepointcloud">
