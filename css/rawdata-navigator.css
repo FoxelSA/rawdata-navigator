@@ -84,7 +84,7 @@ a, a:link, a:visited, a:hover, a:active {
 }
 
 .panel .content {
-  top: 3em;
+  top: 0px;
   height: 100%;
   width: 512px;
 }
@@ -441,7 +441,10 @@ a, a:link, a:visited, a:hover, a:active {
   padding: 5px;
   margin: 5px;
 }
-
+ 
+#video_player {
+  padding-top: 4em;
+}
 #video_player a.button {
   width: auto;
   background: #333;
@@ -685,14 +688,14 @@ a, a:link, a:visited, a:hover, a:active {
   position: absolute;
   height: 100%;
   left: 528px;
-  top: 4em;
-  padding-left:25px;
-  padding-right:10px;
+  top: 0;
 }
 
 #vignettes {
   position: relative;
   overflow: hidden;
+  padding-top: 1em;
+  padding-bottom: 2em;
 }
 
 #vignettes .wrap {
@@ -701,7 +704,8 @@ a, a:link, a:visited, a:hover, a:active {
   background: black;
   border: 1px solid #666;
   float: left;
-  margin: 10px;
+  margin-left: 10px;
+  margin-top: 10px;
 }
 
 #vignettes .wrap.current {
@@ -747,6 +751,7 @@ a, a:link, a:visited, a:hover, a:active {
 }
 
 .panel iframe {
+  background-color: black;
   position: absolute;
   left: 0px;
   width: 100%;

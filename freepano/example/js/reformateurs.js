@@ -53,6 +53,8 @@ $(document).ready(function(){
     }
   }
 
+   
+  /*
   // load image with alpha channel to use as POI
   window.unicorn_texture=new THREE.ImageUtils.loadTexture(
     'img/unicorn.png',
@@ -62,12 +64,18 @@ $(document).ready(function(){
       $.notify('Cannot load unicorn.png !');
     }
   );
+  */
 
 }); // ready
 
-$(document).on('filesloaded', function(){
+$(document).on('ready', function(){
 
   $('#pano').panorama({
+      defaults: {
+        poi: {
+          overlay: true
+        }
+      },
 
 /*
  * Properties and methods defined here will extend or override properties
