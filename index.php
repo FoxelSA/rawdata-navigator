@@ -110,7 +110,7 @@
 <div id="processingpanel" class="panel secondary">
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
   <div class="content">
-    <h1>Journal de processing</h1>
+    <h1>Traitement des données</h1>
     <table>
         <thead>
             <tr>
@@ -186,6 +186,112 @@
 <div id="taxonomypanel" class="panel secondary">
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
   <div class="content">
+      <h1>Classement des données</h1>
+      <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th width="550">Projets</th>
+                <th><i class="fa fa-cog" /></th>
+                <th><i class="fa fa-plus-circle" /></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>SITG</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>3D</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>POI</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>Statue Dufour</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>Street View</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+        </tbody>
+    </table>
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th width="550">Régions</th>
+                <th><i class="fa fa-cog" /></th>
+                <th><i class="fa fa-plus-circle" /></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>Genève</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>Mur des Réformateurs</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>Parc des Bastions</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>Place de Neuve</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+        </tbody>
+    </table>
   </div>
 </div>
 
@@ -246,14 +352,15 @@
     <a id="a_leftpanel" class="button panel_button davicon"></a>
     <a id="viewasvignette" class="button views fa fa-th fa-fw" title="Vignettes"></a>
 
-    <a id="a_digitizingpanel" class="button panel_button fa fa-download fa-fw"></a>
-    <a id="a_processingpanel" class="button panel_button fa fa-cubes fa-fw"></a>
+    <a id="a_taxonomypanel" class="button panel_button fa fa-server fa-fw"></a>
 
-    <a id="a_taxonomypanel" class="button panel_button spacer fa fa-server fa-fw"></a>
-    <a id="a_configurationpanel" class="button panel_button fa fa-gear fa-fw"></a>
+    <a id="a_processingpanel" class="button panel_button spacer fa fa-cubes fa-fw"></a>
+    <a id="a_digitizingpanel" class="button panel_button fa fa-download fa-fw"></a>
+
     <!--
     <div class="separator"></div>
     <a id="logout" class="button fa fa-power-off fa-fw"></a>
+    <a id="a_configurationpanel" class="button panel_button fa fa-gear fa-fw"></a>
     -->
     <div id="leftbar_footer">
       <a id="leftbar_timeline" class="button timeline fa fa-clock-o fa-fw"></a>

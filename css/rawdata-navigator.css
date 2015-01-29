@@ -901,6 +901,10 @@ a.reload {
     border-collapse:collapse;
 }
 
+    #processingpanel th {
+        font-size:15px;
+    }
+
     #processingpanel th,
     #processingpanel td {
         padding:10px 25px;
@@ -920,6 +924,44 @@ a.reload {
         }
 
         #processingpanel tbody tr.space td {
+            padding:0;
+            height:10px;
+            background-color:transparent;
+        }
+
+#taxonomypanel .content {
+    padding:80px;
+    width:1024px;
+}
+
+#taxonomypanel table {
+    margin-top:40px;
+    border-collapse:collapse;
+}
+
+    #taxonomypanel th {
+        font-size:15px;
+    }
+
+    #taxonomypanel th,
+    #taxonomypanel td {
+        padding:10px 25px;
+        text-align:left;
+    }
+
+    #taxonomypanel tbody tr td {
+        background-color:#111;
+    }
+
+        #taxonomypanel tbody tr td:first-child {
+            padding-right:0;
+        }
+
+        #taxonomypanel tbody tr.hover td {
+            background-color:#222;
+        }
+
+        #taxonomypanel tbody tr.space td {
             padding:0;
             height:10px;
             background-color:transparent;
