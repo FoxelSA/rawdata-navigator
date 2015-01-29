@@ -1794,6 +1794,12 @@ var DAV = new function() {
 
               // sources
               var sources = [{
+                  description: 'Mapbox bright',
+                  url: 'https://{s}.tiles.mapbox.com/v3/dennisl.4e2aab76/{z}/{x}/{y}.png',
+                  attribution: '&copy; <a href="https://www.mapbox.com/about/maps">Mapbox</a>, '
+                                  + '<a href="http://openstreetmap.org/copyright">OpenStreetMap</a>'
+              },
+              {
                   description: 'OpenStreetMap Mapnik',
                   url: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                   attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
@@ -1812,6 +1818,12 @@ var DAV = new function() {
                   url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
                   attribution: 'Tiles &copy; Esri, '
                                   + 'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+              },
+              {
+                  description: 'Mapbox Labelled Satellite',
+                  url: 'https://{s}.tiles.mapbox.com/v3/dennisl.map-6g3jtnzm/{z}/{x}/{y}.png',
+                  attribution: '&copy; <a href="https://www.mapbox.com/about/maps">Mapbox</a>, '
+                                  + '<a href="http://openstreetmap.org/copyright">OpenStreetMap</a>'
               }];
 
               // layers
