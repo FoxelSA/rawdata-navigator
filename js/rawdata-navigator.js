@@ -176,6 +176,14 @@ var DAV = new function() {
 
     };
 
+    // goto digitizing
+    this.goToDigitizing = function() {
+        if (!$('iframe',digitizingpanel._dom).attr('src').length) {
+            $('iframe',digitizingpanel._dom).attr('src',digitizingpanel.url);
+        }
+        window._panels['digitizingpanel'].toggle();
+    };
+
     var home = this.home = {
 
         _dom: '#home',
@@ -1561,7 +1569,7 @@ var DAV = new function() {
   });
 
   var configurationpanel = this.configurationpanel = new Panel({
-      _title: "Configuration",
+      _title: "Acquisition des données",
       _expand: true,
       _dom: "#configurationpanel",
       _background_alpha: 1.0,
