@@ -890,3 +890,37 @@ a.reload {
   background-color:#222;
   padding: 7px;
 }
+
+#processingpanel .content {
+    padding:80px;
+    width:1024px;
+}
+
+#processingpanel table {
+    margin-top:40px;
+    border-collapse:collapse;
+}
+
+    #processingpanel th,
+    #processingpanel td {
+        padding:10px 25px;
+        text-align:center;
+    }
+
+    #processingpanel .left {
+        text-align:left;
+    }
+
+    #processingpanel tbody tr td {
+        background-color:#111;
+    }
+
+        #processingpanel tbody tr.hover td {
+            background-color:#222;
+        }
+
+        #processingpanel tbody tr.space td {
+            padding:0;
+            height:10px;
+            background-color:transparent;
+        }

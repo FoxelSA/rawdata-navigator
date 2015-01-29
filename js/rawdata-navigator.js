@@ -166,6 +166,14 @@ var DAV = new function() {
             }
         },{});
 
+        // processing effect
+        $('#processingpanel table tr:not(.space) td').on('mouseenter',function() {
+            $(this).parent().addClass('hover');
+        });
+        $('#processingpanel table tr:not(.space) td').on('mouseleave',function() {
+            $(this).parent().removeClass('hover');
+        });
+
     };
 
     var home = this.home = {
