@@ -198,6 +198,9 @@
 
 <!-- home -->
 <div id="home" class="panel_content">
+
+  <img class="logo" src="img/foxel.png" width="150" alt="FOXEL" />
+
   <div id="allocation">
         <h2>Recherche de données</h2>
         <select multiple="multiple"></select>

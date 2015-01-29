@@ -291,7 +291,7 @@ a, a:link, a:visited, a:hover, a:active {
 
 #allocation {
     position:relative;
-    top: 3em;
+    top:100px;
     width:430px;
     padding:30px;
 }
@@ -665,6 +665,12 @@ a, a:link, a:visited, a:hover, a:active {
 #home {
   padding-left: 10px;
   display: inline;
+}
+
+#home .logo {
+    position:absolute;
+    top:60px;
+    left:38px;
 }
 
 * {

@@ -1110,7 +1110,7 @@ var DAV = new function() {
       _pool: "#panels",
       _width: 512,
       _background_rgb: "0,0,0",
-      _background_alpha: 0.8,
+      _background_alpha: 0.9,
 
       visible: false,
 
