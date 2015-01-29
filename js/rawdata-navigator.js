@@ -176,6 +176,14 @@ var DAV = new function() {
 
     };
 
+    // goto digitizing
+    this.goToDigitizing = function() {
+        if (!$('iframe',digitizingpanel._dom).attr('src').length) {
+            $('iframe',digitizingpanel._dom).attr('src',digitizingpanel.url);
+        }
+        window._panels['digitizingpanel'].toggle();
+    };
+
     var home = this.home = {
 
         _dom: '#home',
@@ -530,18 +538,8 @@ var DAV = new function() {
             this.events();
 
             // add options
-            var group1 = $('<optgroup>',{'label':'Région'});
-            var group2 = $('<optgroup>',{'label':'Projet'});
-
-            /*
-            this._component.append($('<option>',{'value':'dufour'}).text('Statue Dufour'));
-            this._component.append($('<option>',{'value':'both'}).text('Genève'));
-            this._component.append($('<option>',{'value':'reformateurs'}).text('Mur des Réformateurs'));
-            this._component.append($('<option>',{'value':'reformateurs'}).text('Parc des Bastions'));
-            this._component.append($('<option>',{'value':'dufour'}).text('Place de Neuve'));
-            this._component.append($('<option>',{'value':'both'}).text('SITG'));
-            */
-
+            var group1 = $('<optgroup>',{'label':'Régions'});
+            var group2 = $('<optgroup>',{'label':'Projets'});
 
             group2.append($('<option>',{'value':'both'}).text('SITG'));
             group1.append($('<option>',{'value':'both'}).text('Genève'));
@@ -1557,21 +1555,21 @@ var DAV = new function() {
   });
 
   var processingpanel = this.processingpanel = new Panel({
-      _title: "Processing",
+      _title: "Traitement des données",
       _expand: true,
       _dom: "#processingpanel",
       _background_alpha: 1.0
   });
 
   var taxonomypanel = this.taxonomypanel = new Panel({
-      _title: "Taxonomy",
+      _title: "Classement des données",
       _expand: true,
       _dom: "#taxonomypanel",
       _background_alpha: 1.0
   });
 
   var configurationpanel = this.configurationpanel = new Panel({
-      _title: "Configuration",
+      _title: "Acquisition des données",
       _expand: true,
       _dom: "#configurationpanel",
       _background_alpha: 1.0,

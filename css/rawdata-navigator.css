@@ -441,7 +441,7 @@ a, a:link, a:visited, a:hover, a:active {
   padding: 5px;
   margin: 5px;
 }
- 
+
 #video_player {
   padding-top: 4em;
 }
@@ -906,6 +906,10 @@ a.reload {
     border-collapse:collapse;
 }
 
+    #processingpanel th {
+        font-size:15px;
+    }
+
     #processingpanel th,
     #processingpanel td {
         padding:10px 25px;
@@ -925,6 +929,95 @@ a.reload {
         }
 
         #processingpanel tbody tr.space td {
+            padding:0;
+            height:10px;
+            background-color:transparent;
+        }
+
+#taxonomypanel .content {
+    padding:80px;
+    width:1024px;
+}
+
+#taxonomypanel table {
+    margin-top:40px;
+    border-collapse:collapse;
+}
+
+    #taxonomypanel th {
+        font-size:15px;
+    }
+
+    #taxonomypanel th,
+    #taxonomypanel td {
+        padding:10px 25px;
+        text-align:left;
+    }
+
+    #taxonomypanel tbody tr td {
+        background-color:#111;
+    }
+
+        #taxonomypanel tbody tr td:first-child {
+            padding-right:0;
+        }
+
+        #taxonomypanel tbody tr.hover td {
+            background-color:#222;
+        }
+
+        #taxonomypanel tbody tr.space td {
+            padding:0;
+            height:10px;
+            background-color:transparent;
+        }
+
+#configurationpanel .content {
+    padding:80px;
+    width:1024px;
+}
+
+#configurationpanel a {
+    color:#ecb100;
+}
+
+    #configurationpanel a:hover,
+    #configurationpanel a:active {
+        color:#fff;
+    }
+
+#configurationpanel table {
+    margin-top:0;
+    border-collapse:collapse;
+}
+
+    #configurationpanel th {
+        font-size:15px;
+    }
+
+    #configurationpanel th,
+    #configurationpanel td {
+        padding:10px 25px;
+        text-align:center;
+    }
+
+    #configurationpanel .left {
+        text-align:left;
+    }
+
+    #configurationpanel .right {
+        text-align:right;
+    }
+
+    #configurationpanel tbody tr td {
+        background-color:#111;
+    }
+
+        #configurationpanel tbody tr.hover td {
+            background-color:#222;
+        }
+
+        #configurationpanel tbody tr.space td {
             padding:0;
             height:10px;
             background-color:transparent;

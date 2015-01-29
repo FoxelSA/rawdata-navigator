@@ -110,7 +110,7 @@
 <div id="processingpanel" class="panel secondary">
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
   <div class="content">
-    <h1>Journal de processing</h1>
+    <h1>Traitement des données</h1>
     <table>
         <thead>
             <tr>
@@ -186,12 +186,175 @@
 <div id="taxonomypanel" class="panel secondary">
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
   <div class="content">
+      <h1>Classement des données</h1>
+      <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th width="550">Projets</th>
+                <th><i class="fa fa-cog" /></th>
+                <th><i class="fa fa-plus-circle" /></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>SITG</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>3D</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>POI</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>Statue Dufour</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>Street View</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+        </tbody>
+    </table>
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th width="550">Régions</th>
+                <th><i class="fa fa-cog" /></th>
+                <th><i class="fa fa-plus-circle" /></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>Genève</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>Mur des Réformateurs</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>Parc des Bastions</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+            <tr class="space">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>Place de Neuve</td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+        </tbody>
+    </table>
   </div>
 </div>
 
 <div id="configurationpanel" class="panel secondary">
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
   <div class="content">
+    <h1>Acquisition des données</h1>
+    <div style="position:relative;top:-50px;text-align:right;font-size:16px;margin-right:200px;">
+        <a href="#" onclick="DAV.goToDigitizing();return false;"><i class="fa fa-plus-square" style="position:relative;top:4px;left:-10px;font-size:28px;"></i> Commander </a>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th width="400" class="left">Description</th>
+                <th>Distance</th>
+                <th>État</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="space">
+                <td colspan="5"></td>
+            </tr>
+            <tr>
+                <td>0004</td>
+                <td>27.01.2015</td>
+                <td class="left">Tunnels avec éclairage complémentaire</td>
+                <td class="right">4.25 km.</td>
+                <td><span style="color:#0f0;font-weight:700;">100%</span></td>
+            </tr>
+            <tr class="space">
+                <td colspan="5"></td>
+            </tr>
+            <tr>
+                <td>0003</td>
+                <td>14.01.2015</td>
+                <td class="left">Mur des Réformateurs + Parc des Bastions</td>
+                <td class="right">1350 m.</td>
+                <td><span style="color:#0f0;font-weight:700;">100%</span></td>
+            </tr>
+            <tr class="space">
+                <td colspan="5"></td>
+            </tr>
+            <tr>
+                <td>0002</td>
+                <td>06.11.2014</td>
+                <td class="left">Secteur Vernier village</td>
+                <td class="right">350 m.</td>
+                <td><span style="color:#0f0;font-weight:700;">100%</span></td>
+            </tr>
+            <tr class="space">
+                <td colspan="5"></td>
+            </tr>
+            <tr>
+                <td>0001</td>
+                <td>05.11.2014</td>
+                <td class="left">Secteur Meyrin CERN</td>
+                <td class="right">1500 m.</td>
+                <td><span style="color:#0f0;font-weight:700;">100%</span></td>
+            </tr>
+        </tbody>
+    </table>
   </div>
 </div>
 
@@ -217,7 +380,7 @@
   </div>
 </div>
 
-<div class="paneltitle"><div></div></div>
+<!--<div class="paneltitle"><div></div></div>-->
 
 <div id="timeline"></div>
 <div id="statistics"><div></div></div>
@@ -247,14 +410,16 @@
     <a id="a_leftpanel" class="button panel_button davicon"></a>
     <a id="viewasvignette" class="button views fa fa-th fa-fw" title="Vignettes"></a>
 
-    <a id="a_digitizingpanel" class="button panel_button fa fa-download fa-fw"></a>
-    <a id="a_processingpanel" class="button panel_button fa fa-cubes fa-fw"></a>
+    <a id="a_taxonomypanel" class="button panel_button fa fa-server fa-fw"></a>
 
-    <a id="a_taxonomypanel" class="button panel_button spacer fa fa-server fa-fw"></a>
-    <a id="a_configurationpanel" class="button panel_button fa fa-gear fa-fw"></a>
+    <a id="a_processingpanel" class="button panel_button spacer fa fa-cubes fa-fw"></a>
+    <!--<a id="a_digitizingpanel" class="button panel_button fa fa-download fa-fw"></a>-->
+    <a id="a_configurationpanel" class="button panel_button fa fa-download fa-fw"></a>
+
     <!--
     <div class="separator"></div>
     <a id="logout" class="button fa fa-power-off fa-fw"></a>
+    <a id="a_configurationpanel" class="button panel_button fa fa-gear fa-fw"></a>
     -->
     <div id="leftbar_footer">
       <a id="leftbar_timeline" class="button timeline fa fa-clock-o fa-fw"></a>
