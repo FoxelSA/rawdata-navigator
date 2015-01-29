@@ -161,7 +161,8 @@ var DAV = new function() {
                 scrollAmount: 250
             },
             advanced: {
-                updateOnContentResize: true
+                updateOnContentResize: true,
+                updateOnBrowserResize: true
             }
         },{});
 
@@ -248,6 +249,10 @@ var DAV = new function() {
             $(window).on('resize',function() {
                 overlay.resize();
             });
+            $('a.reload',this._dom).on('click',function(e){
+              $(e.target).addClass('fa-spin');
+              document.location.reload();
+            });
         },
 
         /**
@@ -256,6 +261,7 @@ var DAV = new function() {
         show: function(msg) {
             $(this._dom).css('display','block');
             $(this._dom+' .txt').html(msg);
+            this.resize();
         },
 
         /**
@@ -1217,6 +1223,13 @@ var DAV = new function() {
         // hide the requested panel
         panel.hide();
 
+        // show map/vignettes toggle
+        var topp=toppanel();
+        if (topp && $(topp._dom).hasClass('primary')) {
+            $('.views',leftbar._dom).css({
+                visibility: 'visible'
+            });
+        }
 
       } else {
 
@@ -1260,7 +1273,7 @@ var DAV = new function() {
     updateTitle: function panel_updateTitle() {
 
         var panel=this;
-        var toplevel=0;
+        var toplevel=-1;
         var panels={};
 
         $.each(window._panels,function(){
@@ -1272,6 +1285,8 @@ var DAV = new function() {
 
         if (panels[toplevel]) {
           panels[toplevel].setTitle();
+        }  else {
+           $('.paneltitle').css('opacity',0);
         }
 
     }, // panel_gettoplevel
@@ -1279,7 +1294,7 @@ var DAV = new function() {
     gettoplevel: function panel_gettoplevel() {
 
         var panel=this;
-        var toplevel=0;
+        var toplevel=-1;
 
         $.each(window._panels,function(){
           if (this.visible && this!=panel) {
@@ -1326,7 +1341,7 @@ var DAV = new function() {
       panel.visible=false;
       panel._level=0;
 
-      panel.updateTitle();
+      setTimeout(panel.updateTitle,0);
 
       $(panel._dom).trigger('hidden');
 
@@ -1497,7 +1512,32 @@ var DAV = new function() {
       _level: 2,
       _dom: "#infopanel",
       _pool: "#panels2",
-      _background_alpha: 1.0
+      _background_alpha: 1.0,
+      _panel_resize: Panel.prototype.resize,
+      resize: function(e){
+        var infopanel=this;
+        infopanel._panel_resize(e);
+        $('#usages',infopanel._dom)
+            .height($(infopanel._dom).height()-$('#usages',infopanel._dom).offset().top*1.5)
+            .mCustomScrollbar('update');
+      },
+      _panel_expand: Panel.prototype.expand,
+      expand: function() {
+          this._panel_expand();
+          // hide map/vignettes toggle
+          $('.views',leftbar._dom).css({
+              visibility: 'hidden'
+          });
+      },
+      _panel_shrink: Panel.prototype.shrink,
+      shrink: function() {
+        this._panel_shrink();
+          // hide map/vignettes toggle
+          $('.views',leftbar._dom).css({
+              visibility: 'visible'
+          });
+      }
+
   });
 
   var digitizingpanel = this.digitizingpanel = new Panel({
@@ -2290,7 +2330,7 @@ var DAV = new function() {
                 else if (segment == '1404383663')
                     view_panorama_link += 'dufour.php';
                 view_panorama_link += '?initial='+(pose.sec-7200)+'_'+pose.usc;
-                $(information._dom+' .view_panorama').attr('href',view_panorama_link);
+                $(information._dom+' .view_panorama').data('href',view_panorama_link);
 
                 // test panorama
                 $.ajax({
@@ -2298,10 +2338,13 @@ var DAV = new function() {
                     type:'HEAD',
                     error: function() {
                         $('#usages .usage.posepanorama').css('display','none');
+                        $('#usages .usage.posepoi').css('display','none');
                     },
                     success: function() {
                         $('#usages .usage.posepanorama img').attr('src',thumb_panorama_src);
                         $('#usages .usage.posepanorama').css('display','block');
+
+                        information.showpoi(view_panorama_link);
                     }
                 });
 
@@ -2315,7 +2358,7 @@ var DAV = new function() {
                     view_pointcloud_link += 'reformateurs.html';
                 else if (segment == '1404383663')
                     view_pointcloud_link += 'dufour.html';
-                $(information._dom+' .view_pointcloud').attr('href',view_pointcloud_link);
+                $(information._dom+' .view_pointcloud').data('href',view_pointcloud_link);
 
                 // html
                 $('.nav div',information.video._dom).html(
@@ -2328,6 +2371,31 @@ var DAV = new function() {
                 //);
 
             });
+
+        },
+
+        /**
+         * information.showpoi
+         * */
+        showpoi: function(view_panorama_link) {
+          $('#usages .usage.posepoi .list').empty();
+          $('#usages .usage.posepoi').css('display','block');
+          $('#usages .usage.posepoi .edit_poi').data('href',view_panorama_link+'&action=poi_edit');
+          $.ajax({
+              url: view_panorama_link+'&action=poi_list_as_html',
+              error: function() {
+                $('#usages .usage.posepoi .download_poidata').css('display','none');
+                $('#usages .usage.posepoi .list').css('display','none');
+              },
+              success: function(html) {
+                if (!html.length) {
+                  $('#usages .usage.posepoi .download_poidata').css('display','none');
+                  return;
+                }
+                $('#usages .usage.posepoi .list').html(html);
+                $('#usages .usage.posepoi .list').css('display','block');
+              }
+          });
 
         },
 
@@ -2920,8 +2988,8 @@ var DAV = new function() {
      */
     this.viewFreepano = function(item) {
         var panel=window._panels['freepanel'];
-        if ($('iframe',panel._dom).attr('src')!=$(item).attr('href')) {
-            $('iframe',panel._dom).attr('src',$(item).attr('href'));
+        if ($('iframe',panel._dom).attr('src')!=$(item).data('href')) {
+            $('iframe',panel._dom).attr('src',$(item).data('href'));
         }
         panel.toggle();
     };
@@ -2931,12 +2999,24 @@ var DAV = new function() {
      */
     this.viewPotree = function(item) {
         var panel=window._panels['pointcloudpanel'];
-        if ($('iframe',panel._dom).attr('src')!=$(item).attr('href')) {
-            $('iframe',panel._dom).attr('src',$(item).attr('href'));
+        if ($('iframe',panel._dom).attr('src')!=$(item).data('href')) {
+            $('iframe',panel._dom).attr('src',$(item).data('href'));
         }
         panel.toggle();
     };
 
+    var poiEditor = this.poiEditor = new Panel({
+        _expand: true,
+        _dom: "#poipanel",
+        _background_alpha: 1.0,
+        open: function poiEditor_open(elem) {
+          var panel=this;
+          if ($('iframe',panel._dom).attr('src')!=$(elem).data('href')) {
+              $('iframe',panel._dom).attr('src',$(elem).data('href'));
+          }
+          panel.toggle();
+        }
+    });
 
 }; // DAV
 
@@ -2948,7 +3028,7 @@ window.nopreview = function nopreview(img) {
 };
 
 window.toppanel = function toppanel(){
-  var toplevel=0;
+  var toplevel=-1;
   var panel;
   $.each(window._panels,function(){
     if (this.visible && this._level>toplevel){

@@ -138,12 +138,32 @@
   </div>
 </div>
 
+<div id="poipanel" class="panel secondary">
+  <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
+  <div class="content">
+    <iframe src="<?php if (false) { echo '/freepano'; } ?>" frameborder="no" scrolling="no" seamless="seamless"></iframe>
+  </div>
+</div>
+
 <div class="paneltitle"><div></div></div>
 
 <div id="timeline"></div>
 <div id="statistics"><div></div></div>
 
 <div id="overlay">
+  <?php if (isset($_GET['loader']) && !empty($_GET['loader'])): ?>
+  <iframe src="<?php echo $_GET['loader'] ?>" width="100%" height="100%" style="margin-top: -20px;"></iframe>
+  <div class="txt" style="margin-top: 20px;"></div>
+  <center style="position: absolute; margin-top: 20px;"><a class="reload fa fa-refresh fa-fw"></a></center>
+  <?php else: ?>
+    <div>
+        <img src="img/ajax-loader.gif" width="24" height="24" alt="" />
+        <div class="txt"></div>
+        <center><a class="reload fa fa-refresh fa-fw"></a></center>
+    </div>
+  <?php endif; ?>
+</div>
+</div>
     <div>
         <img src="img/ajax-loader.gif" width="24" height="24" alt="" />
         <div class="txt"></div>
@@ -218,7 +238,7 @@
             <div class="nocloseable">
                 <div class="preview"><img onerror="nopreview(this);"></img></div>
                 <div class="actions">
-                    <div class="action"><a href="" class="download_tiles">Download RAW tiles...</a></div>
+                  <a href="" class="download_tiles"><div class="action">Download RAW tiles...</div></a>
                 </div>
             </div>
         </div>
@@ -258,7 +278,16 @@
             <div class="closeable">
               <div><a class="view_panorama" onclick="DAV.viewFreepano(this);return false;"><img width="430" /></a></div>
                 <div class="actions">
-                    <div class="action"><a href="" class="download_panorama">Download EQR image...</a></div>
+                  <a href="" class="download_panorama"><div class="action">Download EQR image...</div></a>
+                </div>
+            </div>
+        </div>
+        <div class="usage posepoi">
+            <div class="title pointer">Points d'intérêt</div>
+            <div class="closeable">
+                <div class="actions">
+                  <a class="edit_poi" onclick="DAV.poiEditor.open(this);return false;"><div class="action">Editer les POIs...</div></a>
+                  <a href="" class="download_poidata"><div class="action">Download POI data...</div></a>
                 </div>
             </div>
         </div>
@@ -267,7 +296,7 @@
             <div class="closeable">
               <div><a class="view_pointcloud" onclick="DAV.viewPotree(this);return false;"><img width="430" /></a></div>
                 <div class="actions">
-                    <div class="action"><a href="" class="download_pointcloud">Download PLY pointcloud...</a></div>
+                  <a href="" class="download_pointcloud"><div class="action">Download PLY pointcloud...</div></a>
                 </div>
             </div>
         </div>
@@ -290,6 +319,7 @@
         <a id="prev" class="button"><span class="fa fa-angle-double-left fa-fw"></span>Prev</a>
         <a id="next" class="button">Next<span class="fa fa-angle-double-right fa-fw"></span></a>
       </span>
+      <a id="download" class="button">Download video</a>
     </div>
  </div>
 <!-- video_player -->

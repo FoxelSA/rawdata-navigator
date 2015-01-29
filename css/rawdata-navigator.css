@@ -288,6 +288,7 @@ a, a:link, a:visited, a:hover, a:active {
             line-height:150%;
         }
 
+
 #allocation {
     position:relative;
     top: 3em;
@@ -841,7 +842,7 @@ a, a:link, a:visited, a:hover, a:active {
         margin-top:5px;
     }
 
-        #usages .usage .actions .action a {
+        #usages .usage .actions .action {
             color:#fff;
         }
 
@@ -849,7 +850,7 @@ a, a:link, a:visited, a:hover, a:active {
             background-color:#333;
         }
 
-            #usages .usage .actions .action:hover a {
+            #usages .usage .actions .action:hover {
                 color:#ecb100;
             }
 
@@ -873,4 +874,17 @@ a, a:link, a:visited, a:hover, a:active {
 
 #usages .mCustomScrollBox .mCSB_container {
     margin-right:0;
+}
+
+#usages img {
+  cursor: pointer;
+}
+
+a.reload {
+  margin-top: 1em;
+  font-size: 3em;
+  border:none;
+  border-radius:7px;
+  background-color:#222;
+  padding: 7px;
 }
