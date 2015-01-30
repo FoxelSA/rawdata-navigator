@@ -983,12 +983,12 @@ a.reload {
     width:1024px;
 }
 
-#configurationpanel a {
+#configurationpanel .content a {
     color:#ecb100;
 }
 
-    #configurationpanel a:hover,
-    #configurationpanel a:active {
+    #configurationpanel .content a:hover,
+    #configurationpanel .content a:active {
         color:#fff;
     }
 
