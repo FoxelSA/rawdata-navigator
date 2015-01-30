@@ -434,7 +434,7 @@ a, a:link, a:visited, a:hover, a:active {
   margin-left: 0px;
 }
 
-#infopanel .viewers .button {
+#infopanel .viewers .button  {
   width: auto;
   font-size: 1.5em;
   background: #333;
@@ -445,7 +445,7 @@ a, a:link, a:visited, a:hover, a:active {
 #video_player {
   padding-top: 4em;
 }
-#video_player a.button {
+#video_player a.button, #poipanel a.button {
   width: auto;
   background: #333;
   padding: 5px;
@@ -453,12 +453,18 @@ a, a:link, a:visited, a:hover, a:active {
   transition: 0.04s all ease-in-out;
 }
 
-#infopanel .viewers a:hover, #video_player a.button:hover {
+#poipanel a.button {
+  font-size: 2em;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+#infopanel .viewers a:hover, #video_player a.button:hover, #poipanel a.button:hover {
   color: #ddd;
   transform: scale(0.95);
 }
 
-#infopanel .viewers a:active, #video_player a.button:active {
+#infopanel .viewers a:active, #video_player a.button:active, #poipanel a.button:active {
   color: #bbb;
   transform: scale(0.8);
 }
@@ -1022,3 +1028,61 @@ a.reload {
             height:10px;
             background-color:transparent;
         }
+
+
+#poipanel_edit { 
+  display: none;
+
+}
+
+#poipanel_edit label {
+  width: 100px;
+}
+
+#poipanel_edit input {
+  display: block;
+}
+
+#poipanel action a.button {
+}
+
+
+#poipanel .title {
+  position: relative;
+  font-size: 2em;
+  top: 1em;
+  margin-bottom: 2em;
+}
+
+#poipanel_edit textarea, #poipanel_edit label {
+  display: block;
+}
+
+#poipanel_edit textarea, #poipanel_edit input {
+  margin-bottom: 10px;
+}
+
+#poipanel_edit input {
+  width: 95%;
+  text-align: center;
+}
+
+#poipanel_edit input#poi_date {
+  width: 20em;
+}
+
+#poipanel_edit textarea {
+  height: 20em;
+  width: 95%;
+}
+
+#poipanel_edit .action {
+  float: right;
+  margin-right: 5%;
+}
+
+#poipanel_edit .input {
+  background: rgba(255,255,255,0.08);
+  color: white;
+  padding: 4px;
+}

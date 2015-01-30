@@ -75,7 +75,7 @@ if (isset($_GET['action']) && $_GET['action']=="poi_list") {
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <title>Freepano Example - https://github.com/FoxelSA/freepano</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimum-scale=1,maximum-scale=1" />
+    <!--meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimum-scale=1,maximum-scale=1" /-->
     <script type="text/javascript">
             var poi_path='<?php print($poi_path); ?>';
         <?php if (isset($_GET['initial'])): ?>

@@ -70,6 +70,7 @@ $.extend(POI_loader.prototype,{
             panorama.poi=$.extend(true,{},panorama.defaults.poi,poi_list);
             // propagate panorama 'ready' event
             poiLoader.panorama_prototype_callback.apply(e.target,[e]);
+            panorama.drawScene();
           }
       });
 

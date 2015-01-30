@@ -1177,7 +1177,7 @@ $(document).on('ready', function(){
     },
 
     map: {
-        active: true
+        active: false
     },
 
     // THREE.js renderer options
@@ -1263,7 +1263,7 @@ $(document).on('ready', function(){
     case 77:
       var map = panorama.map;
       if(map) {
-          map.active = !map.active;
+          map.instance.active = !map.instance.active;
       }
       break;
     }

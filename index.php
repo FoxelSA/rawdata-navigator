@@ -374,7 +374,35 @@
 
 <div id="poipanel" class="panel secondary">
   <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
-  <div class="content"></div>
+  <div class="content">
+
+    <div class="title">
+      <div>Gestion des points d'intérêt</div>
+    </div>
+
+    <div class="action">
+      <a id="addpoi" class="button">Ajouter</a>
+    </div>
+
+    <div id="poipanel_edit">
+      <label for="poi_name">Identifiant</label><input type="text" id="poi_name" class="input">
+      <label for="poi_date">Date</label><input type="text" disabled id="poi_date" class="input">
+      <label for="poi_description">Description</label><textarea id="poi_description" class="input"></textarea>
+      <div class="action">
+        <a class="cancel button">Annuler</a>
+        <a class="save button">Enregistrer</a>
+      </div>
+    </div>
+
+    <div class="inventory">
+      <div class="title"></div>
+      <div class="list">
+        <ul></ul>
+      </div>
+    </div>
+
+  </div>
+
   <div class="content2" >
     <iframe frameborder="no" scrolling="no" seamless="seamless"></iframe>
   </div>
@@ -521,10 +549,10 @@
             </div>
         </div>
         <div class="usage posepoi">
-            <div class="title pointer">Points d'intérêt</div>
+          <div class="title pointer">Points d'intérêt <span class="poicount" /></div>
             <div class="closeable">
                 <div class="actions">
-                  <a class="edit_poi" onclick="DAV.poiEditor.open(this);return false;"><div class="action">Editer les POIs...</div></a>
+                  <a class="edit_poi" onclick="DAV.poiPanel.open(this);return false;"><div class="action">Editer les POIs...</div></a>
                   <a class="download_poidata"><div class="action">Download POI data...</div></a>
                 </div>
                 <div class="actions poilist"></div>
