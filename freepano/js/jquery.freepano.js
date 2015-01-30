@@ -560,16 +560,19 @@ $.extend(true,Panorama.prototype,{
     getMouseCoords: function panorama_getMouseCoords(e) {
 
       this.iMatrix=new THREE.Matrix4();
-      this.iMatrix.getInverse(this.camera.instance.projectionMatrix.clone());
+      var matrix=new THREE.Matrix4();
+      matrix.multiply(this.camera.instance.projectionMatrix.clone());
+// wtf      matrix.multiply(this.viewRotationMatrix.clone());
+      this.iMatrix.getInverse(matrix);
 
       var mouseNear=new THREE.Vector4(0,0,0,1);
       var offset=$(this.renderer.domElement).offset();
       mouseNear.x=-1+2*((e.clientX-offset.left)/this.renderer.domElement.width);
       mouseNear.y=1-2*((e.clientY-offset.top)/this.renderer.domElement.height)
-      mouseNear.z=1;
+      mouseNear.z=0;
 
       var mouseFar=mouseNear.clone();
-      mouseFar.z=-1;
+      mouseFar.z=-0.9;
 
       mouseNear.applyMatrix4(this.iMatrix);
       mouseFar.applyMatrix4(this.iMatrix);
@@ -584,11 +587,9 @@ $.extend(true,Panorama.prototype,{
       mouseFar.z/=mouseFar.w;
       mouseFar.w=1;
 
-      this.mouseCoords=new THREE.Vector4().subVectors(mouseFar,mouseNear);
-      this.mouseCoords.w=1;
+      this.mouseCoords=new THREE.Vector4().subVectors(mouseFar,mouseNear).normalize();
 
-      var r=this.mouseCoords.length();
-      var phi=Math.acos(this.mouseCoords.x/r);
+      var phi=Math.acos(this.mouseCoords.x);
       var theta=Math.atan2(this.mouseCoords.y,this.mouseCoords.z);
 
       this.mouseCoords.x=-this.sphere.radius*Math.sin(phi)*Math.cos(theta);
@@ -614,6 +615,7 @@ $.extend(true,Panorama.prototype,{
           mouseCoords: this.getMouseCoords(e),
           textureCoords: this.worldToTextureCoords(this.mouseCoords)
         };
+        console.log(this.mousedownPos.mouseCoords);
         var wc=this.textureToWorldCoords(this.mousedownPos.textureCoords.left,this.mousedownPos.textureCoords.top);
         console.log('fixme: '+this.mousedownPos.textureCoords.longitude+'=='+wc.longitude,this.mousedownPos.textureCoords.latitude+'=='+wc.latitude);
         //TODO something is wrong: this.mousedownPos.textureCoords.latitude != wc.latitude
