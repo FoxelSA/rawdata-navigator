@@ -62,12 +62,12 @@ $.extend(POI_loader.prototype,{
           url: poiLoader.poi_path+panorama.list.currentImage+'.json',
           error: function() {
             $.notify('Error: Cannot load POI data');
-            panorama.poi={};
+            if (panorama.poi) panorama.poi.list={};
             // propagate panorama 'ready' event
             poiLoader.panorama_prototype_callback.apply(e.target,[e]);
           },
           success: function(poi_list) {
-            panorama.poi=$.extend(true,{},panorama.defaults.poi,poi_list);
+            panorama.poi=$.extend(true,panorama.poi,panorama.defaults.poi,poi_list);
             // propagate panorama 'ready' event
             poiLoader.panorama_prototype_callback.apply(e.target,[e]);
             panorama.drawScene();

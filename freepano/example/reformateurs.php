@@ -1,6 +1,20 @@
 <?php
 $poi_path="/data/footage/demodav/1404381299/poi/";
 
+if (isset($_POST['cmd'])) {
+  $json=$poi_path.$_GET['initial'].".json";
+  switch($_POST['cmd']) {
+  case 'poi_save':
+    file_put_contents($json,$_POST['poi_list']);
+    header('Content-Type: application/json');
+    echo '{"status": "ok"}';
+    exit(0);
+    break;
+  }
+  exit(1);
+}
+
+
 if (isset($_GET['initial'])) {
   $json=$poi_path.$_GET['initial'].".json";
 }

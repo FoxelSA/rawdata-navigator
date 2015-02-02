@@ -2411,6 +2411,7 @@ var DAV = new function() {
                 $('#usages .usage.posepoi .list').css('display','none');
               },
               success: function(json) {
+                poiPanel.panorama_link=view_panorama_link;
                 if (!json.list) {
                   information.setpoicount(0);
                   $('#usages .usage.posepoi .download_poidata').css('display','none');
@@ -3051,6 +3052,7 @@ var DAV = new function() {
         _expand: true,
         _dom: "#poipanel",
         _background_alpha: 1.0,
+        _url: 'php/poi.php',
 
         open: function poiPanel_open(elem) {
 
@@ -3062,12 +3064,11 @@ var DAV = new function() {
           var iframe=panel.iframe=$('iframe',panel._dom);
 
           if (iframe.attr('src')!=$(elem).data('href')) {
+            overlay.show('Loading POI editor...');
             iframe.attr('src',$(elem).data('href')).off('load').on('load',function(){
+              overlay.hide();
               panel.$=iframe[0].contentWindow.$;
               panel.panorama=panel.$('#pano').data('pano');
-              panel.$('#pano canvas').off('mouseup.poipanel').on('mouseup.poipanel',function(e){
-
-              });
               panel.toggle();
               setTimeout(function(){panel.resize()},1000);
             });
@@ -3081,17 +3082,20 @@ var DAV = new function() {
 
         addPOI: function poiPanel_addPOI() {
           var panel=this;
-          panel.$('#pano canvas').off('click.poipanel').on('click.poipanel',function(e){
+          panel.$('#pano canvas').off('mousedown.poipanel').on('mousedown.poipanel',function(e){
             var panorama=panel.panorama;
             var coords=panorama.getMouseCoords(e);
             coords.lon-=180;
 
-            if (panorama.poi.list.temp) {
-              panorama.poi.list.temp.instance.ondispose();
-              panorama.poi.list.temp.instance=null;
-            }
+            coords.lon+=panorama.lon;
+            coords.lat+=panorama.lat;
 
-            if (!panorama.poi.count) panorama.poi.count=0;
+            console.log(coords);
+
+            panorama.poi.count=0;
+            $.each(panorama.poi.list,function(){
+               ++panorama.poi.count;
+            });
 
             var poi={};
             var name='p'+(panorama.poi.count++);
@@ -3108,7 +3112,7 @@ var DAV = new function() {
 
             panorama.poi.add(poi);
             panorama.drawScene();
-            panel.$('#pano canvas').off('click.poipanel');
+            panel.$('#pano canvas').off('mousedown.poipanel');
             panel.edit(name);
           });
         }, // poiPanel_addPOI 
@@ -3148,17 +3152,59 @@ var DAV = new function() {
           data.description=$('#poipanel_edit #poi_description').val();
           panel.panorama.poi.list[panel.currentPOI].metadata=data;
           panel.panorama.drawScene();
-          panel.editClose();
-          // update poicount
-          information.parsepoilist(panel.panorama.poi.list);
+
+          var poi={list:{}};
+          $.each(panel.panorama.poi.list,function(id){
+            poi.list[id]={
+              coords: this.coords,
+              metadata: this.metadata,
+            };
+          });
+
+          $.ajax({
+              url: panel.panorama_link,
+              method: 'POST',
+              data: {
+                cmd: 'poi_save',
+                poi_list: JSON.stringify(poi)
+              },
+              error: function() {
+                $.notify('Error: Save failed !');
+              },
+              success: function(json) {
+                if (json.status!='ok') {
+                  $.notify('Error: Save failed !');
+                  return;
+                }
+                try {
+                  panel.panorama.poi.mesh_list_update();
+                } catch(e){}
+
+                panel.editClose();
+                // update poicount
+                information.parsepoilist(panel.panorama.poi);
+              }
+          });
         },
 
         cancel: function poiPanel_cancel() {
           var panel=this;
-          panel.panorama.poi.list[panel.currentPOI].instance.callback('dispose');
-          panel.panorama.poi.list[panel.currentPOI].instance=null;
-          delete panel.panorama.poi.list[panel.currentPOI];
-          panel.panorama.drawScene();
+
+          try {
+            panel.panorama.poi.list[panel.currentPOI].instance.callback('dispose');
+            panel.panorama.poi.list[panel.currentPOI].instance=null;
+            delete panel.panorama.poi.list[panel.currentPOI];
+            --panel.panorama.poi.count;
+            panel.panorama.drawScene();
+          } catch(e) {
+            console.log(e);
+            panel.$.notify('An error occured while closing dialog');
+          }
+
+          try {
+            panel.panorama.poi.mesh_list_update();
+          } catch(e){}
+
           panel.editClose();
         },
 

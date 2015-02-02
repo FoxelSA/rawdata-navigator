@@ -562,17 +562,17 @@ $.extend(true,Panorama.prototype,{
       this.iMatrix=new THREE.Matrix4();
       var matrix=new THREE.Matrix4();
       matrix.multiply(this.camera.instance.projectionMatrix);
-//      matrix.multiply(this.viewRotationMatrix.clone());
+//      matrix.multiply(this.viewRotationMatrix);
       this.iMatrix.getInverse(matrix);
 
       var mouseNear=new THREE.Vector4(0,0,0,1);
       var offset=$(this.renderer.domElement).offset();
       mouseNear.x=-1+2*((e.clientX-offset.left)/this.renderer.domElement.width);
       mouseNear.y=1-2*((e.clientY-offset.top)/this.renderer.domElement.height)
-      mouseNear.z=0;
+      mouseNear.z=0.5;
 
       var mouseFar=mouseNear.clone();
-      mouseFar.z=-0.9;
+      mouseFar.z=-0.5;
 
       mouseNear.applyMatrix4(this.iMatrix);
       mouseFar.applyMatrix4(this.iMatrix);
@@ -589,7 +589,8 @@ $.extend(true,Panorama.prototype,{
 
       this.mouseCoords=new THREE.Vector4().subVectors(mouseFar,mouseNear).normalize();
 
-      var phi=Math.acos(this.mouseCoords.x);
+      var r=this.mouseCoords.length();
+      var phi=Math.acos(this.mouseCoords.x/r);
       var theta=Math.atan2(this.mouseCoords.y,this.mouseCoords.z);
 
       this.mouseCoords.x=-this.sphere.radius*Math.sin(phi)*Math.cos(theta);

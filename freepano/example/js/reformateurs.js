@@ -238,11 +238,11 @@ $(document).on('ready', function(){
     // When using panorama.list to define several panoramas,
     // poi options below are extended or overrided with the ones
     // from panorama.list.images[id].poi
-
+*/
     poi: {
 
       // use a secondary scene for rendering widgets (eg when using filters)
-      overlay: false,
+      overlay: true,
 
       // panorama.poi.defaults: default values for POIs
       defaults: {
@@ -283,6 +283,9 @@ $(document).on('ready', function(){
             console.log('click',this);
           },
       },
+    },
+
+      /*
 
       // panorama.poi.list
       list: {

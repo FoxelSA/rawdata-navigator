@@ -148,7 +148,6 @@ function WidgetFactory(options) {
         if (widget.object3D) {
           widget.scene.remove(widget.object3D);
           widget.object3D=null;
-
         }
         if (typeof(widget.mesh)=="object") {
           widget.mesh=null;
@@ -342,10 +341,12 @@ function WidgetFactory(options) {
       }, // _widget_mouseout
 
       setColor: function widget_setColor(color) {
-        $.each(this.object3D.children,function(){
+        var widget=this;
+        console.log('setColor',this,color);
+        $.each(widget.object3D.children,function(){
           this.material.color.set(color);
         });
-        this.panorama.drawScene();
+        widget.panorama.drawScene();
       }, // widget_setColor
 
       scale: function widget_scale(scaleFactor) {
@@ -468,13 +469,13 @@ function WidgetFactory(options) {
         // update mesh list used for get_mouseover_list
         mesh_list_update: function widgetList_mesh_list_update() {
           var widgetList=this;
-          $.each(widgetList.list,function(name,widget) {
-            widget.camera.meshes[Widget.name.toLowerCase()]={};
+          $.each(widgetList.list,function(name,widgetList_elem) {
+            widgetList_elem.instance.camera.meshes[Widget.name.toLowerCase()]=[];
             return false; // all widgets from widgetList are of the same constructor
           });
-          $.each(widgetList.list,function(name,widget) {
-            $.each(widget.object3D.children,function(index,mesh){
-              widget.camera.meshes[Widget.name.toLowerCase()].push(this);
+          $.each(widgetList.list,function(name,widgetList_elem) {
+            $.each(widgetList_elem.instance.object3D.children,function(index,mesh){
+              widgetList_elem.instance.camera.meshes[Widget.name.toLowerCase()].push(this);
             });
           });
         }, // widgetList_mesh_list_update
