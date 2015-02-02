@@ -209,8 +209,7 @@ function WidgetFactory(options) {
         // compute widget coords
         widget.coords.vec4=new THREE.Vector4(0,0,-widget.radius,1);
         widget.coords.vec4.applyMatrix4(widget.mv);
-        widget.coords.vec4.applyMatrix4(widget.panorama.rotation.matrix);
-        widget.coords.vec4.applyMatrix4(panorama.viewRotationMatrix);
+        widget.coords.vec4.applyMatrix4(widget.panorama.sphere.object3D.matrix);
 
     //    widget.coords.vec4.applyMatrix4(new THREE.Matrix4().makeRotationY(panorama.lon*Math.PI/180));
     //    widget.coords.vec4.applyMatrix4(new THREE.Matrix4().makeRotationX(panorama.lat*Math.PI/180));

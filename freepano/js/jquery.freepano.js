@@ -561,8 +561,8 @@ $.extend(true,Panorama.prototype,{
 
       this.iMatrix=new THREE.Matrix4();
       var matrix=new THREE.Matrix4();
-      matrix.multiply(this.camera.instance.projectionMatrix.clone());
-// wtf      matrix.multiply(this.viewRotationMatrix.clone());
+      matrix.multiply(this.camera.instance.projectionMatrix);
+//      matrix.multiply(this.viewRotationMatrix.clone());
       this.iMatrix.getInverse(matrix);
 
       var mouseNear=new THREE.Vector4(0,0,0,1);
@@ -615,7 +615,7 @@ $.extend(true,Panorama.prototype,{
           mouseCoords: this.getMouseCoords(e),
           textureCoords: this.worldToTextureCoords(this.mouseCoords)
         };
-        console.log(this.mousedownPos.mouseCoords);
+        console.log(this.mousedownPos.mouseCoords,this.lon,this.lat);
         var wc=this.textureToWorldCoords(this.mousedownPos.textureCoords.left,this.mousedownPos.textureCoords.top);
         console.log('fixme: '+this.mousedownPos.textureCoords.longitude+'=='+wc.longitude,this.mousedownPos.textureCoords.latitude+'=='+wc.latitude);
         //TODO something is wrong: this.mousedownPos.textureCoords.latitude != wc.latitude
@@ -740,11 +740,12 @@ $.extend(true,Panorama.prototype,{
       panorama.lat=Math.max(panorama.limits.lat.min,Math.min(panorama.limits.lat.max,panorama.lat));
 
       // set sphere rotation
-      panorama.viewRotationMatrix=new THREE.Matrix4();
-      panorama.viewRotationMatrix.multiply((new THREE.Matrix4()).makeRotationAxis(new THREE.Vector3(1,0,0),THREE.Math.degToRad(panorama.lat)));
+      panorama.viewRotationMatrix=(new THREE.Matrix4()).makeRotationAxis(new THREE.Vector3(0,0,1),-THREE.Math.degToRad(panorama.lat));
       panorama.viewRotationMatrix.multiply((new THREE.Matrix4()).makeRotationAxis(new THREE.Vector3(0,1,0),THREE.Math.degToRad(panorama.lon)));
+
+      panorama.sphere.object3D.matrixAutoUpdate=false;
       panorama.sphere.object3D.matrix.copy(panorama.rotation.matrix.clone());
-      panorama.sphere.object3D.applyMatrix(panorama.viewRotationMatrix);
+      panorama.sphere.object3D.matrix.multiply(panorama.viewRotationMatrix);
 
       panorama.callback('update');
 
