@@ -800,7 +800,7 @@ function WidgetFactory(options) {
           if (it<30) requestAnimationFrame(_drawScene,null,30-it>>1);
           else {
             panorama.mode.show=false;
-            widget.callback('show');
+            widget.instance.callback('show');
           }
         };
         requestAnimationFrame(_drawScene);
