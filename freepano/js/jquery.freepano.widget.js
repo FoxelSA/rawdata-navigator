@@ -328,7 +328,7 @@ function WidgetFactory(options) {
           }
           return;
         }
-        
+
         // or set hover color
         this.setColor(this.color.hover);
 
@@ -767,6 +767,45 @@ function WidgetFactory(options) {
         return mouseover_list;
 
       }, // widgetList_get_mouseover_list
+
+      show: function widgetList_show(options) {
+
+        var widgetList=this;
+
+        if (typeof(options)=='string') {
+          options={name: options};
+        }
+
+        var panorama=widgetList.panorama;
+        var widget=widgetList.list[options.name];
+        var dlon=(widget.coords.lon-panorama.lon+90)%360;
+        var dlat=(widget.coords.lat-panorama.lat)%180;
+        var dzoom=(widget.zoom)?widget.zoom-panorama.camera.zoom.current:0;
+        if (Math.abs(dlon)>180) {
+            dlon+=(dlon<0)?360:-360;
+        }
+
+        if (dlon==0 && dlat==0) return;
+
+        panorama.mode.show=true;
+        var it=0;
+
+        var _drawScene=function(){
+          ++it;
+          panorama.lon+=dlon/30;
+          panorama.lat+=dlat/30;
+          panorama.camera.zoom.current+=dzoom/30;
+          panorama.zoomUpdate();
+          panorama.drawScene();
+          if (it<30) requestAnimationFrame(_drawScene,null,30-it>>1);
+          else {
+            panorama.mode.show=false;
+            widget.callback('show');
+          }
+        };
+        requestAnimationFrame(_drawScene);
+
+      }, // widgetList_show
 
       callback: function widgetList_callback(widgetList_event) {
         var widgetList=this;

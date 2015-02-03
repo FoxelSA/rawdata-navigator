@@ -98,7 +98,7 @@ a, a:link, a:visited, a:hover, a:active {
   cursor: pointer;
 }
 
-.davicon, a.fa {
+.davicon, a.fa, ul.poi li {
   display: block;
   transition: 0.04s all ease-in-out;
 }
@@ -308,10 +308,15 @@ a, a:link, a:visited, a:hover, a:active {
         margin-bottom:5px;
     }
 
-        #allocation a.quick:hover,
+        #allocation a.quick:hover {
+            background-color:#333;
+            color:#ecb100;
+        }
+
         #allocation a.quick:active {
             background-color:#333;
             color:#ecb100;
+            transform: scale(0.98);
         }
 
     .allocation {
@@ -466,7 +471,7 @@ a, a:link, a:visited, a:hover, a:active {
 
 #infopanel .viewers a:active, #video_player a.button:active, #poipanel a.button:active {
   color: #bbb;
-  transform: scale(0.8);
+  transform: scale(0.90);
 }
 
     #info a, .panel.content a {
@@ -714,7 +719,7 @@ a, a:link, a:visited, a:hover, a:active {
   margin-top: 10px;
 }
 
-#vignettes .wrap.current {
+#vignettes .wrap.current, ul.poi li.current {
   box-shadow: 0 0 1.5em #ecb100;
 }
 
@@ -834,6 +839,11 @@ a, a:link, a:visited, a:hover, a:active {
                 color:#ecb100;
             }
 
+            #usages .usage .title.pointer:active {
+                transform: scale(0.98);
+                color:#ecb100;
+            }
+
     #usages .usage .closeable {
         display:none;
     }
@@ -859,13 +869,12 @@ a, a:link, a:visited, a:hover, a:active {
             color:#fff;
         }
 
+        #usages .usage .actions .action:active,
         #usages .usage .actions .action:hover {
+            transform: scale(0.99);
             background-color:#333;
+            color:#ecb100;
         }
-
-            #usages .usage .actions .action:hover {
-                color:#ecb100;
-            }
 
 .poseinformation div.section {
     padding-bottom:3px;
@@ -1086,3 +1095,52 @@ a.reload {
   color: white;
   padding: 4px;
 }
+
+canvas.poithumb {
+  width: 64px;
+  height: 64px;
+  border: 1px solid gray;
+  display: inline-block;
+  margin: 5px;
+}
+
+ul.poi {
+  list-style-type: none;
+  margin: 0px;
+  padding: 0px;
+
+}
+
+ul.poi li {
+  margin: 5px;
+  border: 1px solid gray;
+}
+
+ul.poi div.details {
+  display: inline;
+  position: absolute;
+  margin: 5px;
+}
+
+ul.poi > div {
+  height: 64px;
+  position: relative;
+}
+
+ul.poi div.details div {
+  position: relative;
+}
+
+ul.poi li > div {
+  display: inline-table;
+}
+
+ul.poi li:hover {
+  border-color: white;
+}
+
+ul.poi li:active {
+  color: #ecb100;
+  transform: scale(0.99);
+}
+

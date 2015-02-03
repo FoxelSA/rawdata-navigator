@@ -87,7 +87,6 @@ $(document).on('ready', function(){
  *
  */
 
-/*
     // panorama.fov: camera field of view
 
     fov: {
@@ -104,7 +103,6 @@ $(document).on('ready', function(){
 
     }, // fov
 
-*/
     // panorama.rotation: initial panorama sphere rotation
 
     rotation: {

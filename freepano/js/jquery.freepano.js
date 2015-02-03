@@ -567,8 +567,11 @@ $.extend(true,Panorama.prototype,{
 
       var mouseNear=new THREE.Vector4(0,0,0,1);
       var offset=$(this.renderer.domElement).offset();
-      mouseNear.x=-1+2*((e.clientX-offset.left)/this.renderer.domElement.width);
-      mouseNear.y=1-2*((e.clientY-offset.top)/this.renderer.domElement.height)
+      var PX=mouseNear.x=-1+2*((e.clientX-offset.left)/this.renderer.domElement.width);
+      var PY=mouseNear.y=1-2*((e.clientY-offset.top)/this.renderer.domElement.height)
+      var factor=Math.cos( Math.atan( Math.sqrt( PX * PX + PY * PY ) ) );
+      mouseNear.x*=factor;
+      mouseNear.y*=factor;
       mouseNear.z=0.5;
 
       var mouseFar=mouseNear.clone();
@@ -598,6 +601,7 @@ $.extend(true,Panorama.prototype,{
       this.mouseCoords.z=-this.sphere.radius*Math.cos(phi);
       this.mouseCoords.phi=phi;
       this.mouseCoords.theta=theta;
+
 
       return {
         lon: THREE.Math.radToDeg(this.mouseCoords.phi),

@@ -2418,6 +2418,7 @@ var DAV = new function() {
                   return;
                 }
                 $('#usages .usage.posepoi .download_poidata').css('display','block').attr('href',view_panorama_link+'&action=poi_list&download');
+                information.poilist=json;
                 information.parsepoilist(json);
               }
           });
@@ -3065,13 +3066,18 @@ var DAV = new function() {
 
           if (iframe.attr('src')!=$(elem).data('href')) {
             overlay.show('Loading POI editor...');
+            panel.inventory_clear();
             iframe.attr('src',$(elem).data('href')).off('load').on('load',function(){
               overlay.hide();
-              panel.$=iframe[0].contentWindow.$;
+              panel.window=iframe[0].contentWindow;
+              panel.$=panel.window.$;
               panel.panorama=panel.$('#pano').data('pano');
+              panel.panorama.setupCallback(panel);
+              poiPanel.window.POI_list.prototype.setupCallback(poiPanel);
               panel.toggle();
               setTimeout(function(){panel.resize()},1000);
             });
+
 
           } else {
             panel.toggle();
@@ -3079,6 +3085,49 @@ var DAV = new function() {
           }
 
         }, // poiPanel_open
+
+        inventory_clear: function poiPanel_inventory_clear() {
+          var panel=this;
+          $('#poipanel_inventory ul').empty();
+          $('#poipanel_inventory').off('click.inventory').on('click.inventory','li',function(e){
+            panel.inventory_click(e);
+          });
+
+        }, // poiPanel_inventory_clear
+
+        inventory_click: function poiPanel_inventory_click(e) {
+          var panel=this;
+          var li=$(e.target);
+          var name=li.attr('id');
+          panel.panorama.poi.show(name);
+        }, // poiPanel_inventory_click
+
+        inventory_update: function poiPanel_inventory_update() {
+          var panel=this;
+          $.each(panel.panorama.poi.list,function(name){
+            poiPanel.addToInventory(name);
+          });
+          $('#poipanel_inventory .list',panel._dom).mCustomScrollbar({
+              axis: 'y',
+              theme: 'light-thin',
+              mouseWheel: {
+                scrollAmount: 250
+              },
+            advanced: {
+                updateOnContentResize: true,
+                updateOnBrowserResize: true
+            }
+          });
+
+
+        }, // poiPanel_inventory_update
+
+        on_panorama_ready: function poiPanel_on_panorama_ready() {
+        },
+
+        on_poi_list_ready: function poiPanel_on_poilist_ready() {
+          poiPanel.inventory_update();
+        }, // poiPanel_on_panorama_ready
 
         addPOI: function poiPanel_addPOI() {
           var panel=this;
@@ -3100,7 +3149,8 @@ var DAV = new function() {
             var poi={};
             var name='p'+(panorama.poi.count++);
             poi[name]={
-                  coords: coords
+                  coords: coords,
+                  zoom: panorama.camera.zoom.current
             }
             panorama.poi.add(poi);
             panorama.drawScene();
@@ -3176,8 +3226,11 @@ var DAV = new function() {
                 } catch(e){}
 
                 panel.editClose();
+
                 // update poicount
                 information.parsepoilist(panel.panorama.poi);
+
+                panel.addToInventory(panel.currentPOI);
               }
           });
         },
@@ -3203,12 +3256,32 @@ var DAV = new function() {
           panel.editClose();
         },
 
+        addToInventory: function poiPanel_addToInventory(name){
+          var panel=this;
+          var data=panel.panorama.poi.list[name].metadata;
+          var li='<li id="'+name+'">';
+          li+='<div>';
+          li+='<canvas class="poithumb" />';
+          li+='</div>';
+          li+='<div class="details">';
+          li+='<div class="name">'+data.name+'</div>';
+          li+='<div class="description">'+data.description+'</div>';
+          li+='</div>'; // .details
+          li+='<div class="buttons"></div>';
+          li+='</li>';
+          $('ul.poi',panel._dom).append(li);
+        },
+
         _panel_resize: Panel.prototype.resize,
         resize: function poiPanel_resize(e){
           var panel=this;
           panel._panel_resize(e);
           panel.iframe.height($('.content2',panel._dom).height());
           panel.iframe.width($(window).width()-panel.iframe.offset().left);
+          $('#poipanel_inventory .list',panel._dom)
+            .height($(panel._dom).height()-$('#poipanel_inventory .list',panel._dom).offset().top+64)
+            .mCustomScrollbar('update');
+
         }
     });
 

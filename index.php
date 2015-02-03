@@ -394,10 +394,10 @@
       </div>
     </div>
 
-    <div class="inventory">
+    <div id="poipanel_inventory">
       <div class="title"></div>
       <div class="list">
-        <ul></ul>
+        <ul class="poi"></ul>
       </div>
     </div>
 
