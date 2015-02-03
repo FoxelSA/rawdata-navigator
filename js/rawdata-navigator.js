@@ -3100,20 +3100,15 @@ var DAV = new function() {
             var poi={};
             var name='p'+(panorama.poi.count++);
             poi[name]={
-                  coords: coords,
-                  instance: null,
-                  color: {
-                    normal: '#00000',
-                    hover: '#fffff',
-                    active: '#0000ff'
-                  },
-                  saved: false
+                  coords: coords
             }
-
             panorama.poi.add(poi);
             panorama.drawScene();
+
             panel.$('#pano canvas').off('mousedown.poipanel');
+
             panel.edit(name);
+
           });
         }, // poiPanel_addPOI 
 
