@@ -54,21 +54,19 @@ $(document).ready(function(){
   }
 
    
-  /*
-  // load image with alpha channel to use as POI
-  window.unicorn_texture=new THREE.ImageUtils.loadTexture(
-    'img/unicorn.png',
+  // load image with alpha channel to use as POI cursor
+  window.poicursor_texture=new THREE.ImageUtils.loadTexture(
+    '../../img/dav-cursor.png',
     new THREE.UVMapping(),
     file_onload,
     function onloaderror() {
-      $.notify('Cannot load unicorn.png !');
+      $.notify('Cannot load dav-cursor.png !');
     }
   );
-  */
 
 }); // ready
 
-$(document).on('ready', function(){
+$(document).on('filesloaded', function(){
 
   $('#pano').panorama({
       defaults: {

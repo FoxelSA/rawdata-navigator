@@ -569,9 +569,7 @@ $.extend(true,Panorama.prototype,{
       var offset=$(this.renderer.domElement).offset();
       var PX=mouseNear.x=-1+2*((e.clientX-offset.left)/this.renderer.domElement.width);
       var PY=mouseNear.y=1-2*((e.clientY-offset.top)/this.renderer.domElement.height)
-      var factor=Math.cos( Math.atan( Math.sqrt( PX * PX + PY * PY ) ) );
-      mouseNear.x*=factor;
-      mouseNear.y*=factor;
+      //var factor=Math.cos( Math.atan( Math.sqrt( PX * PX + PY * PY ) ) );
       mouseNear.z=0.5;
 
       var mouseFar=mouseNear.clone();

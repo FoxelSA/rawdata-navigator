@@ -3059,7 +3059,12 @@ var DAV = new function() {
 
           var panel=this;
           $('#addpoi',panel._dom).off('click').on('click',function(){
-            panel.addPOI();
+            if ($(this).text()=="Ajouter") {
+              $(this).text('Annuler');
+              panel.addPOI();
+            } else {
+              panel.cancel();
+            }
           });
 
           var iframe=panel.iframe=$('iframe',panel._dom);
@@ -3160,12 +3165,33 @@ var DAV = new function() {
             panel.edit(name);
 
           });
+
+          panel.$.notify('Indiquez un emplacement',{
+              sticky: false
+          });
+
+          panel.panorama.poi.add({
+              cursor: {
+                coords: {
+                  lon: panel.panorama.lon-90,
+                  lat: panel.panorama.lat
+                },
+                mesh: new panel.window.THREE.Mesh(new panel.window.THREE.PlaneGeometry(Math.PI/18,Math.PI/18,1,1), new panel.window.THREE.MeshBasicMaterial({
+                   map: panel.window.poicursor_texture,
+                   transparent: true
+                })),
+                handleTransparency: true,
+                handleMouseEvents: false
+              }
+          });
+          panel.panorama.drawScene();
+
         }, // poiPanel_addPOI 
 
         edit: function poiPanel_edit(name){
           var panel=this;
           panel.currentPOI=name;
-          $('div.action:first',panel._dom).hide(0);
+          $('div.action:first, #poipanel_inventory',panel._dom).hide(0);
 
           $('#poipanel_edit a').off('click.poipanel');
           $('#poipanel_edit a.cancel').on('click.poipanel',function(e){
@@ -3186,7 +3212,8 @@ var DAV = new function() {
         editClose: function poiPanel_ediClose() {
           var panel=this;
           $('#poipanel_edit',panel._dom).hide(0);
-          $('div.action:first',panel._dom).show(0);
+          $('#addpoi',panel._dom).text('Ajouter');
+          $('div.action:first, #poipanel_inventory',panel._dom).show(0);
         },
 
         save: function poiPanel_save() {
@@ -3238,16 +3265,13 @@ var DAV = new function() {
         cancel: function poiPanel_cancel() {
           var panel=this;
 
-          try {
+          if (panel.panorama.poi.list[panel.currentPOI] && panel.panorama.poi.list[panel.currentPOI].instance) {
             panel.panorama.poi.list[panel.currentPOI].instance.callback('dispose');
             panel.panorama.poi.list[panel.currentPOI].instance=null;
             delete panel.panorama.poi.list[panel.currentPOI];
-            --panel.panorama.poi.count;
-            panel.panorama.drawScene();
-          } catch(e) {
-            console.log(e);
-            panel.$.notify('An error occured while closing dialog');
           }
+          --panel.panorama.poi.count;
+          panel.panorama.drawScene();
 
           try {
             panel.panorama.poi.mesh_list_update();
@@ -3279,7 +3303,7 @@ var DAV = new function() {
           panel.iframe.height($('.content2',panel._dom).height());
           panel.iframe.width($(window).width()-panel.iframe.offset().left);
           $('#poipanel_inventory .list',panel._dom)
-            .height($(panel._dom).height()-$('#poipanel_inventory .list',panel._dom).offset().top+64)
+            .height($(panel._dom).height()-$('#poipanel_inventory .list',panel._dom).offset().top-32)
             .mCustomScrollbar('update');
 
         }

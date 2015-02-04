@@ -61,7 +61,10 @@ $.extend(POI_loader.prototype,{
       $.ajax({
           url: poiLoader.poi_path+panorama.list.currentImage+'.json',
           error: function() {
-            $.notify('Aucune donnée à afficher');
+            $.notify('Aucunes données à afficher',{
+              sticky: false,
+              stayTime: 5000
+            });
             if (panorama.poi) panorama.poi.list={};
             // propagate panorama 'ready' event
             poiLoader.panorama_prototype_callback.apply(e.target,[e]);
