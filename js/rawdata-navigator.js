@@ -3227,6 +3227,7 @@ var DAV = new function() {
 
           var poi={list:{}};
           $.each(panel.panorama.poi.list,function(id){
+            if (id=='cursor') return;
             poi.list[id]={
               coords: this.coords,
               metadata: this.metadata,
