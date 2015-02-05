@@ -2436,7 +2436,7 @@ var DAV = new function() {
         }, // information_parsepoilist
 
         updatepoicount: function information_updatepoicount() {
-          $('#usages .usage.posepoi .poicount').text(n?'('+this.poicount+')':'');
+          $('#usages .usage.posepoi .poicount').text(this.poicount?'('+this.poicount+')':'');
         },
 
         /**
@@ -3248,6 +3248,13 @@ var DAV = new function() {
 
             var poi={};
             var name='p'+(panorama.poi.count++);
+
+            // unique name
+            var offset=0;
+            while(panorama.poi.list[name]){
+              var name='p'+(panorama.poi.count+offset++);
+            }
+
             poi[name]={
                   coords: coords,
                   zoom: panorama.camera.zoom.current,
