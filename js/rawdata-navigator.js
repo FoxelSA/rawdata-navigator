@@ -2413,7 +2413,8 @@ var DAV = new function() {
               success: function(json) {
                 poiPanel.panorama_link=view_panorama_link;
                 if (!json.list) {
-                  information.setpoicount(0);
+                  information.poicount=0;
+                  information.updatepoicount();
                   $('#usages .usage.posepoi .download_poidata').css('display','none');
                   return;
                 }
@@ -2426,15 +2427,16 @@ var DAV = new function() {
         }, // information.show_poiPanel
 
         parsepoilist: function information_parsepoilist(json) {
-          var poicount=0;
+          var information=this;
+          information.poicount=0;
           $.each(json.list,function(){
-            ++poicount;
+            ++information.poicount;
           });
-          information.setpoicount(poicount);
+          information.updatepoicount();
         }, // information_parsepoilist
 
-        setpoicount: function information_setpoicount(n) {
-          $('#usages .usage.posepoi .poicount').text(n?'('+n+')':'');
+        updatepoicount: function information_updatepoicount() {
+          $('#usages .usage.posepoi .poicount').text(n?'('+this.poicount+')':'');
         },
 
         /**
@@ -3102,7 +3104,7 @@ var DAV = new function() {
 
         inventory_click: function poiPanel_inventory_click(e) {
           var panel=this;
-          var li=$(e.target);
+          var li=$(e.target).closest('li');
           var name=li.attr('id');
           panel.panorama.poi.show(name);
         }, // poiPanel_inventory_click
@@ -3238,23 +3240,26 @@ var DAV = new function() {
             console.log(coords);
 
             panorama.poi.count=0;
-            $.each(panorama.poi.list,function(){
-               ++panorama.poi.count;
+            $.each(panorama.poi.list,function(name){
+              if (name!=='cursor') {
+                 ++panorama.poi.count;
+              }
             });
 
             var poi={};
             var name='p'+(panorama.poi.count++);
             poi[name]={
                   coords: coords,
-                  zoom: panorama.camera.zoom.current
+                  zoom: panorama.camera.zoom.current,
+                  draggable: true,
+                  saved: false
             }
             panorama.poi.add(poi);
             panorama.drawScene();
 
             panel.$('#pano canvas').off('mousedown.poipanel');
 
-            panorama.poi.list.cursor.instance.callback('dispose');
-            delete(panorama.poi.list.cursor);
+            panorama.poi.list.cursor.instance.remove();
 
             panel.edit(name);
 
@@ -3309,14 +3314,14 @@ var DAV = new function() {
           $('#poipanel_edit #poi_description').val(data.description||'');
           $('#poipanel_edit',panel._dom).show(0);
 
-        },
+        }, // poiPanel_edit
 
-        editClose: function poiPanel_ediClose() {
+        editClose: function poiPanel_editClose() {
           var panel=this;
           $('#poipanel_edit',panel._dom).hide(0);
           $('#addpoi',panel._dom).text('Ajouter');
           $('div.action:first, #poipanel_inventory',panel._dom).show(0);
-        },
+        }, // poiPanel_editClose
 
         save: function poiPanel_save() {
           var panel=this;
@@ -3359,26 +3364,36 @@ var DAV = new function() {
                 panel.editClose();
 
                 // update poicount
-                information.parsepoilist(panel.panorama.poi);
+                information.poicount=panel.panorama.poi.count;
+                information.updatepoicount();
 
                 panel.addToInventory(panel.currentPOI);
               }
           });
-        },
+
+        }, // poiPanel_save
 
         cancel: function poiPanel_cancel() {
           var panel=this;
 
-          if (panel.panorama.poi.list[panel.currentPOI] && panel.panorama.poi.list[panel.currentPOI].instance) {
-            panel.panorama.poi.list[panel.currentPOI].instance.callback('dispose');
-            panel.panorama.poi.list[panel.currentPOI].instance=null;
-            delete panel.panorama.poi.list[panel.currentPOI];
+          if (panel.panorama.poi.list.cursor){
+           if (panel.panorama.poi.list.cursor.instance) {
+             panel.panorama.poi.list.cursor.instance.remove();
+           } else {
+              delete(panel.panorama.poi.list.cursor);
+           }
           }
-          --panel.panorama.poi.count;
+
+          if (panel.panorama.poi.list[panel.currentPOI] && !panel.panorama.poi.list[panel.currentPOI].saved) {
+            panel.panorama.poi.list[panel.currentPOI].instance.remove();
+            --panel.panorama.poi.count;
+          }
+
           panel.panorama.drawScene();
 
           panel.editClose();
-        },
+
+        }, // poiPanel_cancel
 
         addToInventory: function poiPanel_addToInventory(name){
           var panel=this;
@@ -3394,7 +3409,8 @@ var DAV = new function() {
           li+='<div class="buttons"></div>';
           li+='</li>';
           $('ul.poi',panel._dom).append(li);
-        },
+
+        }, // poiPanel_addToInventory
 
         _panel_resize: Panel.prototype.resize,
         resize: function poiPanel_resize(e){
@@ -3405,10 +3421,8 @@ var DAV = new function() {
           $('#poipanel_inventory .list',panel._dom)
             .height($(panel._dom).height()-$('#poipanel_inventory .list',panel._dom).offset().top-32)
             .mCustomScrollbar('update');
-
-        }
+        } // poiPanel_resize
     });
-
 
 }; // DAV
 

@@ -140,13 +140,11 @@ function WidgetFactory(options) {
 
       }, // widget_init
 
-      ondispose: function widget_ondispose(){
+      remove: function widget_remove(){
 
         var widget=this;
         var panorama=widget.panorama;
         var widgetList=panorama[widget.constructor.name.toLowerCase()];
-
-        widgetList.mesh_list_update();
 
         if (widgetList._active==widget) {
           widgetList._active=null;
@@ -155,6 +153,19 @@ function WidgetFactory(options) {
         if (widgetList._hover==widget) {
           widgetList._hover=null;
         }
+
+        $.each(widgetList.hover,function(index){
+          if (this.object.parent.name==widget.name) {
+            widgetList.hover.splice(index,1);
+          }
+        });
+
+        if (widgetList.list[widget.name]) {
+          widgetList.list[widget.name].instance=null;
+          delete(widgetList.list[widget.name]);
+        }
+
+        widgetList.mesh_list_update();
 
         if (widget.object3D) {
           widget.scene.remove(widget.object3D);
@@ -167,7 +178,10 @@ function WidgetFactory(options) {
 
         $(document).off('.'+Widget.name.toLowerCase()+'_widget_mousedown');
 
-      }, // widget_dispose
+        widget.callback('dispose');
+
+      }, // widget_remove
+
 
       // callback other classes can hook to
       callback: function widget_callback(widget_event) {
@@ -542,7 +556,7 @@ function WidgetFactory(options) {
           $.each(widgetList.list,function widgetList_widget_dispose() {
             var widget=this;
             if (widget.instance){
-              widget.instance.callback('dispose');
+              widget.instance.remove()
               widget.instance=null;
             }
           });
