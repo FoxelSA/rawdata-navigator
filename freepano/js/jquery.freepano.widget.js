@@ -155,7 +155,7 @@ function WidgetFactory(options) {
         }
 
         $.each(widgetList.hover,function(index){
-          if (this.object.parent.name==widget.name) {
+          if (this.object && this.object.parent.name==widget.name) {
             widgetList.hover.splice(index,1);
           }
         });
