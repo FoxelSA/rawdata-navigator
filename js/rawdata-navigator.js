@@ -3170,7 +3170,14 @@ var DAV = new function() {
               sticky: false
           });
 
-          panel.panorama.poi.add({
+          panel.poicursor.init(panel);
+        }, // poiPanel_addPOI 
+
+
+        poicursor: {
+          init: function poicursor_init(panel) {
+            this.panel=panel;
+            panel.panorama.poi.add({
               cursor: {
                 coords: {
                   lon: panel.panorama.lon-90,
@@ -3183,10 +3190,12 @@ var DAV = new function() {
                 handleTransparency: true,
                 handleMouseEvents: false
               }
-          });
-          panel.panorama.drawScene();
+            });
+            panel.panorama.drawScene();
 
-        }, // poiPanel_addPOI 
+            $(window).on('mousemove.poicursor',function(e){console.log(e)});
+          } // poiPanel_poicursor_init
+        }, // poiPanel_poicursor
 
         edit: function poiPanel_edit(name){
           var panel=this;
