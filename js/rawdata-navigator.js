@@ -3136,7 +3136,98 @@ var DAV = new function() {
 
         addPOI: function poiPanel_addPOI() {
           var panel=this;
-          panel.$('#pano canvas').off('mousedown.poipanel').on('mousedown.poipanel',function(e){
+          panel.$.notify('Indiquez un emplacement',{
+              sticky: false
+          });
+
+          panel.poicursor.init(panel);
+        }, // poiPanel_addPOI 
+
+
+        poicursor: {
+          init: function poicursor_init(panel) {
+
+            var poicursor=this;
+            poicursor.panel=panel;
+
+            panel.panorama.poi.add({
+
+              cursor: {
+
+                colors: null,
+
+                coords: {
+                  lon: panel.panorama.lon-90, // not sure, maybe must apply panorama.rotation matrix instead
+                  lat: panel.panorama.lat
+                },
+
+                mesh: new panel.window.THREE.Mesh(new panel.window.THREE.PlaneGeometry(Math.PI/18,Math.PI/18,1,1), new panel.window.THREE.MeshBasicMaterial({
+                   map: panel.window.poicursor_texture,
+                   transparent: true
+                })),
+
+                handleTransparency: true,
+
+                onmousedown: function(e){
+                  poicursor.mousedown(e);
+                },
+
+                onmouseup: function(e){
+                  poicursor.mouseup(e);
+                  return false;
+                }
+
+              } // cursor
+
+            });
+
+            panel.panorama.drawScene();
+
+          }, // poiPanel_poicursor_init
+
+          mousedown: function poiPanel_poicursor_mousedown(e) {
+
+            var poicursor=this;
+            var panel=poicursor.panel;
+
+            panel.$(panel.panorama.renderer.context.canvas).on('mousemove.poicursor',function(e){
+
+              e.stopPropagation();
+              e.preventDefault();
+
+              var mc=panel.panorama.getMouseCoords(e);
+              mc.lon-=180;
+              mc.lat+=panel.panorama.lat;
+              mc.lon+=panel.panorama.lon;
+
+              panel.panorama.poi.list.cursor.instance.coords.lon=mc.lon%360;
+              panel.panorama.poi.list.cursor.instance.coords.lat=mc.lat%180;
+              if (panel.panorama.poi.list.cursor.instance.coords.lon<0) panel.panorama.poi.list.cursor.instance.coords.lon+=360; 
+
+              panel.panorama.drawScene();
+
+              return false;
+            })
+            .css('cursor','none')
+            .on('mouseup.poicursor',function(e){
+              poicursor.mouseup(e);
+              return false;
+            });
+
+          }, // poiPanel_poicursor_mousedown
+
+          mouseup: function poiPanel_poicursor_mouseup(e){
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            var poicursor=this;
+            var panel=poicursor.panel;
+
+            panel.$(panel.panorama.renderer.context.canvas)
+             .off('.poicursor')
+             .css('cursor','');
+
             var panorama=panel.panorama;
             var coords=panorama.getMouseCoords(e);
             coords.lon-=180;
@@ -3162,40 +3253,42 @@ var DAV = new function() {
 
             panel.$('#pano canvas').off('mousedown.poipanel');
 
+            panorama.poi.list.cursor.instance.callback('dispose');
+            delete(panorama.poi.list.cursor);
+
             panel.edit(name);
 
-          });
+          }
 
-          panel.$.notify('Indiquez un emplacement',{
-              sticky: false
-          });
-
-          panel.poicursor.init(panel);
-        }, // poiPanel_addPOI 
-
-
-        poicursor: {
-          init: function poicursor_init(panel) {
-            this.panel=panel;
-            panel.panorama.poi.add({
-              cursor: {
-                coords: {
-                  lon: panel.panorama.lon-90,
-                  lat: panel.panorama.lat
-                },
-                mesh: new panel.window.THREE.Mesh(new panel.window.THREE.PlaneGeometry(Math.PI/18,Math.PI/18,1,1), new panel.window.THREE.MeshBasicMaterial({
-                   map: panel.window.poicursor_texture,
-                   transparent: true
-                })),
-                handleTransparency: true,
-                handleMouseEvents: false
-              }
-            });
-            panel.panorama.drawScene();
-
-            $(window).on('mousemove.poicursor',function(e){console.log(e)});
-          } // poiPanel_poicursor_init
         }, // poiPanel_poicursor
+
+        mouseoverlay: {
+
+          show: function poiPanel_mouseoverlay_show() {
+
+            var div=this.div=$('#mouseoverlay');
+            if (!div.length) {
+              div=$('<div id="mouseoverlay" />').appendTo('body');
+            }
+
+            div.css({
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                height: '100%',
+                width: '100%',
+                zIndex: 1000000,
+                display: 'block',
+                cursor: 'none'
+            });
+
+          }, // poiPanel_mouseoverlay_show
+
+          hide: function poiPanel_mouseoverlay_hide() {
+            this.div.hide(0);
+          }
+
+        }, // poiPanel_mouseoverlay
 
         edit: function poiPanel_edit(name){
           var panel=this;
@@ -3258,6 +3351,7 @@ var DAV = new function() {
                   $.notify('Error: Save failed !');
                   return;
                 }
+
                 try {
                   panel.panorama.poi.mesh_list_update();
                 } catch(e){}
@@ -3282,10 +3376,6 @@ var DAV = new function() {
           }
           --panel.panorama.poi.count;
           panel.panorama.drawScene();
-
-          try {
-            panel.panorama.poi.mesh_list_update();
-          } catch(e){}
 
           panel.editClose();
         },

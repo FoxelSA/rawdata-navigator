@@ -144,14 +144,28 @@ function WidgetFactory(options) {
 
         var widget=this;
         var panorama=widget.panorama;
+        var widgetList=panorama[widget.constructor.name.toLowerCase()];
+
+        widgetList.mesh_list_update();
+
+        if (widgetList._active==widget) {
+          widgetList._active=null;
+        }
+
+        if (widgetList._hover==widget) {
+          widgetList._hover=null;
+        }
 
         if (widget.object3D) {
           widget.scene.remove(widget.object3D);
           widget.object3D=null;
         }
+
         if (typeof(widget.mesh)=="object") {
           widget.mesh=null;
         }
+
+        $(document).off('.'+Widget.name.toLowerCase()+'_widget_mousedown');
 
       }, // widget_dispose
 
@@ -688,9 +702,20 @@ function WidgetFactory(options) {
           if (widgetList.hover.length) {
 
               // trigger mouseout and return
-              widgetList.list[widgetList.hover[0].object.parent.name].instance._onmouseout(e);
-              widgetList.list[widgetList.hover[0].object.parent.name].instance.onmouseout(e);
+              try {
+
+                if (widgetList.list[widgetList.hover[0].object.parent.name] &&
+                    widgetList.list[widgetList.hover[0].object.parent.name].instance) {
+                      widgetList.list[widgetList.hover[0].object.parent.name].instance._onmouseout(e);
+                      widgetList.list[widgetList.hover[0].object.parent.name].instance.onmouseout(e);
+                }
+
+              } catch(e) {
+                console.log(e);
+              }
+
               widgetList.hover=[];
+
               return;
           }
         }
