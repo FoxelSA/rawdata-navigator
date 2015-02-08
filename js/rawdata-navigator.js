@@ -3112,7 +3112,7 @@ var DAV = new function() {
         inventory_update: function poiPanel_inventory_update() {
           var panel=this;
           $.each(panel.panorama.poi.list,function(name){
-            poiPanel.addToInventory(name);
+            poiPanel.addToInventory(name,{prepend: true});
           });
           $('#poipanel_inventory .list',panel._dom).mCustomScrollbar({
               axis: 'y',
@@ -3374,7 +3374,7 @@ var DAV = new function() {
                 information.poicount=panel.panorama.poi.count;
                 information.updatepoicount();
 
-                panel.addToInventory(panel.currentPOI);
+                panel.addToInventory(panel.currentPOI,{prepend: true});
               }
           });
 
@@ -3402,11 +3402,11 @@ var DAV = new function() {
 
         }, // poiPanel_cancel
 
-        addToInventory: function poiPanel_addToInventory(name){
+        addToInventory: function poiPanel_addToInventory(name,options){
           var panel=this;
           var data=panel.panorama.poi.list[name].metadata;
           var li='<li id="'+name+'">';
-          li+='<div>';
+          li+='<div class="thumb">';
           li+='<canvas class="poithumb" />';
           li+='</div>';
           li+='<div class="details">';
@@ -3415,7 +3415,12 @@ var DAV = new function() {
           li+='</div>'; // .details
           li+='<div class="buttons"></div>';
           li+='</li>';
-          $('ul.poi',panel._dom).append(li);
+          if (options && options.prepend){
+            $('ul.poi',panel._dom).prepend(li);
+          } else {
+            $('ul.poi',panel._dom).append(li);
+          }
+          $('li#'+name+' canvas',panel._dom).replaceWith(panel.panorama.poi.list[name].thumb.canvas);
 
         }, // poiPanel_addToInventory
 
