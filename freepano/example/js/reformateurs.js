@@ -57,7 +57,7 @@ $(document).ready(function(){
   // load image with alpha channel to use as POI cursor
   window.poicursor_texture=new THREE.ImageUtils.loadTexture(
     '../../img/dav-cursor.png',
-    new THREE.UVMapping(),
+    THREE.UVMapping,
     file_onload,
     function onloaderror() {
       $.notify('Cannot load dav-cursor.png !');

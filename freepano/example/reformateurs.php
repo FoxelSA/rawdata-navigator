@@ -104,7 +104,7 @@ if (isset($_GET['action']) && $_GET['action']=="poi_list") {
     <script type="text/javascript" src="../js/thirdparty/hammer.js/hammer-2.0.4.min.js"></script>
     <script type="text/javascript" src="../js/thirdparty/watch-1.3.0.js"></script>
     <script type="text/javascript" src="../js/thirdparty/leaflet/leaflet-0.7.3.min.js"></script>
-    <script type="text/javascript" src="../js/thirdparty/three.js/three-r69.min.js"></script>
+    <script type="text/javascript" src="../js/thirdparty/three.js/three-r70.min.js"></script>
     <script type="text/javascript" src="../js/thirdparty/three.js/postprocessing/EffectComposer.js"></script>
     <script type="text/javascript" src="../js/thirdparty/three.js/postprocessing/RenderPass.js"></script>
     <script type="text/javascript" src="../js/thirdparty/three.js/postprocessing/MaskPass.js"></script>
@@ -118,6 +118,7 @@ if (isset($_GET['action']) && $_GET['action']=="poi_list") {
     <script type="text/javascript" src="../js/jquery.freepano.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.widget.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.poi.js"></script>
+    <script type="text/javascript" src="../js/jquery.freepano.poi.thumbnails.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.poi.loader.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.arrow.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.sound.js"></script>
