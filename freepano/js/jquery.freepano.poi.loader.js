@@ -70,7 +70,7 @@ $.extend(POI_loader.prototype,{
             poiLoader.panorama_prototype_callback.apply(e.target,[e]);
           },
           success: function(poi_list) {
-            panorama.poi=$.extend(true,panorama.poi,panorama.defaults.poi,poi_list);
+            panorama.poi=$.extend(true,panorama.poi,panorama.defaults.poi,poiLoader.defaults.poi,poi_list);
             // propagate panorama 'ready' event
             poiLoader.panorama_prototype_callback.apply(e.target,[e]);
             panorama.drawScene();

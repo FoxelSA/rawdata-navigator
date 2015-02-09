@@ -135,7 +135,7 @@ $(document).on('filesloaded', function(){
     }
 
 */
-/*
+
     // panorama.camera: main camera options
 
     camera: {
@@ -146,12 +146,12 @@ $(document).on('filesloaded', function(){
         current: 1.0,
 
         // maximal zoom value
-        max: 1.5
+        max: 5
 
       }
 
     }, // camera
-
+/*
     // panorama.sphere: sphere object defaults
     // normally you dont need to modify this
 
@@ -770,6 +770,12 @@ $(document).on('filesloaded', function(){
 
     postProcessing: {
       enabled: false,
+
+      green: {
+        shader: THREE.GreenShader,
+        enabled: false
+      },
+
       edge: {
         shader: THREE.EdgeShader,
         enabled: false,
@@ -809,6 +815,9 @@ $(document).on('filesloaded', function(){
     case 50:
       toggleEffect(panorama.postProcessing.edge2);
       break;
+    case 51:
+      toggleEffect(panorama.postProcessing.green);
+      break;
     case 77:
       var map = panorama.map;
       if(map) {
@@ -817,7 +826,7 @@ $(document).on('filesloaded', function(){
       break;
     }
 
-    if (panorama.postProcessing) panorama.postProcessing.enabled=panorama.postProcessing.edge.pass.enabled||panorama.postProcessing.edge2.pass.enabled;
+    if (panorama.postProcessing) panorama.postProcessing.enabled=panorama.postProcessing.edge.pass.enabled||panorama.postProcessing.edge2.pass.enabled||panorama.postProcessing.green.pass.enabled;
   });
 
   function toggleEffect(effect){

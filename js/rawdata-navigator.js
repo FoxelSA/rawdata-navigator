@@ -3245,17 +3245,20 @@ var DAV = new function() {
 
               cursor: {
 
-                radius: 14.9,
+                radius: 14.9, //  < POI.prototype.radius
 
                 coords: {
                   lon: panel.panorama.lon-90, // not sure, maybe must apply panorama.rotation matrix instead
                   lat: panel.panorama.lat
                 },
 
-                mesh: new panel.window.THREE.Mesh(new panel.window.THREE.PlaneGeometry(Math.PI/4,Math.PI/4,1,1), new panel.window.THREE.MeshBasicMaterial({
+                mesh: new panel.window.THREE.Mesh(
+                  new panel.window.THREE.PlaneGeometry(Math.PI/4,Math.PI/4,1,1),
+                  new panel.window.THREE.MeshBasicMaterial({
                    map: panel.window.poicursor_texture,
                    transparent: true
-                })),
+                  })
+                ),
 
                 handleTransparency: true,
 

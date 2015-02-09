@@ -110,6 +110,7 @@ if (isset($_GET['action']) && $_GET['action']=="poi_list") {
     <script type="text/javascript" src="../js/thirdparty/three.js/postprocessing/MaskPass.js"></script>
     <script type="text/javascript" src="../js/thirdparty/three.js/postprocessing/ShaderPass.js"></script>
     <script type="text/javascript" src="../js/thirdparty/three.js/shaders/CopyShader.js"></script>
+    <script type="text/javascript" src="../js/thirdparty/three.js/shaders/GreenShader.js"></script>
     <script type="text/javascript" src="../js/thirdparty/three.js/shaders/EdgeShader.js"></script>
     <script type="text/javascript" src="../js/thirdparty/three.js/shaders/EdgeShader2.js"></script>
     <script type="text/javascript" src="../js/thirdparty/howler.js/howler.core.js"></script>

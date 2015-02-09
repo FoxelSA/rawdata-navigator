@@ -88,12 +88,12 @@ function WidgetFactory(options) {
         overlay: true,
         mesh: null,
         object3D: null,
-        radius: Math.PI ,
+        radius: 15,
         coords: {
           lon: 0,
           lat: 90
         },
-        size: Math.PI/36,
+        size: Math.PI/9,
         handleTransparency: true,
         lookAtVec3: new THREE.Vector3(0,0,0)
       },
@@ -490,7 +490,7 @@ function WidgetFactory(options) {
             var options=$.extend(
               true,
               {},
-              widgetList.defaults,
+              widgetList.defaults[widgetList.constructor.name.split('_')[0].toLowerCase()], // ugly
               { scene: panorama.scene,
                 camera: panorama.camera
               },

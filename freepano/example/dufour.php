@@ -89,7 +89,7 @@ if (isset($_GET['action']) && $_GET['action']=="poi_list") {
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <title>Freepano Example - https://github.com/FoxelSA/freepano</title>
-    <!--meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimum-scale=1,maximum-scale=1" /->
+    <!--meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimum-scale=1,maximum-scale=1" /-->
     <script type="text/javascript">
         <?php if (isset($_GET['initial'])): ?>
             var initialImage = '<?php print ($_GET['initial']); ?>';
@@ -109,6 +109,7 @@ if (isset($_GET['action']) && $_GET['action']=="poi_list") {
     <script type="text/javascript" src="../js/thirdparty/three.js/postprocessing/MaskPass.js"></script>
     <script type="text/javascript" src="../js/thirdparty/three.js/postprocessing/ShaderPass.js"></script>
     <script type="text/javascript" src="../js/thirdparty/three.js/shaders/CopyShader.js"></script>
+    <script type="text/javascript" src="../js/thirdparty/three.js/shaders/GreenShader.js"></script>
     <script type="text/javascript" src="../js/thirdparty/three.js/shaders/EdgeShader.js"></script>
     <script type="text/javascript" src="../js/thirdparty/three.js/shaders/EdgeShader2.js"></script>
     <script type="text/javascript" src="../js/thirdparty/howler.js/howler.core.js"></script>

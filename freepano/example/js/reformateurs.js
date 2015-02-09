@@ -138,6 +138,7 @@ $(document).on('filesloaded', function(){
 /*
     // panorama.camera: main camera options
 
+*/
     camera: {
 
       zoom: {
@@ -146,12 +147,12 @@ $(document).on('filesloaded', function(){
         current: 1.0,
 
         // maximal zoom value
-        max: 1.5
+        max: 5
 
       }
 
     }, // camera
-
+/*
     // panorama.sphere: sphere object defaults
     // normally you dont need to modify this
 
@@ -240,9 +241,11 @@ $(document).on('filesloaded', function(){
       // use a secondary scene for rendering widgets (eg when using filters)
       overlay: true,
 
-      // panorama.poi.defaults: default values for POIs
+      // panorama.poi.defaults: default values for POI_list
       defaults: {
 
+        // panorama.poi.defaults.poi: default values for POIs
+        poi: {
           // set to false to disable mouse event handling
           handleMousevents: true,
 
@@ -252,6 +255,24 @@ $(document).on('filesloaded', function(){
              normal: '#000000',
              selected: '#ecb100'
           },
+
+          wesh: function DAV_poi_object3D(){
+              var poi=this;
+              var object3D=new THREE.Object3D();
+              var title=text2canvas(poi.metadata.name);
+              console.log(title);
+              var mesh=new THREE.Mesh(
+                new THREE.PlaneBufferGeometry(title.width,title.height),
+                new THREE.MeshBasicMaterial({
+                 map: new THREE.Texture(title),
+                 transparent: true,
+                })
+              );
+return mesh;
+              object3D.add(mesh);
+              return object3D;
+          } 
+        }
 
           // event handlers below are already filtered
           // eg: mousein and mouseout are not triggered during panorama rotation
@@ -1199,6 +1220,13 @@ $(document).on('filesloaded', function(){
 
     postProcessing: {
       enabled: false,
+
+      green: {
+        shader: THREE.GreenShader,
+        enabled: false,
+        uniforms: {}
+      },
+
       edge: {
         shader: THREE.EdgeShader,
         enabled: false,
@@ -1238,6 +1266,9 @@ $(document).on('filesloaded', function(){
     case 50:
       toggleEffect(panorama.postProcessing.edge2);
       break;
+    case 51:
+      toggleEffect(panorama.postProcessing.green);
+      break;
     case 77:
       var map = panorama.map;
       if(map) {
@@ -1246,7 +1277,7 @@ $(document).on('filesloaded', function(){
       break;
     }
 
-    if (panorama.postProcessing) panorama.postProcessing.enabled=panorama.postProcessing.edge.pass.enabled||panorama.postProcessing.edge2.pass.enabled;
+    if (panorama.postProcessing) panorama.postProcessing.enabled=panorama.postProcessing.edge.pass.enabled||panorama.postProcessing.edge2.pass.enabled||panorama.postProcessing.green.pass.enabled;
   });
 
   function toggleEffect(effect){
@@ -1255,3 +1286,26 @@ $(document).on('filesloaded', function(){
   }
 
 });
+
+window.text2canvas=function(text,options) {
+  if (!options) options={};
+  var canvas=document.createElement('canvas');
+  var ctx=canvas.getContext('2d');
+  ctx.font=options.font||"Bold 12px Helvetica";
+  ctx.fillStyle=options.fillStyle||"rgba(0,0,0,0.8)";
+  ctx.strokeStyle=options.strokeStyle||"rgba(255,255,255,0.8)";
+  var size=ctx.measureText(text);
+  var hpadding=options.hpadding||8;
+  var vpadding=options.vpadding||8;
+  canvas.width=size.width+hpadding*2;
+  canvas.height=20+vpadding*2;
+  ctx=canvas.getContext('2d');
+  ctx.font=options.font||"Bold 12px Helvetica";
+  ctx.fillStyle=options.fillStyle||"rgba(0,0,0,0.8)";
+  ctx.strokeStyle=options.strokeStyle||"rgba(255,255,255,0.8)";
+  var size=ctx.measureText(text);
+  ctx.strokeText(text,hpadding,vpadding);
+  return canvas;                                                                                                      
+}  
+   
+
