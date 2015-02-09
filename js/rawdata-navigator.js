@@ -2969,7 +2969,7 @@ var DAV = new function() {
             var date=new Date(vignette.pose.sec*1000);
             var html='';
 
-            if (allocation.type() == 'panorama' || allocation.type() == 'poi') {
+            if (allocation.type() == 'panorama') {
                 var testpanoimg = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-7200)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
                 // test panorama
                 $.ajax({
@@ -2987,10 +2987,42 @@ var DAV = new function() {
                 html+='<div class="timestamp">'+date.getSimpleUTCDate()+'</div>';
                 html+='<img class="thumb" alt="n/a"></img>';
                 html+='<div class="info">';
-                if (allocation.type() == 'poi')
-                    html+='<div class="what">Points d\'intérêt</div></div></div>';
-                else
-                    html+='<div class="what">Panorama</div></div></div>';
+                html+='<div class="what">Panorama</div></div></div>';
+            } else if (allocation.type() == 'poi') {
+                var testpanoimg = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-7200)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
+
+                var view_panorama_link_listpoi = document.location.origin+'/dav/freepano/example/';
+                if (vignette.segment == '1404381299')
+                    view_panorama_link_listpoi += 'reformateurs.php';
+                else if (vignette.segment == '1404383663')
+                    view_panorama_link_listpoi += 'dufour.php';
+                view_panorama_link_listpoi += '?initial='+(vignette.pose.sec-7200)+'_'+vignette.pose.usc;
+
+                // test poilist
+                $.ajax({
+                    url: view_panorama_link_listpoi+'&action=poi_list',
+                    error: function() {
+                        $('#vignettes div.wrap.vignette'+index).remove();
+                    },
+                    success: function(json) {
+                        if (json == null || !json.list) {
+                            $('#vignettes div.wrap.vignette'+index).remove();
+                        } else {
+                            var pointcountvignette = 0;
+                            $.each(json.list,function(){
+                                pointcountvignette++;
+                            });
+                            $('#vignettes div.wrap.vignette'+index+' .countpoivignette').html(''+pointcountvignette);
+                            $('#vignettes div.wrap.vignette'+index+' img.thumb').attr('src',testpanoimg);
+                            $('#vignettes div.wrap.vignette'+index).css('display','block');
+                        }
+                    }
+                });
+                html+='<div class="wrap vignette'+index+'" style="display:none;">';
+                html+='<div class="timestamp">'+date.getSimpleUTCDate()+'</div>';
+                html+='<img class="thumb" alt="n/a"></img>';
+                html+='<div class="info">';
+                html+='<div class="what">Points d\'intérêt (<span class="countpoivignette"></span>)</div></div></div>';
             } else if (allocation.type() == 'pointcloud') {
                 if ($('#vignettes div.wrap.segment'+vignette.segment).length == 0) {
                     html+='<div class="wrap vignette'+index+' segment'+vignette.segment+'">';
