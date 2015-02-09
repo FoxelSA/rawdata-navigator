@@ -249,35 +249,14 @@ $(document).on('filesloaded', function(){
           color: {
              active: '#0000ff',
              hover: '#ffffff',
-             normal: '#000000'
+             normal: '#000000',
+             selected: '#ecb100'
           },
 
           // event handlers below are already filtered
           // eg: mousein and mouseout are not triggered during panorama rotation
           // if you really need, you can hook to the 'private' methods (eg: _mousein)
 
-          onmousein: function poi_mousein(e) {
-            console.log('mousein',this);
-          },
-
-          onmouseout: function poi_mouseout(e) {
-            console.log('mouseout',this);
-          },
-
-          onmouseover: function poi_mouseover(e) {
-          },
-
-          onmousedown: function poi_mousedown(e) {
-            console.log('mousedown',this);
-          },
-
-          onmouseup: function poi_mouseup(e) {
-            console.log('mouseup',this);
-          },
-
-          onclick: function poi_click(e) {
-            console.log('click',this);
-          },
       },
     },
 

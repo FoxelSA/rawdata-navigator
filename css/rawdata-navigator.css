@@ -1144,6 +1144,10 @@ ul.poi li:active {
   transform: scale(0.99);
 }
 
+ul.poi li.selected {
+  border-color: #ecb100;
+}
+
 canvas.poithumb {
   transform: scale(1,-1);
 

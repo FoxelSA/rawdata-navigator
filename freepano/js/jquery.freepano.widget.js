@@ -197,6 +197,32 @@ function WidgetFactory(options) {
         }
       }, // widget_callback
 
+      // setup widget_callback hook for specified instance or prototype
+      setupCallback: function widget_setupCallback(obj) {
+
+          obj.widget_prototype_callback=Widget.prototype.callback;
+
+          obj.widget_callback=function(e) {
+             var widget=this;
+             if (typeof(e)=="string") {
+               e={
+                 type: e,
+                 target: widget
+               }
+             }
+             var method='on_'+widget.constructor.name.toLowerCase()+'_'+e.type;
+             if (obj[method]) {
+               if (obj[method].apply(widget,[e])===false) {
+                  return false;
+               }
+             }
+             return obj.widget_prototype_callback.apply(e.target,[e]);
+          }
+
+          Widget.prototype.callback=obj.widget_callback;
+
+      }, // widget_setupCallback
+
       onready: function widget_ready(widget_event) {
         var widget=this;
         widget.object3D.name=widget.name;
@@ -290,6 +316,24 @@ function WidgetFactory(options) {
       },
 
       onclick: function widget_click(e) {
+        var widget=this;
+        var widgetList=widget.panorama[this.constructor.name.toLowerCase()];
+        // todo: handle multiple selection, with shift and ctrl modifiers
+        if (widget.color && widget.color.selected) {
+          if (!widget.selected){
+            widget.selected=true;
+            widget.setColor(widget.color.selected);
+            $.each(widgetList.list,function(name){
+              var _widget=this.instance;
+              if (_widget.selected && _widget!=widget){
+                _widget.selected=false;
+                _widget.setColor(_widget.color.normal)
+                _widget.callback('unselect');
+              }
+            });
+            widget.callback('select');
+          }
+        }
         console.log('click',this);
       },
 
@@ -309,7 +353,7 @@ function WidgetFactory(options) {
               widget.setColor(widget.color.hover);
               widget.panorama.drawScene();
             } else {
-              widget.setColor(widget.color.normal);
+              widget.setColor(widget.selected?widget.color.selected:widget.color.normal);
               widget.panorama.drawScene();
             }
             widgetList._active=null;
@@ -363,9 +407,10 @@ function WidgetFactory(options) {
       }, // _widget_mousein
 
       _onmouseout: function _widget_mouseout(e){
-        if (!this.color || this.panorama.mode.rotate) return;
-        this.panorama[this.constructor.name.toLowerCase()]._hover=null;
-        this.setColor(this.color.normal);
+        var widget=this;
+        if (!widget.color || widget.panorama.mode.rotate) return;
+        widget.panorama[widget.constructor.name.toLowerCase()]._hover=null;
+        widget.setColor(widget.selected?widget.color.selected:widget.color.normal);
       }, // _widget_mouseout
 
       setColor: function widget_setColor(color) {

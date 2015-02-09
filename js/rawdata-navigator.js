@@ -3081,6 +3081,7 @@ var DAV = new function() {
               panel.panorama=panel.$('#pano').data('pano');
               panel.panorama.setupCallback(panel);
               poiPanel.window.POI_list.prototype.setupCallback(poiPanel);
+              poiPanel.window.POI.prototype.setupCallback(poiPanel);
               panel.toggle();
               setTimeout(function(){panel.resize()},1000);
             });
@@ -3106,6 +3107,7 @@ var DAV = new function() {
           var panel=this;
           var li=$(e.target).closest('li');
           var name=li.attr('id');
+          panel.inventory_setSelection([name],e);
           panel.panorama.poi.show(name);
         }, // poiPanel_inventory_click
 
@@ -3128,6 +3130,41 @@ var DAV = new function() {
           poiPanel.resize();
 
         }, // poiPanel_inventory_update
+
+        inventory_setSelection: function poiPanel_inventory_setSelection(list){
+          var panel=this;
+          var poilist=panel.panorama.poi;
+          $.each(poilist.list,function(name){
+            var poi=this.instance;
+            if (list.indexOf(name)<0) {
+              if (poi.selected) {
+                poi.selected=false;
+                poi.setColor(poi.color.normal);
+                $('#'+name,panel._dom).removeClass('selected');
+              }
+            } else {
+              if (!poi.selected) {
+                poi.selected=true;
+                poi.setColor(poi.color.selected);
+                $('#'+name,panel._dom).addClass('selected');
+              }
+            }
+          });
+        }, // poiPanel_inventory_setSelection
+
+        on_poi_unselect: function poiPanel_on_poi_unselect(e) {
+          var poi=this;
+          poi.selected=true; // so that inventory_setSelection update it
+          poiPanel.inventory_setSelection([]);
+        },
+
+        on_poi_select: function poiPanel_on_poi_select(e) {
+          var poi=this;
+          poi.selected=false; // so that inventory_setSelection update it
+          poiPanel.inventory_setSelection([poi.thumb.poiname]);
+          // scroll to selected element
+          $('#poipanel_inventory .list',poiPanel._dom).mCustomScrollbar("scrollTo",'#'+poi.thumb.poiname);
+        },
 
         on_panorama_ready: function poiPanel_on_panorama_ready() {
         },
