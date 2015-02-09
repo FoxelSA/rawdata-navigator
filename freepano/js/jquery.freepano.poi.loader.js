@@ -58,6 +58,12 @@ $.extend(POI_loader.prototype,{
     on_panorama_ready: function poiLoader_onPanoramaReady(e){
       var panorama=this;
       var poiLoader=panorama.poiLoader;
+
+      if (!document.location.search.match(/action=poi_edit/)) {
+         if (panorama.poi) panorama.poi.list={};
+         return;
+      }
+
       $.ajax({
           url: poiLoader.poi_path+panorama.list.currentImage+'.json',
           error: function() {
