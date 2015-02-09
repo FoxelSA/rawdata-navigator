@@ -1627,7 +1627,17 @@ var DAV = new function() {
       _expand: true,
       _dom: "#freepanel",
       _background_alpha: 1.0,
-      url: document.location.origin+'/freepano'
+      url: document.location.origin+'/freepano',
+      _panel_init: Panel.prototype.init,
+      init: function freepanel_init() {
+        var freepanel=this;
+        freepanel._panel_init();
+        $(document).on('keydown',function(e){
+          if (freepanel.visible && freepanel.istoplevel()) {
+            freepanel.$(freepanel.window.document).trigger(e);
+          }
+        });
+      } 
   });
 
   /**
@@ -3173,10 +3183,21 @@ var DAV = new function() {
      */
     this.viewFreepano = function(item) {
         var panel=window._panels['freepanel'];
+        var iframe=panel.iframe=$('iframe',panel._dom);
+        overlay.show('Loading panorama viewer...');
         if ($('iframe',panel._dom).attr('src')!=$(item).data('href')) {
-          $('iframe',panel._dom).attr('src',$(item).data('href')).off('load').on('load',function(){panel.toggle()});
+          $('iframe',panel._dom).attr('src',$(item).data('href')).off('load').on('load',function(){
+            overlay.hide();
+            panel.window=iframe[0].contentWindow;
+            panel.$=panel.window.$;
+            panel.panorama=panel.$('#pano').data('pano');
+            panel.panorama.setupCallback(panel);
+            panel.toggle();
+            setTimeout(function(){panel.resize()},1000);
+          });
         } else {
           panel.toggle();
+          setTimeout(function(){panel.resize()},1000);
         }
     };
 
