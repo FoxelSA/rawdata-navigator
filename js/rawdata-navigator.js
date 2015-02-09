@@ -544,6 +544,7 @@ var DAV = new function() {
             // add options
             var group1 = $('<optgroup>',{'label':'Régions'});
             var group2 = $('<optgroup>',{'label':'Projets'});
+            var group3 = $('<optgroup>',{'label':'Type de données'});
 
             group2.append($('<option>',{'value':'both'}).text('SITG'));
             group1.append($('<option>',{'value':'both'}).text('Genève'));
@@ -555,8 +556,13 @@ var DAV = new function() {
             group2.append($('<option>',{'value':'dufour'}).text('Statue Dufour'));
             group2.append($('<option>',{'value':'both'}).text('Street View'));
 
+            group3.append($('<option>',{'value':'raw'}).text('RAW'));
+            group3.append($('<option>',{'value':'panorama'}).text('Panorama'));
+            group3.append($('<option>',{'value':'pointcloud'}).text('Point Cloud'));
+
             this._component.append(group2);
             this._component.append(group1);
+            this._component.append(group3);
 
 
             // load
@@ -603,6 +609,13 @@ var DAV = new function() {
          */
         quicksearch: function(item) {
             this._component.val([item]).trigger('change');
+        },
+
+        /**
+         * allocation.quicksearchmulti()
+         */
+        quicksearchmulti: function(items) {
+            this._component.val(items).trigger('change');
         },
 
         /**
@@ -925,6 +938,12 @@ var DAV = new function() {
                     }
 
                     if (allocation.current.val.indexOf('reformateurs') > -1) {
+                        hasReformateurs = true;
+                    }
+
+                    if ((allocation.current.val.indexOf('raw') > -1 || allocation.current.val.indexOf('panorama') > -1 || allocation.current.val.indexOf('pointcloud') > -1)
+                        && allocation.current.val.indexOf('dufour') == -1 && allocation.current.val.indexOf('reformateurs') == -1) {
+                        hasDufour = true;
                         hasReformateurs = true;
                     }
 
@@ -3183,7 +3202,7 @@ var DAV = new function() {
           });
 
           panel.poicursor.init(panel);
-        }, // poiPanel_addPOI 
+        }, // poiPanel_addPOI
 
 
         poicursor: {
@@ -3244,7 +3263,7 @@ var DAV = new function() {
 
               panel.panorama.poi.list.cursor.instance.coords.lon=mc.lon%360;
               panel.panorama.poi.list.cursor.instance.coords.lat=mc.lat%180;
-              if (panel.panorama.poi.list.cursor.instance.coords.lon<0) panel.panorama.poi.list.cursor.instance.coords.lon+=360; 
+              if (panel.panorama.poi.list.cursor.instance.coords.lon<0) panel.panorama.poi.list.cursor.instance.coords.lon+=360;
 
               panel.panorama.drawScene();
 
