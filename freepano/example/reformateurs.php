@@ -14,7 +14,6 @@ if (isset($_POST['cmd'])) {
   exit(1);
 }
 
-
 if (isset($_GET['initial'])) {
   $json=$poi_path.$_GET['initial'].".json";
 }
@@ -139,7 +138,7 @@ if (isset($_GET['action']) && $_GET['action']=="poi_list") {
 
 <div id="pano" class="freepano"></div>
 
-<footer>
+<!--footer>
     <div class="shade"></div>
     <div class="main">
         <div class="caption">
@@ -150,7 +149,7 @@ if (isset($_GET['action']) && $_GET['action']=="poi_list") {
             <a href="http://foxel.ch/" target="_blank"><img src="img/foxel.png" alt="FOXEL" width="71" height="18" /></a>
         </div>
     </div>
-</footer>
+</footer-->
 
 </body>
 </html>

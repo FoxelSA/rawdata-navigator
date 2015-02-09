@@ -137,7 +137,7 @@ if (isset($_GET['action']) && $_GET['action']=="poi_list") {
 
 <div id="pano" class="freepano"></div>
 
-<footer>
+<!--footer>
     <div class="shade"></div>
     <div class="main">
         <div class="caption">
@@ -148,7 +148,7 @@ if (isset($_GET['action']) && $_GET['action']=="poi_list") {
             <a href="http://foxel.ch/" target="_blank"><img src="img/foxel.png" alt="FOXEL" width="71" height="18" /></a>
         </div>
     </div>
-</footer>
+</footer-->
 
 </body>
 </html>
