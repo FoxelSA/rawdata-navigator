@@ -558,6 +558,7 @@ var DAV = new function() {
 
             group3.append($('<option>',{'value':'raw'}).text('RAW'));
             group3.append($('<option>',{'value':'panorama'}).text('Panorama'));
+            group3.append($('<option>',{'value':'poi'}).text('Points d\'intérêt'));
             group3.append($('<option>',{'value':'pointcloud'}).text('Point Cloud'));
 
             this._component.append(group2);
@@ -941,7 +942,7 @@ var DAV = new function() {
                         hasReformateurs = true;
                     }
 
-                    if ((allocation.current.val.indexOf('raw') > -1 || allocation.current.val.indexOf('panorama') > -1 || allocation.current.val.indexOf('pointcloud') > -1)
+                    if ((allocation.current.val.indexOf('raw') > -1 || allocation.current.val.indexOf('panorama') > -1 || allocation.current.val.indexOf('poi') > -1 || allocation.current.val.indexOf('pointcloud') > -1)
                         && allocation.current.val.indexOf('dufour') == -1 && allocation.current.val.indexOf('reformateurs') == -1) {
                         hasDufour = true;
                         hasReformateurs = true;

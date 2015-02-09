@@ -526,6 +526,7 @@
         <h3>Recherche rapide</h3>
         <a href="#" class="quick" onclick="DAV.allocation.quicksearchmulti(['both','raw']);return false;">Projet SITG (RAW)</a>
         <a href="#" class="quick" onclick="DAV.allocation.quicksearchmulti(['both','panorama']);return false;">Projet SITG (Panoramas)</a>
+        <a href="#" class="quick" onclick="DAV.allocation.quicksearchmulti(['both','poi']);return false;">Projet SITG (Points d'intérêts)</a>
         <a href="#" class="quick" onclick="DAV.allocation.quicksearchmulti(['both','pointcloud']);return false;">Projet SITG (Point Clouds)</a>
         <a style="margin-top:20px;" href="#" class="quick" onclick="DAV.allocation.quicksearchmulti(['reformateurs','raw']);return false;">Mur des Réformateurs (RAW)</a>
   </div>
