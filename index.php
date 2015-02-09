@@ -557,6 +557,9 @@
       <a class="button" id="a_pointcloudpanel">Point Cloud</a>
    </div>
    -->
+
+   <img class="logo" src="img/foxel.png" width="150" alt="FOXEL" />
+
    <div id="usages" class="data">
        <div class="usage posepreview">
             <div class="title">Preview</div>
