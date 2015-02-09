@@ -1022,6 +1022,7 @@ var DAV = new function() {
                     if (pose.status=="validated") {
                         // add to vignettes
                         vignettes.add({
+                            type: 'raw',
                             segment: segment,
                             segment_info: info,
                             pose_index: index,
@@ -2914,18 +2915,23 @@ var DAV = new function() {
           if (!leftpanel.expanded) return;
           var vignettes=this;
           var vignette=vignettes.list[index];
-          var date=new Date(vignette.pose.sec*1000);
-          var html='<div class="wrap">';
-          html+='<div class="timestamp">'+date.getSimpleUTCDate();
-          //html+='<a class="button fa fa-gear fa-fw"></a></div>';
-          html+='</div>';
-          html+='<img class="thumb" alt="n/a" onerror="nopreview(this);" src="'+document.location.origin+allocation.current.path+'/'+vignette.segment+'/preview/'+vignette.segment_info.debayer+'/0/'+vignette.pose.sec+'_'+vignette.pose.usc+'.jpeg"></img>';
-          html+='<div class="info">';
-          html+='<div class="what">Pose (RAW)</div>';
-          //html+='<div class="footer">INFORMATIONS</div>';
-//          html+=vignette.info;
-          html+='</div>';
-          html+='</div>';
+
+          switch(vignette.type){
+          case 'raw': // raw
+            var date=new Date(vignette.pose.sec*1000);
+            var html='<div class="wrap">';
+            html+='<div class="timestamp">'+date.getSimpleUTCDate();
+            //html+='<a class="button fa fa-gear fa-fw"></a></div>';
+            html+='</div>';
+            html+='<img class="thumb" alt="n/a" onerror="nopreview(this);" src="'+document.location.origin+allocation.current.path+'/'+vignette.segment+'/preview/'+vignette.segment_info.debayer+'/0/'+vignette.pose.sec+'_'+vignette.pose.usc+'.jpeg"></img>';
+            html+='<div class="info">';
+            html+='<div class="what">Pose (RAW)</div>';
+            //html+='<div class="footer">INFORMATIONS</div>';
+  //          html+=vignette.info;
+            html+='</div>';
+            html+='</div>';
+            break;
+          }
           var div;
           var container=$('.mCSB_container',vignettes._dom);
           $(container).append(div=$('div:first',html).parent().data('index',index)).mCustomScrollbar('update');
@@ -2958,9 +2964,13 @@ var DAV = new function() {
           $('.current',vignettes._dom).removeClass('current');
           $('.wrap',vignettes._dom).each(function(){
             var index=$(this).data('index');
-            var info=vignettes.list[index];
-            if (info.pose_index==pose_index && info.segment==segment) {
-              $(this).addClass('current');
+            var vignette=vignettes.list[index];
+            switch(vignette.type){
+            case 'raw':
+              if (vignette.pose_index==pose_index && vignette.segment==segment) {
+                $(this).addClass('current');
+              }
+              break;
             }
           });
         },
@@ -3084,7 +3094,7 @@ var DAV = new function() {
               $(this).text('Annuler');
               panel.addPOI();
             } else {
-              panel.cancel();
+              panel.editCancel();
             }
           });
 
@@ -3146,7 +3156,9 @@ var DAV = new function() {
                 updateOnBrowserResize: true
             }
           });
-          poiPanel.resize();
+          setTimeout(function(){
+            poiPanel.resize();
+          },500);
 
         }, // poiPanel_inventory_update
 
@@ -3197,9 +3209,11 @@ var DAV = new function() {
 
         addPOI: function poiPanel_addPOI() {
           var panel=this;
+          /*
           panel.$.notify('Indiquez un emplacement',{
               sticky: false
           });
+          */
 
           panel.poicursor.init(panel);
         }, // poiPanel_addPOI
@@ -3290,44 +3304,13 @@ var DAV = new function() {
              .css('cursor','');
 
             var panorama=panel.panorama;
-            var coords=panorama.getMouseCoords(e);
-            coords.lon-=180;
+            poicursor.coords=panorama.getMouseCoords(e);
+            poicursor.coords.lon-=180;
 
-            coords.lon+=panorama.lon;
-            coords.lat+=panorama.lat;
+            poicursor.coords.lon+=panorama.lon;
+            poicursor.coords.lat+=panorama.lat;
 
-            console.log(coords);
-
-            panorama.poi.count=0;
-            $.each(panorama.poi.list,function(name){
-              if (name!=='cursor') {
-                 ++panorama.poi.count;
-              }
-            });
-
-            var poi={};
-            var name='p'+(panorama.poi.count++);
-
-            // unique name
-            var offset=0;
-            while(panorama.poi.list[name]){
-              var name='p'+(panorama.poi.count+offset++);
-            }
-
-            poi[name]={
-                  coords: coords,
-                  zoom: panorama.camera.zoom.current,
-                  draggable: true,
-                  saved: false
-            }
-            panorama.poi.add(poi);
-            panorama.drawScene();
-
-            panel.$('#pano canvas').off('mousedown.poipanel');
-
-            panorama.poi.list.cursor.instance.remove();
-
-            panel.edit(name);
+            panel.edit('cursor');
 
           }
 
@@ -3368,10 +3351,10 @@ var DAV = new function() {
 
           $('#poipanel_edit a').off('click.poipanel');
           $('#poipanel_edit a.cancel').on('click.poipanel',function(e){
-            panel.cancel();
+            panel.editCancel();
           });
           $('#poipanel_edit a.save').on('click.poipanel',function(e){
-            panel.save();
+            panel.editSaveNew();
           });
 
           var data=panel.panorama.poi.list[name].metadata||{};
@@ -3388,6 +3371,47 @@ var DAV = new function() {
           $('#addpoi',panel._dom).text('Ajouter');
           $('div.action:first, #poipanel_inventory',panel._dom).show(0);
         }, // poiPanel_editClose
+
+        editSaveNew: function poiPanel_editSaveNew() {
+
+            var panel=this;
+            var panorama=panel.panorama;
+
+            panorama.poi.count=0;
+            $.each(panorama.poi.list,function(name){
+              if (name!=='cursor') {
+                 ++panorama.poi.count;
+              }
+            });
+
+            var poi={};
+            var name='p'+(panorama.poi.count++);
+
+            // unique name
+            var offset=0;
+            while(panorama.poi.list[name]){
+              var name='p'+(panorama.poi.count+offset++);
+            }
+
+            var coords=panorama.poi.list.cursor.instance.coords;
+            poi[name]={
+                  coords: {
+                    lon: coords.lon,
+                    lat: coords.lat
+                  },
+                  zoom: panorama.camera.zoom.current
+            }
+
+            panel.currentPOI=name;
+
+            panel.$('#pano canvas').off('mousedown.poipanel');
+
+            panorama.poi.list.cursor.instance.remove();
+            panorama.poi.add(poi);
+            panorama.drawScene();
+            panel.save();
+
+        }, // poiPanel_editSaveNew
 
         save: function poiPanel_save() {
           var panel=this;
@@ -3443,7 +3467,7 @@ var DAV = new function() {
 
         }, // poiPanel_save
 
-        cancel: function poiPanel_cancel() {
+        cancel: function poiPanel_editCancel() {
           var panel=this;
 
           if (panel.panorama.poi.list.cursor){
