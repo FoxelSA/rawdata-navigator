@@ -2429,6 +2429,37 @@ var DAV = new function() {
                 //    + 'Pose '+(index+1)+' of '+poses.length
                 //);
 
+                // move order
+                if (allocation.type() == 'pointcloud') {
+                    if ($('#usages .usage.posepointcloud').length > 0) {
+                        $('#usages .usage.posepointcloud').parent().prepend($('#usages .usage.posepointcloud'));
+                        $('#usages .usage:not(.posepointcloud) .closeable').slideUp();
+                        $('#usages .usage.posepointcloud .closeable').slideDown();
+                    }
+                } else if (allocation.type() == 'panorama') {
+                    if ($('#usages .usage.posepanorama').length > 0) {
+                        $('#usages .usage.posepanorama').parent().prepend($('#usages .usage.posepanorama'));
+                        $('#usages .usage:not(.posepanorama) .closeable').slideUp();
+                        $('#usages .usage.posepanorama .closeable').slideDown();
+                    }
+                } else if (allocation.type() == 'poi') {
+                    if ($('#usages .usage.posepanorama').length > 0) {
+                        $('#usages .usage.posepanorama').parent().prepend($('#usages .usage.posepanorama'));
+                        $('#usages .usage:not(.posepanorama):not(.posepoi) .closeable').slideUp();
+                        $('#usages .usage.posepanorama .closeable').slideDown();
+                    }
+                    if ($('#usages .usage.posepoi').length > 0) {
+                        $('#usages .usage.posepoi').parent().prepend($('#usages .usage.posepoi'));
+                        $('#usages .usage:not(.posepoi):not(.posepanorama) .closeable').slideUp();
+                        $('#usages .usage.posepoi .closeable').slideDown();
+                    }
+                // raw
+                } else {
+                    $('#usages .usage.posepreview').parent().prepend($('#usages .usage.posepreview'));
+                    $('#usages .usage:not(.posepreview) .closeable').slideUp();
+                    $('#usages .usage.posepreview .closeable').slideDown();
+                }
+
             });
 
         },
@@ -2938,7 +2969,7 @@ var DAV = new function() {
             var date=new Date(vignette.pose.sec*1000);
             var html='';
 
-            if (allocation.type() == 'panorama') {
+            if (allocation.type() == 'panorama' || allocation.type() == 'poi') {
                 var testpanoimg = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-7200)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
                 // test panorama
                 $.ajax({
@@ -2956,7 +2987,10 @@ var DAV = new function() {
                 html+='<div class="timestamp">'+date.getSimpleUTCDate()+'</div>';
                 html+='<img class="thumb" alt="n/a"></img>';
                 html+='<div class="info">';
-                html+='<div class="what">Panorama</div></div></div>';
+                if (allocation.type() == 'poi')
+                    html+='<div class="what">Points d\'intérêt</div></div></div>';
+                else
+                    html+='<div class="what">Panorama</div></div></div>';
             } else if (allocation.type() == 'pointcloud') {
                 if ($('#vignettes div.wrap.segment'+vignette.segment).length == 0) {
                     html+='<div class="wrap vignette'+index+' segment'+vignette.segment+'">';
