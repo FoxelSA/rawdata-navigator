@@ -3279,14 +3279,14 @@ var DAV = new function() {
 
               cursor: {
 
-                colors: null,
+                radius: 14.9,
 
                 coords: {
                   lon: panel.panorama.lon-90, // not sure, maybe must apply panorama.rotation matrix instead
                   lat: panel.panorama.lat
                 },
 
-                mesh: new panel.window.THREE.Mesh(new panel.window.THREE.PlaneGeometry(Math.PI/18,Math.PI/18,1,1), new panel.window.THREE.MeshBasicMaterial({
+                mesh: new panel.window.THREE.Mesh(new panel.window.THREE.PlaneGeometry(Math.PI/4,Math.PI/4,1,1), new panel.window.THREE.MeshBasicMaterial({
                    map: panel.window.poicursor_texture,
                    transparent: true
                 })),
@@ -3459,11 +3459,11 @@ var DAV = new function() {
             panorama.poi.list.cursor.instance.remove();
             panorama.poi.add(poi);
             panorama.drawScene();
-            panel.save();
+            panel.editSave();
 
         }, // poiPanel_editSaveNew
 
-        save: function poiPanel_save() {
+        editSave: function poiPanel_editSave() {
           var panel=this;
           var data=panel.panorama.poi.list[panel.currentPOI].metadata||{};
           data.name=$('#poipanel_edit #poi_name').val();
@@ -3515,9 +3515,9 @@ var DAV = new function() {
               }
           });
 
-        }, // poiPanel_save
+        }, // poiPanel_editSave
 
-        cancel: function poiPanel_editCancel() {
+        editCancel: function poiPanel_editCancel() {
           var panel=this;
 
           if (panel.panorama.poi.list.cursor){

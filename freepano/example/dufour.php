@@ -1,4 +1,42 @@
-<!DOCTYPE html>
+<?php                                                                                                                
+$poi_path="/data/footage/demodav/1404381299/poi/";
+
+if (isset($_POST['cmd'])) {
+  $json=$poi_path.$_GET['initial'].".json";
+  switch($_POST['cmd']) {
+  case 'poi_save':
+    file_put_contents($json,$_POST['poi_list']);
+    header('Content-Type: application/json');
+    echo '{"status": "ok"}';
+    exit(0);
+    break;
+  }
+  exit(1);
+}
+
+
+if (isset($_GET['initial'])) {
+  $json=$poi_path.$_GET['initial'].".json";
+}
+
+if (isset($_GET['action']) && $_GET['action']=="poi_list") {
+
+  if (isset($_GET['download'])) {
+    header('Content-Type: application/octet-stream');
+    header("Content-Transfer-Encoding: Binary"); 
+    header("Content-disposition: attachment; filename=\"" . basename($json) . "\""); 
+  } else {
+    header('Content-Type: application/json');
+  }
+
+  if (isset($json) && file_exists($json)) {
+    print(file_get_contents($json));
+  } else {
+    echo '{}';
+  }
+  exit(0);
+}
+?><!DOCTYPE html>
 <html lang="en">
 <!--
 
@@ -51,7 +89,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <title>Freepano Example - https://github.com/FoxelSA/freepano</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimum-scale=1,maximum-scale=1" />
+    <!--meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimum-scale=1,maximum-scale=1" /->
     <script type="text/javascript">
         <?php if (isset($_GET['initial'])): ?>
             var initialImage = '<?php print ($_GET['initial']); ?>';
@@ -79,6 +117,8 @@
     <script type="text/javascript" src="../js/jquery.freepano.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.widget.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.poi.js"></script>
+    <script type="text/javascript" src="../js/jquery.freepano.poi.thumbnails.js"></script>
+    <script type="text/javascript" src="../js/jquery.freepano.poi.loader.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.arrow.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.sound.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.list.js"></script>

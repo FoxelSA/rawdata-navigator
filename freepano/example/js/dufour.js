@@ -53,13 +53,14 @@ $(document).ready(function(){
     }
   }
 
-  // load image with alpha channel to use as POI
-  window.unicorn_texture=new THREE.ImageUtils.loadTexture(
-    'img/unicorn.png',
+   
+  // load image with alpha channel to use as POI cursor
+  window.poicursor_texture=new THREE.ImageUtils.loadTexture(
+    '../../img/dav-cursor.png',
     THREE.UVMapping,
     file_onload,
     function onloaderror() {
-      $.notify('Cannot load unicorn.png !');
+      $.notify('Cannot load dav-cursor.png !');
     }
   );
 
@@ -68,6 +69,11 @@ $(document).ready(function(){
 $(document).on('filesloaded', function(){
 
   $('#pano').panorama({
+      defaults: {
+        poi: {
+          overlay: true
+        }
+      },
 
 /*
  * Properties and methods defined here will extend or override properties
@@ -79,7 +85,6 @@ $(document).on('filesloaded', function(){
  *
  */
 
-/*
     // panorama.fov: camera field of view
 
     fov: {
@@ -96,7 +101,6 @@ $(document).on('filesloaded', function(){
 
     }, // fov
 
-*/
     // panorama.rotation: initial panorama sphere rotation
 
     rotation: {
@@ -230,11 +234,11 @@ $(document).on('filesloaded', function(){
     // When using panorama.list to define several panoramas,
     // poi options below are extended or overrided with the ones
     // from panorama.list.images[id].poi
-
+*/
     poi: {
 
       // use a secondary scene for rendering widgets (eg when using filters)
-      overlay: false,
+      overlay: true,
 
       // panorama.poi.defaults: default values for POIs
       defaults: {
@@ -245,7 +249,8 @@ $(document).on('filesloaded', function(){
           color: {
              active: '#0000ff',
              hover: '#ffffff',
-             normal: '#000000'
+             normal: '#000000',
+             selected: '#ecb100'
           },
 
           // event handlers below are already filtered
@@ -721,7 +726,7 @@ $(document).on('filesloaded', function(){
     },
 
     map: {
-        active: true
+        active: false
     },
 
     // THREE.js renderer options
@@ -807,7 +812,7 @@ $(document).on('filesloaded', function(){
     case 77:
       var map = panorama.map;
       if(map) {
-          map.active = !map.active;
+          map.instance.active = !map.instance.active;
       }
       break;
     }
