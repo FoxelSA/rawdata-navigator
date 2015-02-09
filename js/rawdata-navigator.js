@@ -3125,16 +3125,19 @@ var DAV = new function() {
                 updateOnBrowserResize: true
             }
           });
-
+          poiPanel.resize();
 
         }, // poiPanel_inventory_update
 
         on_panorama_ready: function poiPanel_on_panorama_ready() {
         },
 
-        on_poi_list_ready: function poiPanel_on_poilist_ready() {
-          poiPanel.inventory_update();
-        }, // poiPanel_on_panorama_ready
+        on_poi_list_ready: function poiPanel_on_poilist_ready(e) {
+          var panel=this;
+          if (!$('#p0',panel._dom).length) { // fixme: on_poi_list_ready is called twice
+            poiPanel.inventory_update();
+          }
+        }, // poiPanel_on_poi_list_ready
 
         addPOI: function poiPanel_addPOI() {
           var panel=this;
@@ -3374,6 +3377,10 @@ var DAV = new function() {
                 information.poicount=panel.panorama.poi.count;
                 information.updatepoicount();
 
+                // generate thumbnail
+                panel.panorama.poiThumb.update(panel.currentPOI);
+
+                // add to inventory
                 panel.addToInventory(panel.currentPOI,{prepend: true});
               }
           });

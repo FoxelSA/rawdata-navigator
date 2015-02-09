@@ -100,7 +100,7 @@ $.extend(POI_thumb.prototype,{
 
     }, // poiThumb_onPanoramaReady
 
-    update: function poiThumb_update(){
+    update: function poiThumb_update(name){
 
       var poiThumb=this;
       var panorama=poiThumb.panorama;
@@ -108,13 +108,23 @@ $.extend(POI_thumb.prototype,{
       // borrow panorama sphere
       poiThumb.scene.add(panorama.sphere.object3D);
 
-      $.each(panorama.poi.list,function(name){
+      var list;
+      if (name){
+        poilist={};
+        poilist[name]=panorama.poi.list[name];
+      } else {
+        poilist=panorama.poi.list;
+      }
+
+      $.each(poilist,function(name){
         var poi=this;
         if (!poi.thumb) {
+          canvas=document.createElement('canvas');
+          canvas.className='poithumb';
           poi.thumb=new poiThumb.image({
             panorama: panorama,
             poiname: name,
-            canvas: document.createElement('canvas')
+            canvas: canvas
           });
         }
       });
@@ -147,7 +157,7 @@ $.extend(true,POI_thumb.prototype.image.prototype,{
       var poiThumb=panorama.poiThumb;
 
       // set sphere rotation
-      var viewRotationMatrix=(new THREE.Matrix4()).makeRotationAxis(new THREE.Vector3(0,0,1),-THREE.Math.degToRad(panorama.poi.list[image.poiname].coords.lat));
+      var viewRotationMatrix=(new THREE.Matrix4()).makeRotationAxis(new THREE.Vector3(1,0,0),THREE.Math.degToRad(panorama.poi.list[image.poiname].coords.lat));
       viewRotationMatrix.multiply((new THREE.Matrix4()).makeRotationAxis(new THREE.Vector3(0,1,0),THREE.Math.degToRad(panorama.poi.list[image.poiname].coords.lon)));
       panorama.sphere.object3D.matrixAutoUpdate=false;
       //panorama.sphere.object3D.matrix.copy(panorama.rotation.matrix.clone());
@@ -163,6 +173,7 @@ $.extend(true,POI_thumb.prototype.image.prototype,{
       image.canvas.width=w;
       image.canvas.height=h;
       var ctx=image.canvas.getContext('2d');
+      ctx.scale(1,-1); // flip context vertically
 
       var bitmap=new Uint8Array(w*h*4);
       image.imageData=ctx.createImageData(w,h);

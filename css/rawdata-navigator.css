@@ -1144,3 +1144,6 @@ ul.poi li:active {
   transform: scale(0.99);
 }
 
+canvas.poithumb {
+  transform: scale(1,-1);
+
