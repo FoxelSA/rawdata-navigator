@@ -610,6 +610,7 @@ var DAV = new function() {
          */
         quicksearch: function(item) {
             this._component.val([item]).trigger('change');
+            $('#a_leftpanel').trigger('click');
         },
 
         /**
@@ -617,6 +618,7 @@ var DAV = new function() {
          */
         quicksearchmulti: function(items) {
             this._component.val(items).trigger('change');
+            $('#a_leftpanel').trigger('click');
         },
 
         /**
