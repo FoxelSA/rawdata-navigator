@@ -608,9 +608,8 @@ var DAV = new function() {
         /**
          * allocation.quicksearch()
          */
-        quicksearch: function(item) {
-            this._component.val([item]).trigger('change');
-            $('#a_leftpanel').trigger('click');
+        quicksearch: function(items) {
+            this._component.val(items).trigger('change');
         },
 
         /**
