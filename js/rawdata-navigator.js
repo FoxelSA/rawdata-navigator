@@ -2429,6 +2429,37 @@ var DAV = new function() {
                 //    + 'Pose '+(index+1)+' of '+poses.length
                 //);
 
+                // move order
+                if (allocation.type() == 'pointcloud') {
+                    if ($('#usages .usage.posepointcloud').length > 0) {
+                        $('#usages .usage.posepointcloud').parent().prepend($('#usages .usage.posepointcloud'));
+                        $('#usages .usage:not(.posepointcloud) .closeable').slideUp();
+                        $('#usages .usage.posepointcloud .closeable').slideDown();
+                    }
+                } else if (allocation.type() == 'panorama') {
+                    if ($('#usages .usage.posepanorama').length > 0) {
+                        $('#usages .usage.posepanorama').parent().prepend($('#usages .usage.posepanorama'));
+                        $('#usages .usage:not(.posepanorama) .closeable').slideUp();
+                        $('#usages .usage.posepanorama .closeable').slideDown();
+                    }
+                } else if (allocation.type() == 'poi') {
+                    if ($('#usages .usage.posepanorama').length > 0) {
+                        $('#usages .usage.posepanorama').parent().prepend($('#usages .usage.posepanorama'));
+                        $('#usages .usage:not(.posepanorama):not(.posepoi) .closeable').slideUp();
+                        $('#usages .usage.posepanorama .closeable').slideDown();
+                    }
+                    if ($('#usages .usage.posepoi').length > 0) {
+                        $('#usages .usage.posepoi').parent().prepend($('#usages .usage.posepoi'));
+                        $('#usages .usage:not(.posepoi):not(.posepanorama) .closeable').slideUp();
+                        $('#usages .usage.posepoi .closeable').slideDown();
+                    }
+                // raw
+                } else {
+                    $('#usages .usage.posepreview').parent().prepend($('#usages .usage.posepreview'));
+                    $('#usages .usage:not(.posepreview) .closeable').slideUp();
+                    $('#usages .usage.posepreview .closeable').slideDown();
+                }
+
             });
 
         },
@@ -2934,18 +2965,55 @@ var DAV = new function() {
 
           switch(vignette.type){
           case 'raw': // raw
+
             var date=new Date(vignette.pose.sec*1000);
-            var html='<div class="wrap">';
-            html+='<div class="timestamp">'+date.getSimpleUTCDate();
-            //html+='<a class="button fa fa-gear fa-fw"></a></div>';
-            html+='</div>';
-            html+='<img class="thumb" alt="n/a" onerror="nopreview(this);" src="'+document.location.origin+allocation.current.path+'/'+vignette.segment+'/preview/'+vignette.segment_info.debayer+'/0/'+vignette.pose.sec+'_'+vignette.pose.usc+'.jpeg"></img>';
-            html+='<div class="info">';
-            html+='<div class="what">Pose (RAW)</div>';
+            var html='';
+
+            if (allocation.type() == 'panorama' || allocation.type() == 'poi') {
+                var testpanoimg = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-7200)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
+                // test panorama
+                $.ajax({
+                    url:testpanoimg,
+                    type:'HEAD',
+                    error: function() {
+                        $('#vignettes div.wrap.vignette'+index).remove();
+                    },
+                    success: function() {
+                        $('#vignettes div.wrap.vignette'+index+' img.thumb').attr('src',testpanoimg);
+                        $('#vignettes div.wrap.vignette'+index).css('display','block');
+                    }
+                });
+                html+='<div class="wrap vignette'+index+'" style="display:none;">';
+                html+='<div class="timestamp">'+date.getSimpleUTCDate()+'</div>';
+                html+='<img class="thumb" alt="n/a"></img>';
+                html+='<div class="info">';
+                if (allocation.type() == 'poi')
+                    html+='<div class="what">Points d\'intérêt</div></div></div>';
+                else
+                    html+='<div class="what">Panorama</div></div></div>';
+            } else if (allocation.type() == 'pointcloud') {
+                if ($('#vignettes div.wrap.segment'+vignette.segment).length == 0) {
+                    html+='<div class="wrap vignette'+index+' segment'+vignette.segment+'">';
+                } else {
+                    html+='<div class="wrap vignette'+index+' segment'+vignette.segment+'" style="display:none;">';
+                }
+                html+='<div class="timestamp">&nbsp;</div>';
+                html+='<img class="thumb" alt="" src="'+document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/pointcloud/pointcloud-'+vignette.segment+'.jpg"></img>';
+                html+='<div class="info">';
+                html+='<div class="what">Point Cloud</div></div></div>';
+            } else { // raw
+                html+='<div class="wrap vignette'+index+'">';
+                html+='<div class="timestamp">'+date.getSimpleUTCDate();
+                //html+='<a class="button fa fa-gear fa-fw"></a></div>';
+                html+='</div>';
+                html+='<img class="thumb" alt="n/a" onerror="nopreview(this);" src="'+document.location.origin+allocation.current.path+'/'+vignette.segment+'/preview/'+vignette.segment_info.debayer+'/0/'+vignette.pose.sec+'_'+vignette.pose.usc+'.jpeg"></img>';
+                html+='<div class="info">';
+                html+='<div class="what">Pose (RAW)</div>';
+                html+='</div>';
+                html+='</div>';
+            }
             //html+='<div class="footer">INFORMATIONS</div>';
-  //          html+=vignette.info;
-            html+='</div>';
-            html+='</div>';
+            //html+=vignette.info;
             break;
           }
           var div;

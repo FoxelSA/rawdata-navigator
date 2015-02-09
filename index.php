@@ -562,8 +562,8 @@
 
    <div id="usages" class="data">
        <div class="usage posepreview">
-            <div class="title">Preview</div>
-            <div class="nocloseable">
+            <div class="title pointer">Preview</div>
+            <div class="closeable">
                 <div class="preview"><img onerror="nopreview(this);"></img></div>
                 <div class="actions">
                   <a href="" class="download_tiles"><div class="action">Download RAW tiles...</div></a>
