@@ -622,6 +622,20 @@ var DAV = new function() {
         },
 
         /**
+         * allocation.type()
+         */
+        type: function() {
+            if (this.current.val.indexOf('panorama') > -1)
+                return 'panorama';
+            else if (this.current.val.indexOf('poi') > -1)
+                return 'poi';
+            else if (this.current.val.indexOf('pointcloud') > -1)
+                return 'pointcloud';
+            else
+                return 'raw';
+        },
+
+        /**
          * allocation.select()
          */
         select: function() {
