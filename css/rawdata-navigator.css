@@ -291,7 +291,7 @@ a, a:link, a:visited, a:hover, a:active {
 
 #allocation {
     position:relative;
-    top:100px;
+    top:70px;
     width:430px;
     padding:30px;
 }
@@ -537,6 +537,12 @@ a, a:link, a:visited, a:hover, a:active {
         text-transform:uppercase;
     }
 
+    #pose_info .logo {
+        position:absolute;
+        top:19px;
+        left:33px;
+    }
+
     #video_player .jump {
         position:relative;
         top:14px;
@@ -683,7 +689,7 @@ a, a:link, a:visited, a:hover, a:active {
 
 #home .logo {
     position:absolute;
-    top:60px;
+    top:21px;
     left:38px;
 }
 
@@ -1039,7 +1045,7 @@ a.reload {
         }
 
 
-#poipanel_edit { 
+#poipanel_edit {
   display: none;
 
 }

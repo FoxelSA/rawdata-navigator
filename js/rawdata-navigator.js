@@ -608,9 +608,8 @@ var DAV = new function() {
         /**
          * allocation.quicksearch()
          */
-        quicksearch: function(item) {
-            this._component.val([item]).trigger('change');
-            $('#a_leftpanel').trigger('click');
+        quicksearch: function(items) {
+            this._component.val(items).trigger('change');
         },
 
         /**
@@ -619,6 +618,20 @@ var DAV = new function() {
         quicksearchmulti: function(items) {
             this._component.val(items).trigger('change');
             $('#a_leftpanel').trigger('click');
+        },
+
+        /**
+         * allocation.type()
+         */
+        type: function() {
+            if (this.current.val.indexOf('panorama') > -1)
+                return 'panorama';
+            else if (this.current.val.indexOf('poi') > -1)
+                return 'poi';
+            else if (this.current.val.indexOf('pointcloud') > -1)
+                return 'pointcloud';
+            else
+                return 'raw';
         },
 
         /**
