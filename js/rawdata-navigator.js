@@ -3288,7 +3288,7 @@ var DAV = new function() {
           var li=$(e.target).closest('li');
           var name=li.attr('id');
 
-          panel.inventory_setSelection([name],e);
+          panel.inventory_setSelection([name]);
           panel.panorama.poi.show(name,function(){
             // trash POI 
             if ($(e.target).hasClass('fa-trash-o')) {
@@ -3777,8 +3777,19 @@ var DAV = new function() {
           panel._panel_init();
           $(document).on('keydown',function(e){
             if (panel.visible && panel.istoplevel()){
-              // forward key event to freepano
+              // forward key event to freepano when inventory is visible and add button has not been pressed
               if ($('#poipanel_inventory',panel._dom).is(':visible') && !$('#addpoi',panel._dom).hasClass('cancel')) {
+                // unless the key is assigned to inventory navigation
+                switch(e.keyCode){
+                case 32: // space
+                  var next=$('ul.poi li.selected:last',panel._dom).next();
+                  if (!next.length) {
+                    next=$('ul.poi li:first',panel._dom);
+                  }
+                  next.click();
+                  $('#poipanel_inventory .list',panel._dom).mCustomScrollbar("scrollTo",'#'+next.attr('id'));
+                  return;
+                }
                 panel.$(panel.window.document).trigger(e);
               } else {
                 // POI edit dialog is open or "add" button has been pressed, watch for escape keydown
