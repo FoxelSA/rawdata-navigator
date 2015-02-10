@@ -3331,14 +3331,14 @@ var DAV = new function() {
               if (poi.selected) {
                 poi.selected=false;
                 poi.setColor(poi.color.normal);
-                poi.scale(poi.initialScale*2);
+                poi.scale(poi.initialScale);
                 poi.radius=panel.panorama.sphere.radius-1;
                 $('#'+name,panel._dom).removeClass('selected');
               }
             } else {
               if (!poi.selected) {
                 poi.selected=true;
-                poi.scale(poi.initialScale);
+                poi.scale(poi.initialScale*3);
                 poi.radius=panel.panorama.sphere.radius-2;
                 poi.setColor(poi.color.selected);
                 $('#'+name,panel._dom).addClass('selected');
