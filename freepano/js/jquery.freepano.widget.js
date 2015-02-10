@@ -648,6 +648,7 @@ function WidgetFactory(options) {
         var panorama=widgetList.panorama;
         var filtered_list=[];
         var canvas=panorama.renderer.getContext().canvas;
+        panorama.renderer.autoClear=true;
 
         // for each hover candidate
         $.each(hover_list,function(index,hover_elem){
@@ -692,6 +693,7 @@ function WidgetFactory(options) {
           filtered_list.push(hover_elem);
 
         });
+        panorama.renderer.autoClear=false;
 
         return filtered_list;
 

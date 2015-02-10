@@ -44,7 +44,7 @@
 
 $(document).ready(function(){
 
-  var filesToLoad=1;
+  var filesToLoad=2;
 
   function file_onload() {
     --filesToLoad;
@@ -53,7 +53,6 @@ $(document).ready(function(){
     }
   }
 
-   
   // load image with alpha channel to use as POI cursor
   window.poicursor_texture=new THREE.ImageUtils.loadTexture(
     '../../img/dav-cursor.png',
@@ -61,6 +60,16 @@ $(document).ready(function(){
     file_onload,
     function onloaderror() {
       $.notify('Cannot load dav-cursor.png !');
+    }
+  );
+
+  // load image with alpha channel to use as POI
+  window.poi_texture=new THREE.ImageUtils.loadTexture(
+    '../../img/dav-cursor-blank.png',
+    THREE.UVMapping,
+    file_onload,
+    function onloaderror() {
+      $.notify('Cannot load dav-cursor-blank.png !');
     }
   );
 
@@ -241,6 +250,10 @@ $(document).on('filesloaded', function(){
       // use a secondary scene for rendering widgets (eg when using filters)
       overlay: true,
 
+//      camera: {
+//        instance: new THREE.OrthographicCamera(-10,10,10,-10,0.1,15.1),
+//      },
+
       // panorama.poi.defaults: default values for POI_list
       defaults: {
 
@@ -250,36 +263,76 @@ $(document).on('filesloaded', function(){
           handleMousevents: true,
 
           color: {
-             active: '#0000ff',
-             hover: '#ffffff',
-             normal: '#000000',
+             active: '#bbbbbb',
+             hover: '#dddddd',
+             normal: '#ffffff',
              selected: '#ecb100'
           },
 
-          wesh: function DAV_poi_object3D(){
+          radius: 14,
+
+          object3D: function DAV_poi_object3D(){
               var poi=this;
               var object3D=new THREE.Object3D();
-              var title=text2canvas(poi.metadata.name);
-              console.log(title);
+
+              // poi icon
+              object3D.add(poi.icon());
+
+              // poi title
+              poi.title=text2canvas(poi.metadata.name);
+              console.log(poi.title);
+              var map=new THREE.Texture(poi.title);
+              map.needsUpdate=true;
               var mesh=new THREE.Mesh(
-                new THREE.PlaneBufferGeometry(title.width,title.height),
+                new THREE.PlaneBufferGeometry(poi.title.width/150,poi.title.height/150,100),
                 new THREE.MeshBasicMaterial({
-                 map: new THREE.Texture(title),
+                 map: map,
                  transparent: true,
+                 depthWrite: false,
+                 depthTest: false,
+                 opacity: 0.6
                 })
               );
-return mesh;
+              mesh.position.y=0.5;
               object3D.add(mesh);
+
+              // poi line
+              var geometry=new THREE.Geometry();
+              geometry.vertices.push(
+                new THREE.Vector3(0,0,-1),
+                new THREE.Vector3(0,0.2,-1),
+                new THREE.Vector3(0,0.52-poi.title.height/300,-1)
+              );
+              var line=new THREE.Line(
+                geometry,
+                new THREE.LineBasicMaterial()
+              );
+              object3D.add(line);
+
               return object3D;
-          } 
-        }
+          },
+
+          icon: function DAV_poi_icon() {
+            return new THREE.Mesh(
+              new THREE.PlaneBufferGeometry(Math.PI/36,Math.PI/36,1,1),
+              new THREE.MeshBasicMaterial({
+                map: poi_texture,
+                transparent: true,
+                depthWrite: false,
+                depthTest: false,
+                opacity: 0.5
+              })
+            );
+          }
+        }, // defaults.poi
 
           // event handlers below are already filtered
           // eg: mousein and mouseout are not triggered during panorama rotation
           // if you really need, you can hook to the 'private' methods (eg: _mousein)
 
-      },
-    },
+      }, // defaults
+
+    }, // poi
 
       /*
 
@@ -1287,25 +1340,45 @@ return mesh;
 
 });
 
-window.text2canvas=function(text,options) {
+window.text2canvas=function text2canvas(text,options) {
   if (!options) options={};
   var canvas=document.createElement('canvas');
   var ctx=canvas.getContext('2d');
-  ctx.font=options.font||"Bold 12px Helvetica";
+  ctx.font=options.font||"Bold 48px Helvetica";
   ctx.fillStyle=options.fillStyle||"rgba(0,0,0,0.8)";
   ctx.strokeStyle=options.strokeStyle||"rgba(255,255,255,0.8)";
+  ctx.align='left';
+  ctx.textBaseline='middle';
   var size=ctx.measureText(text);
-  var hpadding=options.hpadding||8;
-  var vpadding=options.vpadding||8;
-  canvas.width=size.width+hpadding*2;
-  canvas.height=20+vpadding*2;
+  console.log(text);
+  canvas.width=size.width+16+48;
+  canvas.height=64;
   ctx=canvas.getContext('2d');
-  ctx.font=options.font||"Bold 12px Helvetica";
+  ctx.rect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#c0d1b2";
+  ctx.strokeStyle="#000000";
+  ctx.fill();
+  ctx.stroke();
+  ctx.font=options.font||"Bold 48px Helvetica";
   ctx.fillStyle=options.fillStyle||"rgba(0,0,0,0.8)";
   ctx.strokeStyle=options.strokeStyle||"rgba(255,255,255,0.8)";
-  var size=ctx.measureText(text);
-  ctx.strokeText(text,hpadding,vpadding);
+  ctx.align='left';
+  ctx.textBaseline='middle';
+  ctx.fillText(text,16,canvas.height/2,(canvas.width-80));
+  ctx.strokeText(text,16,canvas.height/2,(canvas.width-80));
+  ctx.beginPath();
+  ctx.rect(canvas.width-48,0,canvas.width,canvas.height);
+  ctx.fill();
   return canvas;                                                                                                      
 }  
+
+window.next_power_of_two=function next_power_of_2(x) {
+   x = x - 1; 
+   x = x | (x >> 1); 
+   x = x | (x >> 2); 
+   x = x | (x >> 4); 
+   x = x | (x >> 8); 
+   return x + 1; 
+} 
    
 

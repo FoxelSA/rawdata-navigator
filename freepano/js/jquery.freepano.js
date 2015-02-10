@@ -144,6 +144,8 @@ $.extend(true,Sphere.prototype,{
         var tileTexture=sphere.loadTile(col,row,callback);
         var material=new THREE.MeshBasicMaterial({
            map: tileTexture,
+           depthTest: false,
+           depthWrite: false
 //           wireframe: true,
 //           color: 'white'
         });

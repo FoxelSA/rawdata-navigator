@@ -44,7 +44,7 @@
 
 $(document).ready(function(){
 
-  var filesToLoad=1;
+  var filesToLoad=2;
 
   function file_onload() {
     --filesToLoad;
@@ -61,6 +61,16 @@ $(document).ready(function(){
     file_onload,
     function onloaderror() {
       $.notify('Cannot load dav-cursor.png !');
+    }
+  );
+
+  // load image with alpha channel to use as POI
+  window.poi_texture=new THREE.ImageUtils.loadTexture(
+    '../../img/dav-cursor-blank.png',
+    THREE.UVMapping,
+    file_onload,
+    function onloaderror() {
+      $.notify('Cannot load dav-cursor-blank.png !');
     }
   );
 
@@ -253,6 +263,17 @@ $(document).on('filesloaded', function(){
              selected: '#ecb100'
           },
 
+          mesh: new THREE.Mesh(
+            new THREE.PlaneBufferGeometry(Math.PI/4,Math.PI/4,1,1),
+            new THREE.MeshBasicMaterial({
+              map: poi_texture,
+              transparent: true,
+              depthWrite: false,
+              depthTest: false
+            })
+          ),
+
+
           // event handlers below are already filtered
           // eg: mousein and mouseout are not triggered during panorama rotation
           // if you really need, you can hook to the 'private' methods (eg: _mousein)
@@ -280,7 +301,7 @@ $(document).on('filesloaded', function(){
             console.log('click',this);
           },
       },
-
+/*
       // panorama.poi.list
       list: {
 
@@ -358,8 +379,10 @@ $(document).on('filesloaded', function(){
             }
         } // circle
       } // poi.list
-    }, // poi
 
+      */
+    }, // poi
+/*
     // work in progress
     hud: {
       list: {

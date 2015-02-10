@@ -462,6 +462,7 @@ a, a:link, a:visited, a:hover, a:active {
   font-size: 2em;
   padding-left: 1em;
   padding-right: 1em;
+  border-radius: 7px;
 }
 
 #infopanel .viewers a:hover, #video_player a.button:hover, #poipanel a.button:hover {
@@ -1079,7 +1080,6 @@ a.reload {
 
 #poipanel_edit input {
   width: 95%;
-  text-align: center;
 }
 
 #poipanel_edit input#poi_date {
@@ -1119,7 +1119,17 @@ ul.poi {
 
 ul.poi li {
   margin: 5px;
-  border: 1px solid gray;
+  border: 1px solid #222;
+  border-radius:7px;
+  background-color:#222;
+}
+
+ul.poi div.name {
+  font-weight: bold;
+  font-size: 15px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  font-size:
 }
 
 ul.poi div.details {
@@ -1142,18 +1152,25 @@ ul.poi li > div {
 }
 
 ul.poi li:hover {
-  border-color: white;
+  background-color: #333;
 }
 
 ul.poi li:active {
   color: #ecb100;
-  transform: scale(0.99);
+  transform: scale(0.98);
 }
 
 ul.poi li.selected {
   border-color: #ecb100;
 }
 
+ul.poi li.selected div.details {
+  color: #ecb100;
+}
+
 canvas.poithumb {
+  margin-top: 8px;
+  margin-left: 6px;
   transform: scale(1,-1);
+  border-radius: 7px;
 

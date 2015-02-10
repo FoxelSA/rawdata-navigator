@@ -94,10 +94,6 @@ $.extend(POI_thumb.prototype,{
 
       poiThumb.update();
 
-      // propagate panorama 'ready' event
-      poiThumb.panorama_prototype_callback.apply(e.target,[e]);
-      panorama.drawScene();
-
     }, // poiThumb_onPanoramaReady
 
     update: function poiThumb_update(name){
@@ -121,7 +117,7 @@ $.extend(POI_thumb.prototype,{
         if (!poi.thumb) {
           canvas=document.createElement('canvas');
           canvas.className='poithumb';
-          poi.thumb=new poiThumb.image({
+          panorama.poi.list[name].thumb=new poiThumb.image({
             panorama: panorama,
             poiname: name,
             canvas: canvas

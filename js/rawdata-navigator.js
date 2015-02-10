@@ -3373,6 +3373,8 @@ var DAV = new function() {
                   lat: panel.panorama.lat
                 },
 
+                object3D: null,
+
                 mesh: new panel.window.THREE.Mesh(
                   new panel.window.THREE.PlaneGeometry(Math.PI/4,Math.PI/4,1,1),
                   new panel.window.THREE.MeshBasicMaterial({
@@ -3380,6 +3382,13 @@ var DAV = new function() {
                    transparent: true
                   })
                 ),
+
+                color: {
+                  normal: '#ffffff',
+                  hover: '#eeeeee',
+                  active: '#ffffff'
+                },
+
 
                 handleTransparency: true,
 
@@ -3539,7 +3548,18 @@ var DAV = new function() {
                     lon: coords.lon,
                     lat: coords.lat
                   },
-                  zoom: panorama.camera.zoom.current
+                  zoom: panorama.camera.zoom.current,
+                  metadata: {
+                    name: $('#poipanel_edit #poi_name').val(),
+                    date: $('#poipanel_edit #poi_date').val(),
+                    description: $('#poipanel_edit #poi_description').val()
+                  }
+            }
+
+            if (poi[name].metadata.name.trim()=="") {
+              window.alert('Vous devez spécifier un nom.');
+              $('#poipanel_edit #poi_name').focus();
+              return;
             }
 
             panel.currentPOI=name;
