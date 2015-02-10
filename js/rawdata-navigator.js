@@ -3649,6 +3649,7 @@ var DAV = new function() {
             if (id=='cursor') return;
             poi.list[id]={
               coords: this.coords,
+              zoom: this.zoom,
               metadata: this.metadata,
             };
           });
