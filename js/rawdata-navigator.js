@@ -3289,7 +3289,14 @@ var DAV = new function() {
           var name=li.attr('id');
 
           panel.inventory_setSelection([name],e);
-          panel.panorama.poi.show(name);
+          panel.panorama.poi.show(name,function(){
+            // trash POI 
+            if ($(e.target).hasClass('fa-trash-o')) {
+              if (confirm("Supprimer ce point d'intérêt ?")) {
+                panel.panorama.poi.list[name].instance.remove();
+              }
+            }
+          });
 
           // edit POI
           if ($(e.target).hasClass('fa-pencil-square-o')) {
@@ -3297,14 +3304,11 @@ var DAV = new function() {
             e.stopPropagation();
             e.preventDefault();
             return false;
-
-          // trash POI 
-          } else if ($(e.target).hasClass('fa-trash-o')) {
-            setTimeout(function(){
-              if (confirm("Supprimer ce point d'intérêt ?")) {
-                panel.panorama.poi.list[name].instance.remove();
-              }
-            },2000);
+          }
+          if ($(e.target).hasClass('fa-trash-o')) {
+            e.stopPropagation();
+            e.preventDefault();
+            return false;
           }
 
         }, // poiPanel_inventory_click
