@@ -434,7 +434,7 @@
       <div>Gestion des points d'intérêt</div>
     </div>
 
-    <div class="action">
+    <div class="addpoi action">
       <a id="addpoi" class="button">Ajouter</a>
     </div>
 

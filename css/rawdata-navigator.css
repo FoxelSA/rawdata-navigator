@@ -1062,12 +1062,18 @@ a.reload {
 #poipanel action a.button {
 }
 
+#poipanel .addpoi {
+  position: relative;
+  top: 1.8em;
+  margin-left: 0.5em;
+}
 
 #poipanel .title {
   position: relative;
   font-size: 2em;
-  top: 1em;
+  top: 1.2em;
   margin-bottom: 2em;
+  margin-left: 0.5em;
 }
 
 #poipanel_edit textarea, #poipanel_edit label {
@@ -1164,7 +1170,7 @@ ul.poi li:active div.details {
   color: #ecb100;
 }
 
-ul.poi li:active {
+ul.poi li.active {
   transform: scale(0.98);
 }
 
@@ -1189,6 +1195,9 @@ ul.poi li .buttons {
 
 #poipanel a.button.fa {
   background-color: inherit;
+  padding-right: 10px;
+  padding-left: 10px;
+  padding-top: 8px;
 }
 
 

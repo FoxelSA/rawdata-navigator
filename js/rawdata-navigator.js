@@ -3047,7 +3047,8 @@ var DAV = new function() {
                 html+='<img class="thumb" alt="" src="'+document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/pointcloud/pointcloud-'+vignette.segment+'.jpg"></img>';
                 html+='<div class="info">';
                 html+='<div class="what">Point Cloud</div></div></div>';
-            } else { // raw
+
+    } else { // allocation.type() == 'raw'
                 html+='<div class="wrap vignette'+index+'">';
                 html+='<div class="timestamp">'+date.getSimpleUTCDate();
                 //html+='<a class="button fa fa-gear fa-fw"></a></div>';
@@ -3269,6 +3270,12 @@ var DAV = new function() {
           $('#poipanel_inventory ul').empty();
           $('#poipanel_inventory').off('click.inventory').on('click.inventory','a.button',function(e){
             panel.inventory_click(e);
+          });
+          $('#poipanel_inventory').on('mousedown.inventory','li',function(e){
+            $(e.target).addClass('active');
+            $(document).add(panel.window).off('mouseup.inventory').on('mouseup.inventory',function(){
+              $(e.target).removeClass('active');
+            });
           });
           $('#poipanel_inventory').on('click.inventory','li',function(e){
             panel.inventory_click(e);
