@@ -3233,7 +3233,7 @@ var DAV = new function() {
           var panel=this;
           $('#addpoi',panel._dom).off('click').on('click',function(){
             if ($(this).text()=="Ajouter") {
-              $(this).text('Annuler');
+              $(this).text('Annuler').addClass('cancel');
               panel.addPOI();
             } else {
               panel.editCancel();
@@ -3300,9 +3300,11 @@ var DAV = new function() {
 
           // trash POI 
           } else if ($(e.target).hasClass('fa-trash-o')) {
-            if (confirm("Supprimer ce point d'intérêt ?")) {
-              panel.panorama.poi.list[name].instance.remove();
-            }
+            setTimeout(function(){
+              if (confirm("Supprimer ce point d'intérêt ?")) {
+                panel.panorama.poi.list[name].instance.remove();
+              }
+            },2000);
           }
 
         }, // poiPanel_inventory_click
@@ -3570,7 +3572,7 @@ var DAV = new function() {
         editClose: function poiPanel_editClose() {
           var panel=this;
           $('#poipanel_edit',panel._dom).hide(0);
-          $('#addpoi',panel._dom).text('Ajouter');
+          $('#addpoi',panel._dom).text('Ajouter').removeClass('cancel');
           $('div.action:first, #poipanel_inventory',panel._dom).show(0);
         }, // poiPanel_editClose
 
@@ -3619,7 +3621,7 @@ var DAV = new function() {
             }
 
             if (poi[name].metadata.name.trim()=="") {
-              window.alert('Vous devez spécifier un nom.');
+              window.alert('Vous devez spécifier un identifiant.');
               $('#poipanel_edit #poi_name').focus();
               return;
             }
@@ -3770,8 +3772,20 @@ var DAV = new function() {
           var panel=this;
           panel._panel_init();
           $(document).on('keydown',function(e){
-            if (panel.visible && panel.istoplevel() && $('#poipanel_inventory',panel._dom).is(':visible')) {
-              panel.$(panel.window.document).trigger(e);
+            if (panel.visible && panel.istoplevel()){
+              // forward key event to freepano
+              if ($('#poipanel_inventory',panel._dom).is(':visible') && !$('#addpoi',panel._dom).hasClass('cancel')) {
+                panel.$(panel.window.document).trigger(e);
+              } else {
+                // POI edit dialog is open or "add" button has been pressed, watch for escape keydown
+                switch(e.keyCode) {
+                case 27: // escape
+                  if ($('#addpoi',panel._dom).hasClass('cancel') || $('#poipanel_edit',panel._dom).is(':visible')) {
+                    panel.editCancel();
+                  }
+                  break;
+                }
+              }
             }
           });
         } // poiPanel_init
