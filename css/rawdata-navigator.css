@@ -1155,8 +1155,16 @@ ul.poi li:hover {
   background-color: #333;
 }
 
-ul.poi li:active {
+ul.poi. li .buttons a:active {
+    color: #ecb100;       
+    transform: scale(0.98);
+}
+
+ul.poi li:active div.details {
   color: #ecb100;
+}
+
+ul.poi li:active {
   transform: scale(0.98);
 }
 
@@ -1173,4 +1181,14 @@ canvas.poithumb {
   margin-left: 6px;
   transform: scale(1,-1);
   border-radius: 7px;
+}
+
+ul.poi li .buttons {
+  float: right;
+}
+
+#poipanel a.button.fa {
+  background-color: inherit;
+}
+
 

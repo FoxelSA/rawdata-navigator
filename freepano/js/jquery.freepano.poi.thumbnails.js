@@ -101,16 +101,21 @@ $.extend(POI_thumb.prototype,{
       var poiThumb=this;
       var panorama=poiThumb.panorama;
 
-      // borrow panorama sphere
-      poiThumb.scene.add(panorama.sphere.object3D);
-
       var list;
       if (name){
+        // if poiThumb.image exists, update
+        if (panorama.poi.list[name].thumb) {
+          panorama.poi.list[name].thumb.init('update');
+          return;
+        }
         poilist={};
         poilist[name]=panorama.poi.list[name];
       } else {
         poilist=panorama.poi.list;
       }
+
+      // borrow panorama sphere
+      poiThumb.scene.add(panorama.sphere.object3D);
 
       $.each(poilist,function(name){
         var poi=this;
@@ -147,7 +152,7 @@ $.extend(true,POI_thumb.prototype.image.prototype,{
     defaults: {
     },
 
-    init: function poiThumb_image_init() {
+    init: function poiThumb_image_init(update) {
       var image=this;
       var panorama=this.panorama;
       var poiThumb=panorama.poiThumb;

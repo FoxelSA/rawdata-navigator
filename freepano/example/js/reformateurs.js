@@ -1358,7 +1358,16 @@ window.text2canvas=function text2canvas(text,options) {
   ctx.fillStyle="#c0d1b2";
   ctx.strokeStyle="#000000";
   ctx.fill();
+  ctx.lineWidth=2;
   ctx.stroke();
+  ctx.closePath();
+  ctx.beginPath();
+  ctx.rect(2,2,canvas.width-2,canvas.height-2);
+  ctx.lineWidth=1;
+  ctx.strokeStyle="#ffffff";
+  ctx.stroke();
+  ctx.closePath();
+  ctx.beginPath();
   ctx.font=options.font||"Bold 48px Helvetica";
   ctx.fillStyle=options.fillStyle||"rgba(0,0,0,0.8)";
   ctx.strokeStyle=options.strokeStyle||"rgba(255,255,255,0.8)";

@@ -3267,7 +3267,10 @@ var DAV = new function() {
         inventory_clear: function poiPanel_inventory_clear() {
           var panel=this;
           $('#poipanel_inventory ul').empty();
-          $('#poipanel_inventory').off('click.inventory').on('click.inventory','li',function(e){
+          $('#poipanel_inventory').off('click.inventory').on('click.inventory','a.button',function(e){
+            panel.inventory_click(e);
+          });
+          $('#poipanel_inventory').on('click.inventory','li',function(e){
             panel.inventory_click(e);
           });
 
@@ -3277,8 +3280,24 @@ var DAV = new function() {
           var panel=this;
           var li=$(e.target).closest('li');
           var name=li.attr('id');
+
           panel.inventory_setSelection([name],e);
           panel.panorama.poi.show(name);
+
+          // edit POI
+          if ($(e.target).hasClass('fa-pencil-square-o')) {
+            panel.edit(name);
+            e.stopPropagation();
+            e.preventDefault();
+            return false;
+
+          // trash POI 
+          } else if ($(e.target).hasClass('fa-trash-o')) {
+            if (confirm("Supprimer ce point d'intérêt ?")) {
+              panel.panorama.poi.list[name].instance.remove();
+            }
+          }
+
         }, // poiPanel_inventory_click
 
         inventory_update: function poiPanel_inventory_update() {
@@ -3312,11 +3331,13 @@ var DAV = new function() {
               if (poi.selected) {
                 poi.selected=false;
                 poi.setColor(poi.color.normal);
+                poi.radius=panel.panorama.sphere.radius-1;
                 $('#'+name,panel._dom).removeClass('selected');
               }
             } else {
               if (!poi.selected) {
                 poi.selected=true;
+                poi.radius=panel.panorama.sphere.radius-2;
                 poi.setColor(poi.color.selected);
                 $('#'+name,panel._dom).addClass('selected');
               }
@@ -3333,7 +3354,7 @@ var DAV = new function() {
         on_poi_select: function poiPanel_on_poi_select(e) {
           var poi=this;
           poi.selected=false; // so that inventory_setSelection update it
-          poiPanel.inventory_setSelection([poi.thumb.poiname]);
+          poiPanel.inventory_setSelection([poi.name]);
           // scroll to selected element
           $('#poipanel_inventory .list',poiPanel._dom).mCustomScrollbar("scrollTo",'#'+poi.thumb.poiname);
         },
@@ -3356,6 +3377,7 @@ var DAV = new function() {
           });
           */
 
+          panel.currentPOI='cursor';
           panel.poicursor.init(panel);
         }, // poiPanel_addPOI
 
@@ -3365,17 +3387,28 @@ var DAV = new function() {
 
             var poicursor=this;
             poicursor.panel=panel;
+            var coords;
+
+            // editing an existing poi ?
+            if (panel.currentPOI!='cursor') {
+              coords={
+                lon: panel.panorama.poi.list[panel.currentPOI].instance.coords.lon,
+                lat: panel.panorama.poi.list[panel.currentPOI].instance.coords.lat
+              }
+            } else {
+              coords={
+                lon: panel.panorama.lon-90, 
+                lat: panel.panorama.lat
+              }
+            }
 
             panel.panorama.poi.add({
 
               cursor: {
 
-                radius: 14.9, //  < POI.prototype.radius
+                radius: panel.panorama.sphere.radius-2.5,
 
-                coords: {
-                  lon: panel.panorama.lon-90, // not sure, maybe must apply panorama.rotation matrix instead
-                  lat: panel.panorama.lat
-                },
+                coords: coords,
 
                 object3D: null,
 
@@ -3463,7 +3496,9 @@ var DAV = new function() {
             poicursor.coords.lon+=panorama.lon;
             poicursor.coords.lat+=panorama.lat;
 
-            panel.edit('cursor');
+            if (!$('#poipanel_edit',panel._dom).is(':visible')) {
+              panel.edit(panel.currentPOI);
+            }
 
           }
 
@@ -3500,6 +3535,11 @@ var DAV = new function() {
         edit: function poiPanel_edit(name){
           var panel=this;
           panel.currentPOI=name;
+
+          if (name!='cursor') {
+            panel.poicursor.init(panel);
+          }
+
           $('div.action:first, #poipanel_inventory',panel._dom).hide(0);
 
           $('#poipanel_edit a').off('click.poipanel');
@@ -3507,7 +3547,7 @@ var DAV = new function() {
             panel.editCancel();
           });
           $('#poipanel_edit a.save').on('click.poipanel',function(e){
-            panel.editSaveNew();
+            panel.editSave();
           });
 
           var data=panel.panorama.poi.list[name].metadata||{};
@@ -3525,25 +3565,34 @@ var DAV = new function() {
           $('div.action:first, #poipanel_inventory',panel._dom).show(0);
         }, // poiPanel_editClose
 
-        editSaveNew: function poiPanel_editSaveNew() {
+        editSave: function poiPanel_editSave() {
 
             var panel=this;
             var panorama=panel.panorama;
 
-            panorama.poi.count=0;
-            $.each(panorama.poi.list,function(name){
-              if (name!=='cursor') {
-                 ++panorama.poi.count;
-              }
-            });
-
             var poi={};
-            var name='p'+(panorama.poi.count++);
+            var name;
+            var isNew;
 
-            // unique name
-            var offset=0;
-            while(panorama.poi.list[name]){
-              var name='p'+(panorama.poi.count+offset++);
+            if (panel.currentPOI=='cursor') {
+              isNew=true;
+              panorama.poi.count=0;
+              $.each(panorama.poi.list,function(name){
+                if (name!=='cursor') {
+                   ++panorama.poi.count;
+                }
+              });
+
+              name='p'+(panorama.poi.count++);
+
+              // unique name
+              var offset=0;
+              while(panorama.poi.list[name]){
+                var name='p'+(panorama.poi.count+offset++);
+              }
+
+            } else {
+              name=panel.currentPOI;
             }
 
             var coords=panorama.poi.list.cursor.instance.coords;
@@ -3571,13 +3620,18 @@ var DAV = new function() {
             panel.$('#pano canvas').off('mousedown.poipanel');
 
             panorama.poi.list.cursor.instance.remove();
+
+            if (!isNew) {
+              panorama.poi.list[name].instance.remove();
+            }
             panorama.poi.add(poi);
+
             panorama.drawScene();
-            panel.editSave();
+            panel.editSaveToServer();
 
-        }, // poiPanel_editSaveNew
+        }, // poiPanel_editSave
 
-        editSave: function poiPanel_editSave() {
+        editSaveToServer: function poiPanel_editSaveToServer() {
           var panel=this;
           var data=panel.panorama.poi.list[panel.currentPOI].metadata||{};
           data.name=$('#poipanel_edit #poi_name').val();
@@ -3617,6 +3671,7 @@ var DAV = new function() {
 
                 panel.editClose();
 
+
                 // update poicount
                 information.poicount=panel.panorama.poi.count;
                 information.updatepoicount();
@@ -3624,12 +3679,15 @@ var DAV = new function() {
                 // generate thumbnail
                 panel.panorama.poiThumb.update(panel.currentPOI);
 
-                // add to inventory
-                panel.addToInventory(panel.currentPOI,{prepend: true});
+                // just edited existing poi
+                var update=$('li#'+panel.currentPOI,panel._dom).length;
+
+                // add to inventory or update entry
+                panel.addToInventory(panel.currentPOI,{update: update, prepend: true});
               }
           });
 
-        }, // poiPanel_editSave
+        }, // poiPanel_editSaveToServer
 
         editCancel: function poiPanel_editCancel() {
           var panel=this;
@@ -3642,11 +3700,6 @@ var DAV = new function() {
            }
           }
 
-          if (panel.panorama.poi.list[panel.currentPOI] && !panel.panorama.poi.list[panel.currentPOI].saved) {
-            panel.panorama.poi.list[panel.currentPOI].instance.remove();
-            --panel.panorama.poi.count;
-          }
-
           panel.panorama.drawScene();
 
           panel.editClose();
@@ -3656,22 +3709,36 @@ var DAV = new function() {
         addToInventory: function poiPanel_addToInventory(name,options){
           var panel=this;
           var data=panel.panorama.poi.list[name].metadata;
+
+          if (options && options.update){
+            var li=$('li#'+name,panel._dom);
+            $('div.name',li).text(data.name);
+            $('div.description',li).text(data.description);
+            return;
+          }
+
           var li='<li id="'+name+'">';
           li+='<div class="thumb">';
           li+='<canvas class="poithumb" />';
           li+='</div>';
           li+='<div class="details">';
-          li+='<div class="name">'+data.name+'</div>';
-          li+='<div class="description">'+data.description+'</div>';
+          li+='<div class="name"></div>';
+          li+='<div class="description"></div>';
           li+='</div>'; // .details
-          li+='<div class="buttons"></div>';
+          li+='<div class="buttons">';
+          li+='<a class="fa fa-trash-o fa-fw button"></a>';
+          li+='<a class="fa fa-pencil-square-o fa-fw button"></a>';
+          li+='</div>';
           li+='</li>';
           if (options && options.prepend){
             $('ul.poi',panel._dom).prepend(li);
           } else {
             $('ul.poi',panel._dom).append(li);
           }
-          $('li#'+name+' canvas',panel._dom).replaceWith(panel.panorama.poi.list[name].thumb.canvas);
+          var li=$('li#'+name,panel._dom);
+          $('div.name',li).text(data.name);
+          $('div.description',li).text(data.description);
+          $('canvas',li).replaceWith(panel.panorama.poi.list[name].thumb.canvas);
 
         }, // poiPanel_addToInventory
 
@@ -3684,7 +3751,18 @@ var DAV = new function() {
           $('#poipanel_inventory .list',panel._dom)
             .height($(panel._dom).height()-$('#poipanel_inventory .list',panel._dom).offset().top-32)
             .mCustomScrollbar('update');
-        } // poiPanel_resize
+        }, // poiPanel_resize
+
+        _panel_init: Panel.prototype.init,
+        init: function poiPanel_init() {
+          var panel=this;
+          panel._panel_init();
+          $(document).on('keydown',function(e){
+            if (panel.visible && panel.istoplevel() && $('#poipanel_inventory',panel._dom).is(':visible')) {
+              panel.$(panel.window.document).trigger(e);
+            }
+          });
+        } // poiPanel_init
     });
 
 }; // DAV
