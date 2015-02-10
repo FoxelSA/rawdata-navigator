@@ -3626,6 +3626,8 @@ var DAV = new function() {
             }
             panorama.poi.add(poi);
 
+            panel.inventory_setSelection([name]);
+
             panorama.drawScene();
             panel.editSaveToServer();
 

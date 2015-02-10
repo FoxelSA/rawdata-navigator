@@ -1355,7 +1355,7 @@ window.text2canvas=function text2canvas(text,options) {
   canvas.height=64;
   ctx=canvas.getContext('2d');
   ctx.rect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle="#c0d1b2";
+  ctx.fillStyle="#ffffff";
   ctx.strokeStyle="#000000";
   ctx.fill();
   ctx.lineWidth=2;
