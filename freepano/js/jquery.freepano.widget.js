@@ -854,12 +854,15 @@ function WidgetFactory(options) {
 
       }, // widgetList_get_mouseover_list
 
-      show: function widgetList_show(options) {
+      show: function widgetList_show(options,callback) {
 
         var widgetList=this;
 
         if (typeof(options)=='string') {
-          options={name: options};
+          options={
+            name: options,
+            callback: callback
+          };
         }
 
         var panorama=widgetList.panorama;
@@ -871,7 +874,12 @@ function WidgetFactory(options) {
             dlon+=(dlon<0)?360:-360;
         }
 
-        if (dlon==0 && dlat==0) return;
+        if (dlon==0 && dlat==0) {
+          if (typeof(options.callback=="function")){
+            callback(widget);
+          }
+          return;
+        }
 
         panorama.mode.show=true;
         var it=0;
@@ -887,6 +895,9 @@ function WidgetFactory(options) {
           else {
             panorama.mode.show=false;
             widget.instance.callback('show');
+            if (typeof(options.callback=="function")){
+              callback(widget);
+            }
           }
         };
         requestAnimationFrame(_drawScene);
