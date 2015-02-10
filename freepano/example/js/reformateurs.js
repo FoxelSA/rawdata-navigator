@@ -271,6 +271,8 @@ $(document).on('filesloaded', function(){
 
           radius: 14,
 
+          initialScale: 0.3,
+
           object3D: function DAV_poi_object3D(){
               var poi=this;
               var object3D=new THREE.Object3D();
@@ -290,7 +292,7 @@ $(document).on('filesloaded', function(){
                  transparent: true,
                  depthWrite: false,
                  depthTest: false,
-                 opacity: 0.6
+                 opacity: 0.8
                 })
               );
               mesh.position.y=0.5;
@@ -308,6 +310,7 @@ $(document).on('filesloaded', function(){
                 new THREE.LineBasicMaterial()
               );
               object3D.add(line);
+              object3D.scale.x=object3D.scale.y=object3D.scale.z=poi.initialScale;
 
               return object3D;
           },
@@ -1344,9 +1347,9 @@ window.text2canvas=function text2canvas(text,options) {
   if (!options) options={};
   var canvas=document.createElement('canvas');
   var ctx=canvas.getContext('2d');
-  ctx.font=options.font||"Bold 48px Helvetica";
-  ctx.fillStyle=options.fillStyle||"rgba(0,0,0,0.8)";
-  ctx.strokeStyle=options.strokeStyle||"rgba(255,255,255,0.8)";
+  ctx.font=options.font||"Bold 48px helvetica";
+  ctx.fillStyle=options.fillStyle||"rgba(0,0,0,1)";
+  ctx.strokeStyle=options.strokeStyle||"rgba(255,255,255,1)";
   ctx.align='left';
   ctx.textBaseline='middle';
   var size=ctx.measureText(text);
@@ -1368,9 +1371,9 @@ window.text2canvas=function text2canvas(text,options) {
   ctx.stroke();
   ctx.closePath();
   ctx.beginPath();
-  ctx.font=options.font||"Bold 48px Helvetica";
-  ctx.fillStyle=options.fillStyle||"rgba(0,0,0,0.8)";
-  ctx.strokeStyle=options.strokeStyle||"rgba(255,255,255,0.8)";
+  ctx.font=options.font||"Bold 48px helvetica";
+  ctx.fillStyle=options.fillStyle||"rgba(0,0,0,1)";
+  ctx.strokeStyle=options.strokeStyle||"rgba(255,255,255,1)";
   ctx.align='left';
   ctx.textBaseline='middle';
   ctx.fillText(text,16,canvas.height/2,(canvas.width-80));
