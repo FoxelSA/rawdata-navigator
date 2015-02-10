@@ -1,5 +1,5 @@
 <?php                                                                                                                
-$poi_path="/data/footage/demodav/1404381299/poi/";
+$poi_path="/data/footage/demodav/1404383663/poi/";
 
 if (isset($_POST['cmd'])) {
   $json=$poi_path.$_GET['initial'].".json";
@@ -91,6 +91,7 @@ if (isset($_GET['action']) && $_GET['action']=="poi_list") {
     <title>Freepano Example - https://github.com/FoxelSA/freepano</title>
     <!--meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimum-scale=1,maximum-scale=1" /-->
     <script type="text/javascript">
+        var poi_path='<?php print($poi_path); ?>'
         <?php if (isset($_GET['initial'])): ?>
             var initialImage = '<?php print ($_GET['initial']); ?>';
         <?php endif; ?>

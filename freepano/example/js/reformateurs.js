@@ -156,7 +156,7 @@ $(document).on('filesloaded', function(){
         current: 1.0,
 
         // maximal zoom value
-        max: 5
+        max: 10
 
       }
 

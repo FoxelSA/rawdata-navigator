@@ -702,6 +702,14 @@ a, a:link, a:visited, a:hover, a:active {
   user-select: none;
 }
 
+.input {
+  -moz-user-select: text;
+  -webkit-user-select: text;
+  -ms-user-select: text;
+  -o-user-select: text;
+  user-select: text;
+}
+
 .content2 {
   position: absolute;
   height: 100%;
