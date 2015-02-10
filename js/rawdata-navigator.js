@@ -3338,7 +3338,7 @@ var DAV = new function() {
             } else {
               if (!poi.selected) {
                 poi.selected=true;
-                poi.scale(poi.initialScale*3);
+                poi.scale(poi.initialScale*2.5);
                 poi.radius=panel.panorama.sphere.radius-2;
                 poi.setColor(poi.color.selected);
                 $('#'+name,panel._dom).addClass('selected');
