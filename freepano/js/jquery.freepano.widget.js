@@ -896,7 +896,9 @@ function WidgetFactory(options) {
             panorama.mode.show=false;
             widget.instance.callback('show');
             if (typeof(options.callback=="function")){
-              callback(widget);
+              setTimeout(function(){
+                callback(widget);
+              },150);
             }
           }
         };
