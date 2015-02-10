@@ -3022,9 +3022,13 @@ var DAV = new function() {
                             $.each(json.list,function(){
                                 pointcountvignette++;
                             });
-                            $('#vignettes div.wrap.vignette'+index+' .countpoivignette').html(''+pointcountvignette);
-                            $('#vignettes div.wrap.vignette'+index+' img.thumb').attr('src',testpanoimg);
-                            $('#vignettes div.wrap.vignette'+index).css('display','block');
+                            if (pointcountvignette > 0) {
+                                $('#vignettes div.wrap.vignette'+index+' .countpoivignette').html(''+pointcountvignette);
+                                $('#vignettes div.wrap.vignette'+index+' img.thumb').attr('src',testpanoimg);
+                                $('#vignettes div.wrap.vignette'+index).css('display','block');
+                            } else {
+                                $('#vignettes div.wrap.vignette'+index).remove();
+                            }
                         }
                     }
                 });
