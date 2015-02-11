@@ -857,6 +857,11 @@ function WidgetFactory(options) {
       show: function widgetList_show(options,callback) {
 
         var widgetList=this;
+        var panorama=widgetList.panorama;
+
+        if (panorama.mode.show) {
+          return;
+        }
 
         if (typeof(options)=='string') {
           options={
@@ -865,7 +870,6 @@ function WidgetFactory(options) {
           };
         }
 
-        var panorama=widgetList.panorama;
         var widget=widgetList.list[options.name];
         var dlon=(widget.coords.lon-panorama.lon+90)%360;
         var dlat=(widget.coords.lat-panorama.lat)%180;
