@@ -591,11 +591,43 @@ $.extend(true,Panorama.prototype,{
       mouseFar.w=1;
 
       this.mouseCoords=new THREE.Vector4().subVectors(mouseFar,mouseNear);
-
       var m=this.mouseCoords;
+
       var r=Math.sqrt(m.x*m.x+m.y*m.y+m.z*m.z);
       var phi=Math.acos(this.mouseCoords.x/r);
       var theta=Math.atan2(this.mouseCoords.y,this.mouseCoords.z);
+
+      if (this.debugmouse) {
+        var lon=THREE.Math.radToDeg(phi);
+        var lat=THREE.Math.radToDeg(theta);
+
+        var div=$('#mousecoords');
+        if (!div.length) {
+          div=$('<div id="mousecoords">').appendTo('body').css({
+              position: 'absolute',
+              bottom: 0,
+              right: 0,
+              width: 240,
+              backgroundColor: "rgba(0,0,0,.6)",
+              color: 'white'
+          });
+        }
+
+        var html='<div style="width: 100%; position: relative; margin-left: 10px;">';
+        html+='x: '+m.x.toPrecision(6)+'<br />';
+        html+='y: '+m.y.toPrecision(6)+'<br />';
+        html+='z: '+m.z.toPrecision(6)+'<br />';
+        html+='lon: '+lon.toPrecision(6)+'<br />';
+        html+='lat: '+lat.toPrecision(6)+'<br />';
+        lon=(lon-90)%360;
+        if (lon<0) lon+=360;
+        if (lat>90) lat-=180;
+        if (lat<-90) lat+=180;
+        html+='tx: '+(this.sphere.texture.height/180*lon).toPrecision(6)+'<br />';
+        html+='ty: '+(this.sphere.texture.height/180*lat+this.sphere.texture.height/2).toPrecision(6)+'<br />';
+        html+='</div>';
+        div.html(html);
+      }
 
       this.mouseCoords.x=-this.sphere.radius*Math.sin(phi)*Math.cos(theta);
       this.mouseCoords.y=-this.sphere.radius*Math.sin(phi)*Math.sin(theta);
