@@ -570,13 +570,12 @@ $.extend(true,Panorama.prototype,{
 
       var mouseNear=new THREE.Vector4(0,0,0,1);
       var offset=$(this.renderer.domElement).offset();
-      var PX=mouseNear.x=-1+2*((e.clientX-offset.left)/this.renderer.domElement.width);
-      var PY=mouseNear.y=1-2*((e.clientY-offset.top)/this.renderer.domElement.height)
-      //var factor=Math.cos( Math.atan( Math.sqrt( PX * PX + PY * PY ) ) );
-      mouseNear.z=0.5;
+      mouseNear.x=-1+2*((e.clientX-offset.left)/this.renderer.domElement.width);
+      mouseNear.y=1-2*((e.clientY-offset.top)/this.renderer.domElement.height)
+      mouseNear.z=0;
 
       var mouseFar=mouseNear.clone();
-      mouseFar.z=-0.5;
+      mouseFar.z=-0.9;
 
       mouseNear.applyMatrix4(this.iMatrix);
       mouseFar.applyMatrix4(this.iMatrix);
@@ -591,9 +590,10 @@ $.extend(true,Panorama.prototype,{
       mouseFar.z/=mouseFar.w;
       mouseFar.w=1;
 
-      this.mouseCoords=new THREE.Vector4().subVectors(mouseFar,mouseNear).normalize();
+      this.mouseCoords=new THREE.Vector4().subVectors(mouseFar,mouseNear);
 
-      var r=this.mouseCoords.length();
+      var m=this.mouseCoords;
+      var r=Math.sqrt(m.x*m.x+m.y*m.y+m.z*m.z);
       var phi=Math.acos(this.mouseCoords.x/r);
       var theta=Math.atan2(this.mouseCoords.y,this.mouseCoords.z);
 
