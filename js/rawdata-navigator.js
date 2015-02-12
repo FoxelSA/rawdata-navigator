@@ -3379,9 +3379,12 @@ var DAV = new function() {
 
         on_poi_list_ready: function poiPanel_on_poilist_ready(e) {
           var panel=this;
-          if (!$('#p0',panel._dom).length) { // fixme: on_poi_list_ready is called twice
+          if (!$('#p0',panel._dom).length) { // fixme: on_poi_list_ready is called twice -- should be fixed already
             poiPanel.inventory_update();
+          } else {
+            console.log('fixme')
           }
+
         }, // poiPanel_on_poi_list_ready
 
         addPOI: function poiPanel_addPOI() {
@@ -3397,7 +3400,11 @@ var DAV = new function() {
         }, // poiPanel_addPOI
 
 
+        /*
+         * poiPanel_poicursor
+         */
         poicursor: {
+
           init: function poicursor_init(panel) {
 
             var poicursor=this;
@@ -3410,6 +3417,7 @@ var DAV = new function() {
                 lon: panel.panorama.poi.list[panel.currentPOI].instance.coords.lon,
                 lat: panel.panorama.poi.list[panel.currentPOI].instance.coords.lat
               }
+
             } else {
               coords={
                 lon: panel.panorama.lon-90, 
@@ -3421,6 +3429,7 @@ var DAV = new function() {
 
               cursor: {
 
+                // we want the cursor above POIs
                 radius: panel.panorama.sphere.radius-2.5,
 
                 coords: coords,
@@ -3508,8 +3517,19 @@ var DAV = new function() {
             poicursor.coords=panorama.getMouseCoords(e);
             poicursor.coords.lon-=180;
 
+
             poicursor.coords.lon+=panorama.lon;
             poicursor.coords.lat+=panorama.lat;
+
+            var lat=poicursor.coords.lat;
+            var lon=poicursor.coords.lon;
+
+            if (lon<0) lon+=360;
+            if (lon>360) lon-=360;
+            if (lat>90) lat-=180;
+            if (lat<-90) lat+=180;
+            console.log('textureCoords=',panorama.sphere.texture.height/180*lon,panorama.sphere.texture.height/180*lat+panorama.sphere.texture.height/2);
+
 
             if (!$('#poipanel_edit',panel._dom).is(':visible')) {
               panel.edit(panel.currentPOI);
@@ -3519,6 +3539,7 @@ var DAV = new function() {
 
         }, // poiPanel_poicursor
 
+        /*
         mouseoverlay: {
 
           show: function poiPanel_mouseoverlay_show() {
@@ -3546,6 +3567,7 @@ var DAV = new function() {
           }
 
         }, // poiPanel_mouseoverlay
+        */
 
         edit: function poiPanel_edit(name){
           var panel=this;
