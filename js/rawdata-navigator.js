@@ -3522,14 +3522,13 @@ var DAV = new function() {
             poicursor.coords.lat+=panorama.lat;
 
             var lat=poicursor.coords.lat;
-            var lon=poicursor.coords.lon;
+            var lon=poicursor.coords.lon-90;
 
             if (lon<0) lon+=360;
             if (lon>360) lon-=360;
             if (lat>90) lat-=180;
             if (lat<-90) lat+=180;
             console.log('textureCoords=',panorama.sphere.texture.height/180*lon,panorama.sphere.texture.height/180*lat+panorama.sphere.texture.height/2);
-
 
             if (!$('#poipanel_edit',panel._dom).is(':visible')) {
               panel.edit(panel.currentPOI);
