@@ -192,53 +192,59 @@
             <tr>
                 <th></th>
                 <th width="550">Projets</th>
-                <th><i class="fa fa-cog" /></th>
-                <th><i class="fa fa-plus-circle" /></th>
+                <th style="color:#ecb100;"><i class="fa fa-search" /></th>
+                <th style="color:#ecb100;"><i class="fa fa-cog" /></th>
+                <th style="color:#ecb100;"><i class="fa fa-plus-circle" /></th>
             </tr>
         </thead>
         <tbody>
             <tr class="space">
-                <td colspan="4"></td>
+                <td colspan="5"></td>
             </tr>
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>SITG</td>
+                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['both','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
             <tr class="space">
-                <td colspan="4"></td>
+                <td colspan="5"></td>
             </tr>
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>3D</td>
+                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['both','pointcloud']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
             <tr class="space">
-                <td colspan="4"></td>
+                <td colspan="5"></td>
             </tr>
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>POI</td>
+                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['both','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
             <tr class="space">
-                <td colspan="4"></td>
+                <td colspan="5"></td>
             </tr>
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>Statue Dufour</td>
+                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['dufour','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
             <tr class="space">
-                <td colspan="4"></td>
+                <td colspan="5"></td>
             </tr>
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>Street View</td>
+                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['both','panorama']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
@@ -249,44 +255,92 @@
             <tr>
                 <th></th>
                 <th width="550">Régions</th>
-                <th><i class="fa fa-cog" /></th>
-                <th><i class="fa fa-plus-circle" /></th>
+                <th style="color:#ecb100;"><i class="fa fa-search" /></th>
+                <th style="color:#ecb100;"><i class="fa fa-cog" /></th>
+                <th style="color:#ecb100;"><i class="fa fa-plus-circle" /></th>
             </tr>
         </thead>
         <tbody>
             <tr class="space">
-                <td colspan="4"></td>
+                <td colspan="5"></td>
             </tr>
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>Genève</td>
+                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['both','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
             <tr class="space">
-                <td colspan="4"></td>
+                <td colspan="5"></td>
             </tr>
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>Mur des Réformateurs</td>
+                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['reformateurs','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
             <tr class="space">
-                <td colspan="4"></td>
+                <td colspan="5"></td>
             </tr>
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>Parc des Bastions</td>
+                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['reformateurs','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
             <tr class="space">
-                <td colspan="4"></td>
+                <td colspan="5"></td>
             </tr>
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>Place de Neuve</td>
+                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['dufour','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+        </tbody>
+    </table>
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th width="550">Type de données</th>
+                <th style="color:#ecb100;"><i class="fa fa-search" /></th>
+                <th style="color:#ecb100;"><i class="fa fa-cog" /></th>
+                <th style="color:#ecb100;"><i class="fa fa-plus-circle" /></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="space">
+                <td colspan="5"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>RAW</td>
+                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['both','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+            <tr class="space">
+                <td colspan="5"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>Panorama</td>
+                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['both','panorama']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
+                <td><i class="fa fa-cog" /></td>
+                <td><i class="fa fa-minus-circle" /></td>
+            </tr>
+            <tr class="space">
+                <td colspan="5"></td>
+            </tr>
+            <tr>
+                <td><i class="fa fa-sort" /></td>
+                <td>Point Cloud</td>
+                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['both','pointcloud']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
@@ -380,7 +434,7 @@
       <div>Gestion des points d'intérêt</div>
     </div>
 
-    <div class="action">
+    <div class="addpoi action">
       <a id="addpoi" class="button">Ajouter</a>
     </div>
 
@@ -470,8 +524,11 @@
         <h2>Recherche de données</h2>
         <select multiple="multiple"></select>
         <h3>Recherche rapide</h3>
-        <a href="#" class="quick" onclick="DAV.allocation.quicksearch('both');return false;">Projet SITG</a>
-        <a href="#" class="quick" onclick="DAV.allocation.quicksearch('reformateurs');return false;">Mur des Réformateurs</a>
+        <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['both','raw']);return false;">Projet SITG (RAW)</a>
+        <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['both','panorama']);return false;">Projet SITG (Panoramas)</a>
+        <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['both','poi']);return false;">Projet SITG (Points d'intérêts)</a>
+        <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['both','pointcloud']);return false;">Projet SITG (Point Clouds)</a>
+        <a style="margin-top:20px;" href="#" class="quick" onclick="DAV.allocation.quicksearch(['reformateurs','raw']);return false;">Mur des Réformateurs (RAW)</a>
   </div>
 
   <!--div id="search">
@@ -500,10 +557,13 @@
       <a class="button" id="a_pointcloudpanel">Point Cloud</a>
    </div>
    -->
+
+   <img class="logo" src="img/foxel.png" width="150" alt="FOXEL" />
+
    <div id="usages" class="data">
        <div class="usage posepreview">
-            <div class="title">Preview</div>
-            <div class="nocloseable">
+            <div class="title pointer">Preview</div>
+            <div class="closeable">
                 <div class="preview"><img onerror="nopreview(this);"></img></div>
                 <div class="actions">
                   <a href="" class="download_tiles"><div class="action">Download RAW tiles...</div></a>

@@ -44,7 +44,7 @@
 
 $(document).ready(function(){
 
-  var filesToLoad=1;
+  var filesToLoad=2;
 
   function file_onload() {
     --filesToLoad;
@@ -53,14 +53,23 @@ $(document).ready(function(){
     }
   }
 
-   
   // load image with alpha channel to use as POI cursor
   window.poicursor_texture=new THREE.ImageUtils.loadTexture(
     '../../img/dav-cursor.png',
-    new THREE.UVMapping(),
+    THREE.UVMapping,
     file_onload,
     function onloaderror() {
       $.notify('Cannot load dav-cursor.png !');
+    }
+  );
+
+  // load image with alpha channel to use as POI
+  window.poi_texture=new THREE.ImageUtils.loadTexture(
+    '../../img/dav-cursor-blank.png',
+    THREE.UVMapping,
+    file_onload,
+    function onloaderror() {
+      $.notify('Cannot load dav-cursor-blank.png !');
     }
   );
 
@@ -138,6 +147,7 @@ $(document).on('filesloaded', function(){
 /*
     // panorama.camera: main camera options
 
+*/
     camera: {
 
       zoom: {
@@ -146,12 +156,12 @@ $(document).on('filesloaded', function(){
         current: 1.0,
 
         // maximal zoom value
-        max: 1.5
+        max: 10
 
       }
 
     }, // camera
-
+/*
     // panorama.sphere: sphere object defaults
     // normally you dont need to modify this
 
@@ -240,46 +250,92 @@ $(document).on('filesloaded', function(){
       // use a secondary scene for rendering widgets (eg when using filters)
       overlay: true,
 
-      // panorama.poi.defaults: default values for POIs
+//      camera: {
+//        instance: new THREE.OrthographicCamera(-10,10,10,-10,0.1,15.1),
+//      },
+
+      // panorama.poi.defaults: default values for POI_list
       defaults: {
 
+        // panorama.poi.defaults.poi: default values for POIs
+        poi: {
           // set to false to disable mouse event handling
           handleMousevents: true,
 
           color: {
-             active: '#0000ff',
-             hover: '#ffffff',
-             normal: '#000000'
+             active: '#bbbbbb',
+             hover: '#dddddd',
+             normal: '#ffffff',
+             selected: '#ecb100'
           },
+
+          radius: 14,
+
+          initialScale: 0.3,
+
+          object3D: function DAV_poi_object3D(){
+              var poi=this;
+              var object3D=new THREE.Object3D();
+
+              // poi icon
+              object3D.add(poi.icon());
+
+              // poi title
+              poi.title=text2canvas(poi.metadata.name);
+              console.log(poi.title);
+              var map=new THREE.Texture(poi.title);
+              map.needsUpdate=true;
+              var mesh=new THREE.Mesh(
+                new THREE.PlaneBufferGeometry(poi.title.width/150,poi.title.height/150,100),
+                new THREE.MeshBasicMaterial({
+                 map: map,
+                 transparent: true,
+                 depthWrite: false,
+                 depthTest: false,
+                 opacity: 0.8
+                })
+              );
+              mesh.position.y=0.5;
+              object3D.add(mesh);
+
+              // poi line
+              var geometry=new THREE.Geometry();
+              geometry.vertices.push(
+                new THREE.Vector3(0,0,-1),
+                new THREE.Vector3(0,0.2,-1),
+                new THREE.Vector3(0,0.52-poi.title.height/300,-1)
+              );
+              var line=new THREE.Line(
+                geometry,
+                new THREE.LineBasicMaterial()
+              );
+              object3D.add(line);
+              object3D.scale.x=object3D.scale.y=object3D.scale.z=poi.initialScale;
+
+              return object3D;
+          },
+
+          icon: function DAV_poi_icon() {
+            return new THREE.Mesh(
+              new THREE.PlaneBufferGeometry(Math.PI/36,Math.PI/36,1,1),
+              new THREE.MeshBasicMaterial({
+                map: poi_texture,
+                transparent: true,
+                depthWrite: false,
+                depthTest: false,
+                opacity: 0.5
+              })
+            );
+          }
+        }, // defaults.poi
 
           // event handlers below are already filtered
           // eg: mousein and mouseout are not triggered during panorama rotation
           // if you really need, you can hook to the 'private' methods (eg: _mousein)
 
-          onmousein: function poi_mousein(e) {
-            console.log('mousein',this);
-          },
+      }, // defaults
 
-          onmouseout: function poi_mouseout(e) {
-            console.log('mouseout',this);
-          },
-
-          onmouseover: function poi_mouseover(e) {
-          },
-
-          onmousedown: function poi_mousedown(e) {
-            console.log('mousedown',this);
-          },
-
-          onmouseup: function poi_mouseup(e) {
-            console.log('mouseup',this);
-          },
-
-          onclick: function poi_click(e) {
-            console.log('click',this);
-          },
-      },
-    },
+    }, // poi
 
       /*
 
@@ -1220,6 +1276,13 @@ $(document).on('filesloaded', function(){
 
     postProcessing: {
       enabled: false,
+
+      green: {
+        shader: THREE.GreenShader,
+        enabled: false,
+        uniforms: {}
+      },
+
       edge: {
         shader: THREE.EdgeShader,
         enabled: false,
@@ -1259,6 +1322,9 @@ $(document).on('filesloaded', function(){
     case 50:
       toggleEffect(panorama.postProcessing.edge2);
       break;
+    case 51:
+      toggleEffect(panorama.postProcessing.green);
+      break;
     case 77:
       var map = panorama.map;
       if(map) {
@@ -1267,7 +1333,7 @@ $(document).on('filesloaded', function(){
       break;
     }
 
-    if (panorama.postProcessing) panorama.postProcessing.enabled=panorama.postProcessing.edge.pass.enabled||panorama.postProcessing.edge2.pass.enabled;
+    if (panorama.postProcessing) panorama.postProcessing.enabled=panorama.postProcessing.edge.pass.enabled||panorama.postProcessing.edge2.pass.enabled||panorama.postProcessing.green.pass.enabled;
   });
 
   function toggleEffect(effect){
@@ -1276,3 +1342,55 @@ $(document).on('filesloaded', function(){
   }
 
 });
+
+window.text2canvas=function text2canvas(text,options) {
+  if (!options) options={};
+  var canvas=document.createElement('canvas');
+  var ctx=canvas.getContext('2d');
+  ctx.font=options.font||"Bold 48px helvetica";
+  ctx.fillStyle=options.fillStyle||"rgba(0,0,0,1)";
+  ctx.strokeStyle=options.strokeStyle||"rgba(255,255,255,1)";
+  ctx.align='left';
+  ctx.textBaseline='middle';
+  var size=ctx.measureText(text);
+  console.log(text);
+  canvas.width=size.width+16+48;
+  canvas.height=64;
+  ctx=canvas.getContext('2d');
+  ctx.rect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#ffffff";
+  ctx.strokeStyle="#000000";
+  ctx.fill();
+  ctx.lineWidth=2;
+  ctx.stroke();
+  ctx.closePath();
+  ctx.beginPath();
+  ctx.rect(2,2,canvas.width-2,canvas.height-2);
+  ctx.lineWidth=1;
+  ctx.strokeStyle="#ffffff";
+  ctx.stroke();
+  ctx.closePath();
+  ctx.beginPath();
+  ctx.font=options.font||"Bold 48px helvetica";
+  ctx.fillStyle=options.fillStyle||"rgba(0,0,0,1)";
+  ctx.strokeStyle=options.strokeStyle||"rgba(255,255,255,1)";
+  ctx.align='left';
+  ctx.textBaseline='middle';
+  ctx.fillText(text,16,canvas.height/2,(canvas.width-80));
+  ctx.strokeText(text,16,canvas.height/2,(canvas.width-80));
+  ctx.beginPath();
+  ctx.rect(canvas.width-48,0,canvas.width,canvas.height);
+  ctx.fill();
+  return canvas;                                                                                                      
+}  
+
+window.next_power_of_two=function next_power_of_2(x) {
+   x = x - 1; 
+   x = x | (x >> 1); 
+   x = x | (x >> 2); 
+   x = x | (x >> 4); 
+   x = x | (x >> 8); 
+   return x + 1; 
+} 
+   
+

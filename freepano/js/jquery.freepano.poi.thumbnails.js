@@ -57,13 +57,17 @@ $.extend(POI_thumb.prototype,{
         stencilBuffer: false,
         depthBuffer: false
       },
-      fov: 30
-      
+      cameraOptions: {
+        fov: 30,
+        nearPlane: Camera.prototype.defaults.nearPlane,
+        farPlane: Camera.prototype.defaults.farPlane
+      }
     },
 
     init: function poiThumb_init() {
 
       var poiThumb=this;
+      var panorama=poiThumb.panorama;
 
       poiThumb.renderTarget=new THREE.WebGLRenderTarget(
         poiThumb.width,
@@ -74,13 +78,11 @@ $.extend(POI_thumb.prototype,{
       poiThumb.scene=new THREE.Scene();
 
       poiThumb.camera=new THREE.PerspectiveCamera(
-        poiThumb.fov,
+        poiThumb.cameraOptions.fov,
         poiThumb.width/poiThumb.height,
-        panorama.camera.nearPlane,
-        panorama.camera.farPlane
-      }
-
-      poiThumb.bitmap=new Uint8Array(poiThumb.width*poiThumb.height);
+        poiThumb.cameraOptions.nearPlane,
+        poiThumb.cameraOptions.farPlane
+      );
 
     }, // poiThumb_init
 
@@ -92,26 +94,38 @@ $.extend(POI_thumb.prototype,{
 
       poiThumb.update();
 
-      // propagate panorama 'ready' event
-      poiThumb.panorama_prototype_callback.apply(e.target,[e]);
-      panorama.drawScene();
-
     }, // poiThumb_onPanoramaReady
 
-    update: function poiThumb_update(){
+    update: function poiThumb_update(name){
 
       var poiThumb=this;
       var panorama=poiThumb.panorama;
 
+      var list;
+      if (name){
+        // if poiThumb.image exists, update
+        if (panorama.poi.list[name].thumb) {
+          panorama.poi.list[name].thumb.init('update');
+          return;
+        }
+        poilist={};
+        poilist[name]=panorama.poi.list[name];
+      } else {
+        poilist=panorama.poi.list;
+      }
+
       // borrow panorama sphere
       poiThumb.scene.add(panorama.sphere.object3D);
 
-      $.each(panorama.poi.list,function(name){
+      $.each(poilist,function(name){
         var poi=this;
         if (!poi.thumb) {
-          poi.thumb=new poiThumb.image({
+          canvas=document.createElement('canvas');
+          canvas.className='poithumb';
+          panorama.poi.list[name].thumb=new poiThumb.image({
             panorama: panorama,
-            poiname: name
+            poiname: name,
+            canvas: canvas
           });
         }
       });
@@ -138,26 +152,40 @@ $.extend(true,POI_thumb.prototype.image.prototype,{
     defaults: {
     },
 
-    init: function poiThumb_image_init() {
+    init: function poiThumb_image_init(update) {
       var image=this;
       var panorama=this.panorama;
       var poiThumb=panorama.poiThumb;
 
       // set sphere rotation
-      poiThumb.viewRotationMatrix=(new THREE.Matrix4()).makeRotationAxis(new THREE.Vector3(0,0,1),-THREE.Math.degToRad(panorama.poi.list[poiThumb.name].coords.lat));
-      poiThumb.viewRotationMatrix.multiply((new THREE.Matrix4()).makeRotationAxis(new THREE.Vector3(0,1,0),THREE.Math.degToRad(panorama.poi.list[poiThumb.name].coords.lon)));
+      var viewRotationMatrix=(new THREE.Matrix4()).makeRotationAxis(new THREE.Vector3(1,0,0),THREE.Math.degToRad(panorama.poi.list[image.poiname].coords.lat));
+      viewRotationMatrix.multiply((new THREE.Matrix4()).makeRotationAxis(new THREE.Vector3(0,1,0),THREE.Math.degToRad(panorama.poi.list[image.poiname].coords.lon)));
       panorama.sphere.object3D.matrixAutoUpdate=false;
-      panorama.sphere.object3D.matrix.copy(panorama.rotation.matrix.clone());
-      panorama.sphere.object3D.matrix.multiply(poiThumb.viewRotationMatrix);
+      //panorama.sphere.object3D.matrix.copy(panorama.rotation.matrix.clone());
+      //panorama.sphere.object3D.matrix.multiply(viewRotationMatrix);
+      panorama.sphere.object3D.matrix.copy(viewRotationMatrix);
 
       // render thumbnail to framebuffer
-      panorama.renderer.render(poiThumb.scene,poiThumb.camera.instance,poiThumb.renderTarget,true);
+      panorama.renderer.render(poiThumb.scene,poiThumb.camera,poiThumb.renderTarget,true);
 
       // read thumbnail image data
-      var gl=panorama.renderer.getContext();                                                                    
-      gl.readPixels(0,0,poiThumb.renderTarget.height-e.pageY,1,1,gl.RGBA,gl.UNSIGNED_BYTE,poiThumb.bitmap);
+      var w=poiThumb.width;
+      var h=poiThumb.height;
+      image.canvas.width=w;
+      image.canvas.height=h;
+      var ctx=image.canvas.getContext('2d');
+      ctx.scale(1,-1); // flip context vertically
 
-      image.canvas(
+      var bitmap=new Uint8Array(w*h*4);
+      image.imageData=ctx.createImageData(w,h);
+
+      var gl=panorama.renderer.getContext();                                                                    
+      gl.readPixels(0,0,w,h,gl.RGBA,gl.UNSIGNED_BYTE,bitmap);
+
+      image.imageData.data.set(bitmap);
+
+      // draw thumbnail
+      ctx.putImageData(image.imageData,0,0);
 
     } // POIThumb.image_init
 
@@ -172,5 +200,5 @@ $.extend(true,Panorama.prototype,{
     }
 });
 
-Panorama.prototype.setupCallback(POI_thumb.prototype); // maybe should go in poiThumb_init (but then for every other module too)
+Panorama.prototype.setupCallback(POI_thumb.prototype);
 

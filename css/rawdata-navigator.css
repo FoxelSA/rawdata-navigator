@@ -291,7 +291,7 @@ a, a:link, a:visited, a:hover, a:active {
 
 #allocation {
     position:relative;
-    top:100px;
+    top:70px;
     width:430px;
     padding:30px;
 }
@@ -462,6 +462,7 @@ a, a:link, a:visited, a:hover, a:active {
   font-size: 2em;
   padding-left: 1em;
   padding-right: 1em;
+  border-radius: 7px;
 }
 
 #infopanel .viewers a:hover, #video_player a.button:hover, #poipanel a.button:hover {
@@ -535,6 +536,12 @@ a, a:link, a:visited, a:hover, a:active {
         font-size:10px;
         font-weight:700;
         text-transform:uppercase;
+    }
+
+    #pose_info .logo {
+        position:absolute;
+        top:19px;
+        left:33px;
     }
 
     #video_player .jump {
@@ -683,7 +690,7 @@ a, a:link, a:visited, a:hover, a:active {
 
 #home .logo {
     position:absolute;
-    top:60px;
+    top:21px;
     left:38px;
 }
 
@@ -693,6 +700,14 @@ a, a:link, a:visited, a:hover, a:active {
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
+}
+
+.input {
+  -moz-user-select: text;
+  -webkit-user-select: text;
+  -ms-user-select: text;
+  -o-user-select: text;
+  user-select: text;
 }
 
 .content2 {
@@ -1039,7 +1054,7 @@ a.reload {
         }
 
 
-#poipanel_edit { 
+#poipanel_edit {
   display: none;
 
 }
@@ -1055,12 +1070,18 @@ a.reload {
 #poipanel action a.button {
 }
 
+#poipanel .addpoi {
+  position: relative;
+  top: 1.8em;
+  margin-left: 0.5em;
+}
 
 #poipanel .title {
   position: relative;
   font-size: 2em;
-  top: 1em;
+  top: 1.2em;
   margin-bottom: 2em;
+  margin-left: 0.5em;
 }
 
 #poipanel_edit textarea, #poipanel_edit label {
@@ -1073,7 +1094,6 @@ a.reload {
 
 #poipanel_edit input {
   width: 95%;
-  text-align: center;
 }
 
 #poipanel_edit input#poi_date {
@@ -1113,7 +1133,17 @@ ul.poi {
 
 ul.poi li {
   margin: 5px;
-  border: 1px solid gray;
+  border: 1px solid #222;
+  border-radius:7px;
+  background-color:#222;
+}
+
+ul.poi div.name {
+  font-weight: bold;
+  font-size: 15px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  font-size:
 }
 
 ul.poi div.details {
@@ -1136,11 +1166,46 @@ ul.poi li > div {
 }
 
 ul.poi li:hover {
-  border-color: white;
+  background-color: #333;
 }
 
-ul.poi li:active {
-  color: #ecb100;
-  transform: scale(0.99);
+ul.poi. li .buttons a:active {
+    color: #ecb100;       
+    transform: scale(0.98);
 }
+
+ul.poi li:active div.details {
+  color: #ecb100;
+}
+
+ul.poi li.active {
+  transform: scale(0.98);
+}
+
+ul.poi li.selected {
+  border-color: #ecb100;
+}
+
+ul.poi li.selected div.details {
+  color: #ecb100;
+}
+
+canvas.poithumb {
+  margin-top: 8px;
+  margin-left: 6px;
+  transform: scale(1,-1);
+  border-radius: 7px;
+}
+
+ul.poi li .buttons {
+  float: right;
+}
+
+#poipanel a.button.fa {
+  background-color: inherit;
+  padding-right: 10px;
+  padding-left: 10px;
+  padding-top: 8px;
+}
+
 
