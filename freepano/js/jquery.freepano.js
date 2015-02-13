@@ -599,7 +599,15 @@ $.extend(true,Panorama.prototype,{
       var phi=Math.acos(this.mouseCoords.x/r);
       var theta=Math.atan2(this.mouseCoords.y,this.mouseCoords.z);
 
-      if (this.debugmouse) {
+      this.mouseCoords.x=-this.sphere.radius*Math.sin(phi)*Math.cos(theta);
+      this.mouseCoords.y=-this.sphere.radius*Math.sin(phi)*Math.sin(theta);
+      this.mouseCoords.z=-this.sphere.radius*Math.cos(phi);
+      this.mouseCoords.phi=phi;
+      this.mouseCoords.theta=theta;
+
+      this.getMouseCoords2(e);
+
+      if (true) {
         var lon=THREE.Math.radToDeg(phi);
         var lat=THREE.Math.radToDeg(theta);
 
@@ -616,9 +624,6 @@ $.extend(true,Panorama.prototype,{
         }
 
         var html='<div style="width: 100%; position: relative; margin-left: 10px;">';
-        html+='x: '+m.x.toPrecision(6)+'<br />';
-        html+='y: '+m.y.toPrecision(6)+'<br />';
-        html+='z: '+m.z.toPrecision(6)+'<br />';
         html+='lon: '+lon.toPrecision(6)+'<br />';
         html+='lat: '+lat.toPrecision(6)+'<br />';
         lon=(lon-90)%360;
@@ -630,14 +635,6 @@ $.extend(true,Panorama.prototype,{
         html+='</div>';
         div.html(html);
       }
-
-      this.mouseCoords.x=-this.sphere.radius*Math.sin(phi)*Math.cos(theta);
-      this.mouseCoords.y=-this.sphere.radius*Math.sin(phi)*Math.sin(theta);
-      this.mouseCoords.z=-this.sphere.radius*Math.cos(phi);
-      this.mouseCoords.phi=phi;
-      this.mouseCoords.theta=theta;
-
-      this.getMouseCoords2(e);
 
       return {
         lon: THREE.Math.radToDeg(this.mouseCoords.phi),
