@@ -518,6 +518,7 @@ $.extend(true,Panorama.prototype,{
 
     }, // panorama_eventsInit
 
+ /* 
     worldToTextureCoords: function panorama_worldToTextureCoords(worldCoords){
       this.inversePanoramaRotationMatrix=new THREE.Matrix4();
       this.inversePanoramaRotationMatrix.getInverse(this.sphere.object3D.matrix);
@@ -558,6 +559,7 @@ $.extend(true,Panorama.prototype,{
           latitude: latitude
         }
     }, // textureToWorldCoords
+    */
 
     // set mouseCoords (xyz/phi/theta) and return lon/lat
     getMouseCoords: function panorama_getMouseCoords(e) {
@@ -635,6 +637,7 @@ $.extend(true,Panorama.prototype,{
       this.mouseCoords.phi=phi;
       this.mouseCoords.theta=theta;
 
+      this.getMouseCoords2(e);
 
       return {
         lon: THREE.Math.radToDeg(this.mouseCoords.phi),
@@ -642,6 +645,38 @@ $.extend(true,Panorama.prototype,{
       }
 
     }, // getMouseCoords
+
+    getMouseCoords2: function panorama_getMouseCoords2(e) {
+
+      var panorama=this;
+      var camera=panorama.camera.instance;
+      var canvas=panorama.renderer.domElement;
+
+      // field of view 
+      var fov={
+        v: camera.fov,
+        h: camera.fov*camera.aspect
+      }
+
+      // relative mouse coordinates
+      var offset=$(canvas).offset();
+      var mouseRel={
+        x: e.clientX-offset.left,
+        y: e.clientY-offset.top
+      }
+
+      // normalized mouse coordinates
+      var u=panorama.mouseCoords.u=-1+2*(mouseRel.x/canvas.width);
+      var v=panorama.mouseCoords.v=1-2*(mouseRel.y/canvas.height)
+
+      // compute lon/lat here
+      // ....
+
+      // return lon/lat
+      panorama.mouseCoords.lon=panorama.mouseCoords.lon;
+      panorama.mouseCoords.lat=panorama.mouseCoords.lat;
+
+    }, // getMouseCoords2
 
     onmousedown: function panorama_mousedown(e){
       if (isLeftButtonDown(e)) {
@@ -651,11 +686,11 @@ $.extend(true,Panorama.prototype,{
           lon: this.lon,
           lat: this.lat,
           mouseCoords: this.getMouseCoords(e),
-          textureCoords: this.worldToTextureCoords(this.mouseCoords)
+//          textureCoords: this.worldToTextureCoords(this.mouseCoords)
         };
-        console.log(this.mousedownPos.mouseCoords,this.lon,this.lat);
-        var wc=this.textureToWorldCoords(this.mousedownPos.textureCoords.left,this.mousedownPos.textureCoords.top);
-        console.log('fixme: '+this.mousedownPos.textureCoords.longitude+'=='+wc.longitude,this.mousedownPos.textureCoords.latitude+'=='+wc.latitude);
+//        console.log(this.mousedownPos.mouseCoords,this.lon,this.lat);
+//        var wc=this.textureToWorldCoords(this.mousedownPos.textureCoords.left,this.mousedownPos.textureCoords.top);
+//        console.log('fixme: '+this.mousedownPos.textureCoords.longitude+'=='+wc.longitude,this.mousedownPos.textureCoords.latitude+'=='+wc.latitude);
         //TODO something is wrong: this.mousedownPos.textureCoords.latitude != wc.latitude
       }
     },
