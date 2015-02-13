@@ -3252,7 +3252,7 @@ var DAV = new function() {
             // unique name
             var offset=0;
             while(panorama.poi.list[name]){
-              var name='p'+(panorama.poi.count+offset++);
+              name='p'+(panorama.poi.count+offset++);
             }
 
             poi[name]={
