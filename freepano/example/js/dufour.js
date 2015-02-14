@@ -791,7 +791,7 @@ $(document).on('filesloaded', function(){
 
     renderer: {
 
-      precision: 'lowp',
+      precision: 'highp',
 
       antialias: false,
 
