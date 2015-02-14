@@ -608,8 +608,8 @@ $.extend(true,Panorama.prototype,{
       this.getMouseCoords2(e);
 
       if (true) {
-        var lon=THREE.Math.radToDeg(phi);
-        var lat=THREE.Math.radToDeg(theta);
+        var lon=THREE.Math.radToDeg(this.mouseCoords.phi);
+        var lat=THREE.Math.radToDeg(this.mouseCoords.theta);
 
         var div=$('#mousecoords');
         if (!div.length) {
@@ -666,12 +666,13 @@ $.extend(true,Panorama.prototype,{
       var u=panorama.mouseCoords.u=-1+2*(mouseRel.x/canvas.width);
       var v=panorama.mouseCoords.v=1-2*(mouseRel.y/canvas.height)
 
-      // compute lon/lat here
-      // ....
+      // compute phi/theta here
+      var phi=panorama.mouseCoords.phi; // lon
+      var theta=panorama.mouseCoords.theta;// lat
 
       // return lon/lat
-      panorama.mouseCoords.lon=panorama.mouseCoords.lon;
-      panorama.mouseCoords.lat=panorama.mouseCoords.lat;
+      panorama.mouseCoords.phi=phi; 
+      panorama.mouseCoords.theta=theta;
 
     }, // getMouseCoords2
 
