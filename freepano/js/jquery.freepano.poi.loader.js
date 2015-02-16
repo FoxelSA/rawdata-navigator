@@ -40,7 +40,7 @@
 
 function POI_loader(options) {
   if (!this instanceof POI_loader) {
-    return POI_loader(options);
+    return new POI_loader(options);
   }
   $.extend(true,this,POI_loader.prototype.defaults,options);
   this.init();
