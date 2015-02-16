@@ -638,7 +638,7 @@ $.extend(true,Panorama.prototype,{
 
     }, // panorama_showMouseDebugInfo
 
-    getMouseCoords2: function panorama_getMouseCoords2(e) {
+    getMouseCoords: function panorama_getMouseCoords(e) {
 
       var panorama=this;
       var camera=panorama.camera.instance;
@@ -681,6 +681,15 @@ $.extend(true,Panorama.prototype,{
     posi[1] /= norm;
     posi[2] /= norm;
 
+    // get mouse coordinates in the camera referential
+    var cursor=panorama.cursorCoords={
+      vector: new THREE.Vector3(posi[0],posi[1],posi[2]).multiplyScalar(panorama.sphere.radius),
+      phi: Math.acos(posi[1]),
+      theta: Math.atan2(posi[2],posi[0])
+    }
+    cursor.lon=THREE.Math.radToDeg(cursor.theta);
+    cursor.lat=THREE.Math.radToDeg(cursor.phi);
+
     /* Remove linear transformation */
     var posf = Array(3);
     posf[0] = mat_view[0] * posi[0] + mat_view[1] * posi[1] + mat_view[2] * posi[2];
@@ -705,8 +714,6 @@ $.extend(true,Panorama.prototype,{
     var pixel_y = ((Math.PI * 0.5 - phi) / Math.PI) * image_h;
 
 
-
-
     console.log("lam = "+lam);
     console.log("phi = "+phi);
 
@@ -716,19 +723,14 @@ $.extend(true,Panorama.prototype,{
     console.log("pixel_x = "+pixel_x);
     console.log("pixel_y = "+pixel_y);
 
-    /*
-      // normalized mouse coordinates
-      var u=panorama.mouseCoords.u=-1+2*(mouseRel.x/canvas.width);
-      var v=panorama.mouseCoords.v=1-2*(mouseRel.y/canvas.height)
+    var m=panorama.mouseCoords=new THREE.Vector3(posf[0],posf[1],posf[2]).multiplyScalar(panorama.sphere.radius);
+    m.lon=deg_lam;
+    m.lat=deg_phi;
 
-      // compute phi/theta here
-      var phi=panorama.mouseCoords.phi; // lon
-      var theta=panorama.mouseCoords.theta;// lat
-
-      // return lon/lat
-      panorama.mouseCoords.phi=phi;
-      panorama.mouseCoords.theta=theta;
-      */
+    return {
+      lon: cursor.lon,
+      lat: cursor.lat
+    }
 
     }, // getMouseCoords2
 
