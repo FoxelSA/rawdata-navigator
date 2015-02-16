@@ -603,15 +603,8 @@ $.extend(true,Panorama.prototype,{
 
       panorama.showMouseDebugInfo(m);
 
-      // store mouse coordinates in the sphere referential
+      // scale mouse coordinates in the sphere referential
       m.multiplyScalar(panorama.sphere.radius);
-      this.mouseCoords={
-        lon: m.lon,
-        lat: m.lat,
-        x: m.x,
-        y: m.y,
-        z: m.z
-      };
 
       // return coordinates in the camera referential
       return {
