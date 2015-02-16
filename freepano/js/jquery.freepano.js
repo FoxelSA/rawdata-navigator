@@ -562,58 +562,6 @@ $.extend(true,Panorama.prototype,{
         }
     }, // textureToWorldCoords
 
-    // set mouseCoords (xyz/phi/theta) and return lon/lat
-    getMouseCoords: function panorama_getMouseCoords(event) {
-
-      var panorama=this;
-      var canvas = panorama.renderer.domElement;
-
-        this.getMouseCoords2(event);
-
-      // get normalized mouse coordinates
-      var vector = new THREE.Vector3((event.clientX / canvas.width) * 2 - 1, -(event.clientY / canvas.height) * 2 + 1, 0.5);
-
-      // get mouse coordinates in the camera referential
-      vector.applyMatrix4(new THREE.Matrix4().getInverse(panorama.camera.instance.projectionMatrix));
-      vector.normalize();
-
-      // store mouse coordinates in the camera referential
-      var cursor=panorama.cursorCoords= {
-        vector: vector.clone().multiplyScalar(panorama.sphere.radius),
-        phi: Math.acos(vector.y),
-        theta: Math.atan2(vector.z,vector.x)
-      }
-      cursor.lon=THREE.Math.radToDeg(cursor.theta);
-      cursor.lat=THREE.Math.radToDeg(cursor.phi);
-
-      // get mouse coordinates in the sphere referential
-      vector.applyMatrix4(new THREE.Matrix4().getInverse(panorama.sphere.object3D.matrix));
-
-      // convert to polar coordinates
-      var m=panorama.mouseCoords=vector;
-      var phi = Math.acos(m.y);
-      var theta = Math.atan2(m.z, m.x);
-
-      // get cartesian coords in the sphere referential
-
-      // adjust lon/lat
-      m.lon = -(90 - THREE.Math.radToDeg(theta)) - 90;
-      m.lat = 90 - THREE.Math.radToDeg(phi);
-      if (m.lon < 0) m.lon += 360;
-
-      panorama.showMouseDebugInfo(m);
-
-      // scale mouse coordinates in the sphere referential
-      m.multiplyScalar(panorama.sphere.radius);
-
-      // return coordinates in the camera referential
-      return {
-        lon: cursor.lon,
-        lat: cursor.lat
-      };
-
-    }, // panorama_getMouseCoords
-
     showMouseDebugInfo: function panorama_showMouseDebugInfo(vector){
 
       var div = $('#mouseDebugInfo');
@@ -638,6 +586,7 @@ $.extend(true,Panorama.prototype,{
 
     }, // panorama_showMouseDebugInfo
 
+    // set mouseCoords (xyz/phi/theta) and return lon/lat
     getMouseCoords: function panorama_getMouseCoords(e) {
 
       var panorama=this;
@@ -724,15 +673,19 @@ $.extend(true,Panorama.prototype,{
     console.log("pixel_y = "+pixel_y);
 
     var m=panorama.mouseCoords=new THREE.Vector3(posf[0],posf[1],posf[2]).multiplyScalar(panorama.sphere.radius);
+    m.phi=phi;
+    m.theta=lam;
     m.lon=deg_lam;
     m.lat=deg_phi;
+
+    panorama.showMouseDebugInfo(m);
 
     return {
       lon: cursor.lon,
       lat: cursor.lat
     }
 
-    }, // getMouseCoords2
+    }, // panorama_getMouseCoords
 
     onmousedown: function panorama_mousedown(e){
       if (isLeftButtonDown(e)) {
