@@ -3,7 +3,7 @@
 /**
  * rawdata-navigator - Human-understandable raw data navigator
  *
- * Copyright (c) 2014 FOXEL SA - http://foxel.ch
+ * Copyright (c) 2014-2015 FOXEL SA - http://foxel.ch
  * Please read <http://foxel.ch/license> for more information.
  *
  *
@@ -46,48 +46,49 @@ if (!isset($_GET['storage']) || empty($_GET['storage']) || !is_dir($_GET['storag
     exit();
 
 // path
-$camera_path = $_GET['storage'].'/camera';
-if (!is_dir($camera_path))
+$rawdata_path = $_GET['storage'].'/rawdata';
+if (!is_dir($rawdata_path))
     exit();
 
 // scan
-$camera_lsdir = scandir($camera_path);
+$rawdata_lsdir = scandir($rawdata_path);
 
 // loop over mac addresses
-foreach ($camera_lsdir as $macaddress) {
+foreach ($rawdata_lsdir as $macaddress) {
 
-    $macaddress_path = $camera_path.'/'.$macaddress;
-    $rawmaster_path = $macaddress_path.'/raw/sync';
-    $rawsegment_path = $macaddress_path.'/raw/segment';
-    if (!is_dir($rawsegment_path))
+    $macaddress_path = $rawdata_path.'/'.$macaddress;
+    $rawmaster_path = $macaddress_path.'/master';
+    if (!is_dir($rawmaster_path))
         continue;
 
     $csps[$macaddress] = array();
-    $rawsegment_lsdir = scandir($rawsegment_path,SCANDIR_SORT_DESCENDING);
+    $rawmaster_lsdir = scandir($rawmaster_path,SCANDIR_SORT_DESCENDING);
 
     // loop over raw segment masters
-    foreach ($rawsegment_lsdir as $master) {
+    foreach ($rawmaster_lsdir as $master) {
 
-        $master_path = $rawsegment_path.'/'.$master;
-        $sync_path = $rawmaster_path.'/'.$master;
-        if (!is_dir($master_path) || substr($master,0,1)=='.')
+        $master_path = $rawmaster_path.'/'.$master;
+        $rawsegment_path = $master_path.'/segment';
+
+        if (!is_dir($master_path) || !is_dir($rawsegment_path) || substr($master,0,1)=='.')
             continue;
 
         $csps[$macaddress][$master] = (object)array('name'=>NULL,'segments'=>array());
-        $master_lsdir = scandir($master_path);
+        $rawsegment_lsdir = scandir($rawsegment_path);
 
         // loop over segments
-        foreach ($master_lsdir as $segment) {
+        foreach ($rawsegment_lsdir as $segment) {
 
-            $segment_path = $master_path.'/'.$segment;
+            if (substr($segment,0,1)=='.')
+                continue;
 
             // not processed
-            if (!file_exists($segment_path.'/info/rawdata-autoseg/segment.json'))
+            if (!file_exists($rawsegment_path.'/'.$segment.'/info/segment.json'))
                 continue;
 
             // description exists
-            if (file_exists($sync_path.'/info/description.info'))
-                $csps[$macaddress][$master]->name = file_get_contents($sync_path.'/info/description.info');
+            if (file_exists($master_path.'/info/description.info'))
+                $csps[$macaddress][$master]->name = file_get_contents($master_path.'/info/description.info');
 
             $csps[$macaddress][$master]->segments[] = $segment;
 
