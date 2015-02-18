@@ -721,6 +721,7 @@ var RawDataNavigator = new function() {
 
                     var knownposition = !_.isNull(pose.position);
                     var displaymarker = !info.gps || (info.gps && knownposition);
+                    var knownorientation = !_.isNull(pose.orientation);
 
                     // position
                     pose.lat = knownposition ? pose.position[2] : 0.0;
@@ -760,6 +761,19 @@ var RawDataNavigator = new function() {
                             latlng: latlng,
                             alt: knownposition ? pose.position[0] : 0.0,
                             robustness: knownposition ? pose.position[3] : 0.0
+                        },
+                        orientation: {
+                            known: knownorientation,
+                            rotation00: knownorientation ? pose.orientation[0] : 0.0,
+                            rotation01: knownorientation ? pose.orientation[1] : 0.0,
+                            rotation02: knownorientation ? pose.orientation[2] : 0.0,
+                            rotation10: knownorientation ? pose.orientation[3] : 0.0,
+                            rotation11: knownorientation ? pose.orientation[4] : 0.0,
+                            rotation12: knownorientation ? pose.orientation[5] : 0.0,
+                            rotation20: knownorientation ? pose.orientation[6] : 0.0,
+                            rotation21: knownorientation ? pose.orientation[7] : 0.0,
+                            rotation22: knownorientation ? pose.orientation[8] : 0.0,
+                            robustness: knownorientation ? pose.orientation[9] : 0.0
                         }
                     };
 
@@ -819,11 +833,12 @@ var RawDataNavigator = new function() {
                 zoom: this.zoom.default,
                 minZoom: this.zoom.min,
                 maxZoom: this.zoom.max,
-                center: [46.205007,6.145134]
+                center: [46.205007,6.145134],
+                zoomControl: false
             });
 
             // scale
-            L.control.scale().addTo(this._component);
+            L.control.scale({position:'bottomright'}).addTo(this._component);
 
             // tiles
             this.tiles.init();
@@ -919,8 +934,13 @@ var RawDataNavigator = new function() {
              */
             init: function() {
 
+                // layers
                 this.control = L.control.layers({},{}).addTo(map._component);
 
+                // zoom
+                L.control.zoom({position:'topright'}).addTo(map._component);
+
+                // tiles
                 this.maps();
                 this.static();
 
@@ -936,25 +956,29 @@ var RawDataNavigator = new function() {
 
                 // sources
                 var sources = [{
-                    description: 'OpenStreetMap Mapnik',
-                    url: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
-                                    + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>'
-                },
-                /*
-                {
-                    description: 'OpenStreetMap Black and White',
-                    url: 'http://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png',
-                    attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
-                                    + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>'
-                },
-                */
-                {
-                    description: 'Esri World Imagery',
-                    url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-                    attribution: 'Tiles &copy; Esri, '
-                                    + 'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-                }];
+                  description: 'Mapbox Bright',
+                  url: 'https://{s}.tiles.mapbox.com/v3/dennisl.4e2aab76/{z}/{x}/{y}.png',
+                  attribution: '&copy; <a href="https://www.mapbox.com/about/maps">Mapbox</a>, '
+                                  + '<a href="http://openstreetmap.org/copyright">OpenStreetMap</a>'
+              },
+              {
+                  description: 'OpenStreetMap Mapnik',
+                  url: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
+                                  + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>'
+              },
+              {
+                  description: 'Esri World Imagery',
+                  url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                  attribution: 'Tiles &copy; Esri, '
+                                  + 'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+              },
+              {
+                  description: 'Mapbox Labelled Satellite',
+                  url: 'https://{s}.tiles.mapbox.com/v3/dennisl.map-6g3jtnzm/{z}/{x}/{y}.png',
+                  attribution: '&copy; <a href="https://www.mapbox.com/about/maps">Mapbox</a>, '
+                                  + '<a href="http://openstreetmap.org/copyright">OpenStreetMap</a>'
+              }];
 
                 // layers
                 $.each(sources, function(index,source) {
@@ -1234,6 +1258,7 @@ var RawDataNavigator = new function() {
         init: function() {
             this._component = $(this._dom+' .data');
             this.events();
+            this.resize();
             this.video.init();
             this.overview.init();
         },
@@ -1243,10 +1268,13 @@ var RawDataNavigator = new function() {
          */
         events: function() {
 
+            // resize
+            $(window).on('resize',function() {
+                information.resize();
+            });
+
             // close
-            $(this._dom+' .close a').on('click',function(e) {
-                e.preventDefault();
-                e.stopPropagation();
+            $(this._dom+' .close').on('click',function(e) {
                 information.close();
             });
 
@@ -1271,6 +1299,18 @@ var RawDataNavigator = new function() {
                 // display
                 information.show(information._segment,req-1);
 
+            });
+
+            // closeable
+            $(this._dom+' .block .section').on('click',function(e) {
+                var element = $(this);
+                var closed = $(this).hasClass('closed');
+                $(this).siblings('.closeable').slideToggle(150,function() {
+                    if (closed)
+                        element.removeClass('closed');
+                    else
+                        element.addClass('closed');
+                });
             });
 
         },
@@ -1348,7 +1388,7 @@ var RawDataNavigator = new function() {
             information.overview.marker(segment,pose);
 
             // show
-            $(this._dom).stop(true,false).slideDown('fast',function() {
+            $(this._dom).stop(true,false).animate({left:0},250,function() {
 
                 // fix overview
                 information.overview._component.invalidateSize();
@@ -1370,11 +1410,33 @@ var RawDataNavigator = new function() {
                     information._component.find('.section.geo.unknown').css('display','block');
                 }
 
+                // orientation
+                if (pose.orientation.known) {
+                    information._component.find('.section.orientation.unknown').css('display','none');
+                    information._component.find('.section.orientation.known').css('display','block');
+                    information._component.find('.rot00').html(pose.orientation.rotation00);
+                    information._component.find('.rot01').html(pose.orientation.rotation01);
+                    information._component.find('.rot02').html(pose.orientation.rotation02);
+                    information._component.find('.rot10').html(pose.orientation.rotation10);
+                    information._component.find('.rot11').html(pose.orientation.rotation11);
+                    information._component.find('.rot12').html(pose.orientation.rotation12);
+                    information._component.find('.rot20').html(pose.orientation.rotation20);
+                    information._component.find('.rot21').html(pose.orientation.rotation21);
+                    information._component.find('.rot22').html(pose.orientation.rotation22);
+                    information._component.find('.orientation .robustness').html(pose.orientation.robustness);
+                } else {
+                    information._component.find('.section.orientation.known').css('display','none');
+                    information._component.find('.section.orientation.unknown').css('display','block');
+                }
+
                 // status
                 if (info.split)
                     information._component.find('.jp4').html(pose.raw.charAt(0).toUpperCase()+pose.raw.slice(1));
                 else
                     information._component.find('.jp4').html('Not splitted yet');
+                information._component.find('.master').html(allocation.current.master);
+                information._component.find('.segment').html(segment);
+                information._component.find('.camera').html(allocation.current.mac);
 
                 // date
                 var date = new Date(parseInt(pose.sec,10)*1000);
@@ -1383,16 +1445,14 @@ var RawDataNavigator = new function() {
 
                 // html
                 $(information._dom+' .preview').html(
-                    (!info.preview || pose.raw!='valid') ? '<img src="img/def.png" alt="" width="640" height="320" />' : ''
+                    (!info.preview || pose.raw!='valid') ? '<img src="img/def.png" alt="" width="498" height="249" />' : ''
                 );
                 $(information._dom+' .nav > div').html(
-                    ((index > 0) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index-1)+'\');return false;"><span class="prev"></span>Prev</a>' : '')
-                    + ((index+1 < poses.length) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index+1)+'\');return false;">Next<span class="next"></span></a>' : '')
+                    ((index > 0) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index-1)+'\');return false;"><span class="prev"></span></a>' : '')
+                    + ((index+1 < poses.length) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index+1)+'\');return false;"><span class="next"></span></a>' : '')
                 );
-                $(information._dom+' .pose').html(
-                    'Segment '+segment+' &nbsp; &nbsp; &nbsp; '
-                    + 'Pose '+(index+1)+' of '+poses.length
-                );
+                $(information._dom+' #jump').val((index+1));
+                $(information._dom+' .poses').html(poses.length);
 
             });
 
@@ -1409,7 +1469,7 @@ var RawDataNavigator = new function() {
 
             // wait for the player to stop
             setTimeout(function() {
-                $(information._dom).stop(true,false).slideUp('fast');
+                $(information._dom).stop(true,false).animate({left:-($(information._dom).width())},250);
             },250);
 
         },
@@ -1423,6 +1483,13 @@ var RawDataNavigator = new function() {
             this._layer = null;
             this._segment = null;
             this._index = null;
+        },
+
+        /**
+         * information.resize()
+         */
+        resize: function() {
+            $(this._dom).height($(window).height());
         },
 
         /**
