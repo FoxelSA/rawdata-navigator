@@ -89,19 +89,19 @@
     <div class="data">
         <div class="timestamp"></div>
         <div class="section geo">Geo</div>
-        <table class="section geo">
+        <table class="section geo known">
             <tr><td class="attr">Latitude</td><td class="lat"></td></tr>
             <tr><td class="attr">Longitude</td><td class="lng"></td></tr>
             <tr><td class="attr">Altitude</td><td class="alt"></td></tr>
+            <tr><td class="attr">Still</td><td class="still"></td></tr>
+            <tr><td class="attr">Robustness</td><td class="robustness"></td></tr>
         </table>
-        <div class="section geounknown">Geo</div>
-        <table class="section geounknown">
+        <table class="section geo unknown">
             <tr><td class="attr">GPS</td><td class="gps">No GPS fix</td></tr>
         </table>
         <div class="section status">Status</div>
         <table class="section status">
             <tr><td class="attr">JP4</td><td class="jp4"></td></tr>
-            <tr><td class="attr">Splitted</td><td class="split"></td></tr>
         </table>
         <div class="section date">Date</div>
         <table class="section date">

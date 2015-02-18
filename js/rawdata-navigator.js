@@ -725,7 +725,6 @@ var RawDataNavigator = new function() {
                     // position
                     pose.lat = knownposition ? pose.position[2] : 0.0;
                     pose.lng = knownposition ? pose.position[1] : 0.0;
-                    pose.alt = knownposition ? pose.position[0] : 0.0;
 
                     // geopoint
                     var latlng = map.helpers.latlng(pose,info,call,index);
@@ -752,13 +751,16 @@ var RawDataNavigator = new function() {
 
                     // add on poses
                     poses[index] = {
-                        sec: pose.sec,
-                        usec: String(pose.usec).zeropad(6),
-                        latlng: latlng,
-                        alt: pose.alt,
                         still: pose.still,
                         raw: pose.raw,
-                        knownposition: knownposition
+                        sec: pose.sec,
+                        usec: String(pose.usec).zeropad(6),
+                        position: {
+                            known: knownposition,
+                            latlng: latlng,
+                            alt: knownposition ? pose.position[0] : 0.0,
+                            robustness: knownposition ? pose.position[3] : 0.0
+                        }
                     };
 
                 });
@@ -1327,7 +1329,7 @@ var RawDataNavigator = new function() {
             // static marker
             if (_.isNull(this._layer)) {
 
-                this._layer = L.marker(pose.latlng,{icon:L.icon({
+                this._layer = L.marker(pose.position.latlng,{icon:L.icon({
                     iconUrl: 'img/pose-icon.png',
                     iconRetinaUrl: 'img/pose-icon-2x.png',
                     iconSize: [25, 41],
@@ -1340,7 +1342,7 @@ var RawDataNavigator = new function() {
             }
 
             // place static marker
-            this._layer.setLatLng(pose.latlng);
+            this._layer.setLatLng(pose.position.latlng);
 
             // track marker
             information.overview.marker(segment,pose);
@@ -1355,21 +1357,24 @@ var RawDataNavigator = new function() {
                 information._component.find('.timestamp').html(pose.sec+'.'+pose.usec);
 
                 // geo
-                if (info.gps && pose.knownposition) {
-                    information._component.find('.section.geounknown').css('display','none');
-                    information._component.find('.section.geo').css('display','block');
-                    information._component.find('.lat').html(pose.latlng.lat);
-                    information._component.find('.lng').html(pose.latlng.lng);
-                    information._component.find('.alt').html(pose.alt);
+                if (info.gps && pose.position.known) {
+                    information._component.find('.section.geo.unknown').css('display','none');
+                    information._component.find('.section.geo.known').css('display','block');
+                    information._component.find('.lat').html(pose.position.latlng.lat);
+                    information._component.find('.lng').html(pose.position.latlng.lng);
+                    information._component.find('.alt').html(pose.position.alt);
+                    information._component.find('.still').html(pose.still?'Yes':'No');
+                    information._component.find('.geo .robustness').html(pose.position.robustness);
                 } else {
-                    information._component.find('.section.geo').css('display','none');
-                    information._component.find('.section.geounknown').css('display','block');
+                    information._component.find('.section.geo.known').css('display','none');
+                    information._component.find('.section.geo.unknown').css('display','block');
                 }
 
                 // status
-
-                information._component.find('.jp4').html(pose.raw.charAt(0).toUpperCase()+pose.raw.slice(1));
-                information._component.find('.split').html(info.split?'Yes':'No');
+                if (info.split)
+                    information._component.find('.jp4').html(pose.raw.charAt(0).toUpperCase()+pose.raw.slice(1));
+                else
+                    information._component.find('.jp4').html('Not splitted yet');
 
                 // date
                 var date = new Date(parseInt(pose.sec,10)*1000);
@@ -1569,8 +1574,8 @@ var RawDataNavigator = new function() {
                 // add on track
                 var track = [];
                 $.each(poses,function(index,pose) {
-                    if (pose.knownposition)
-                        track.push(pose.latlng);
+                    if (pose.position.known)
+                        track.push(pose.position.latlng);
                 });
 
                 // add on map
@@ -1604,7 +1609,7 @@ var RawDataNavigator = new function() {
                 // track marker
                 if (_.isNull(this._marker)) {
 
-                    this._marker = L.marker(pose.latlng,{icon:L.icon({
+                    this._marker = L.marker(pose.position.latlng,{icon:L.icon({
                         iconUrl: 'img/pose-icon.png',
                         iconRetinaUrl: 'img/pose-icon-2x.png',
                         iconSize: [25, 41],
@@ -1617,7 +1622,7 @@ var RawDataNavigator = new function() {
                 }
 
                 // place track marker
-                this._marker.setLatLng(pose.latlng);
+                this._marker.setLatLng(pose.position.latlng);
 
             }
 
