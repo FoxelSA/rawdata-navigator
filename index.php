@@ -43,7 +43,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Raw data navigator</title>
+    <title>FOXEL | rawdata-navigator</title>
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet/leaflet.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet.markercluster/MarkerCluster.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/leaflet.markercluster/MarkerCluster.Default.css" />
@@ -73,11 +74,15 @@
 
 <body>
 
-<div id="map"></div>
-
-<div id="allocation">
-    <select></select>
+<div id="header">
+    <a class="logo" href="http://foxel.ch" target="_blank"><img src="img/foxel.png" width="175" alt="FOXEL" /></a>
+    <div class="dataset">Dataset :</div>
+    <div id="allocation">
+        <select></select>
+    </div>
 </div>
+
+<div id="map"></div>
 
 <div id="info">
     <div class="close"><span></span></div>

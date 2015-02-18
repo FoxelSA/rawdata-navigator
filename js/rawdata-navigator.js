@@ -859,7 +859,7 @@ var RawDataNavigator = new function() {
          */
         resize: function() {
             $(this._dom).width($(window).width());
-            $(this._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
+            $(this._dom).height($(window).height()-$(timeline._dom).outerHeight(true)-$('#header').outerHeight(true));
         },
 
         /**
@@ -1489,7 +1489,7 @@ var RawDataNavigator = new function() {
          * information.resize()
          */
         resize: function() {
-            $(this._dom).height($(window).height());
+            $(this._dom).height($(window).height()-$(timeline._dom).outerHeight(true)-$('#header').outerHeight(true));
         },
 
         /**
