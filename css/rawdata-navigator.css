@@ -431,20 +431,22 @@ a, a:link, a:visited, a:hover, a:active {
                 }
 
     #info .viewer {
+        position:relative;
+        height:250px;
         margin:50px;
         margin-top:20px;
         margin-bottom:30px;
     }
 
         #info .video {
-            display:absolute;
+            position:absolute;
             top:0;
             left:0;
             border:solid 1px #4f4f4f;
         }
 
         #info .preview {
-            display:absolute;
+            position:absolute;
             top:0;
             left:0;
         }
