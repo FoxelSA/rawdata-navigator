@@ -1664,6 +1664,9 @@ var RawDataNavigator = new function() {
                     // center
                     information.overview._component.panTo(bounds.getCenter());
 
+                    // unzoom
+                    information.overview._component.setZoom(information.overview._component.getZoom()-1);
+
                 },500);
 
             },
