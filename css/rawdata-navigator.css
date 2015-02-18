@@ -1,7 +1,7 @@
 /*
  * rawdata-navigator - Human-understandable raw data navigator
  *
- * Copyright (c) 2014 FOXEL SA - http://foxel.ch
+ * Copyright (c) 2014-2015 FOXEL SA - http://foxel.ch
  * Please read <http://foxel.ch/license> for more information.
  *
  *
@@ -128,8 +128,8 @@ a, a:link, a:visited, a:hover, a:active {
             line-height:30px;
         }
 
-            .marker-pnt.type-trashed span,
-            .marker-pnt.type-corrupted span {
+            .marker-pnt.type-trash span,
+            .marker-pnt.type-corrupt span {
                 color:#000;
             }
 
@@ -137,19 +137,15 @@ a, a:link, a:visited, a:hover, a:active {
                 content:"\f0e7";
             }
 
-            .marker-pnt.type-guess span:before {
-                content:"\f0c3";
-            }
-
-            .marker-pnt.type-validated span:before {
+            .marker-pnt.type-valid span:before {
                 content:"\f00c";
             }
 
-            .marker-pnt.type-trashed span:before {
+            .marker-pnt.type-trash span:before {
                 content:"\f00d";
             }
 
-            .marker-pnt.type-corrupted span:before {
+            .marker-pnt.type-corrupt span:before {
                 content:"\f071";
             }
 

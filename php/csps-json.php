@@ -3,7 +3,7 @@
 /**
  * rawdata-navigator - Human-understandable raw data navigator
  *
- * Copyright (c) 2014 FOXEL SA - http://foxel.ch
+ * Copyright (c) 2014-2015 FOXEL SA - http://foxel.ch
  * Please read <http://foxel.ch/license> for more information.
  *
  *
@@ -41,7 +41,21 @@
 if (!isset($_GET['json']) || empty($_GET['json']) || !file_exists($_GET['json'].'/segment.json'))
     exit();
 
+// get json
+$json = json_decode(file_get_contents($_GET['json'].'/segment.json'));
+
+// init gps
+$json->gps = false;
+
+// parse poses
+foreach ($json->pose as $pose) {
+    if (!is_null($pose->position)) {
+        $json->gps = true;
+        break;
+    }
+}
+
 // output
 header('Content-Type: application/json');
 header('Cache-Control: no-cache, must-revalidate');
-echo file_get_contents($_GET['json'].'/segment.json');
+echo json_encode($json);

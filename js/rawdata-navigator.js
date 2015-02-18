@@ -1,7 +1,7 @@
 /*
  * rawdata-navigator - Human-understandable raw data navigator
  *
- * Copyright (c) 2014 FOXEL SA - http://foxel.ch
+ * Copyright (c) 2014-2015 FOXEL SA - http://foxel.ch
  * Please read <http://foxel.ch/license> for more information.
  *
  *
@@ -186,8 +186,8 @@ var RawDataNavigator = new function() {
             this._items.push({
                 id: segment,
                 content: '<div id="timeline_'+segment+'"></div><strong>'+segment+'</strong>',
-                start: parseInt(_.first(poses).sec,10)*1000+parseInt(_.first(poses).usc,10)/1000,
-                end: parseInt(_.last(poses).sec,10)*1000+parseInt(_.last(poses).usc,10)/1000,
+                start: parseInt(_.first(poses).sec,10)*1000+parseInt(_.first(poses).usec,10)/1000,
+                end: parseInt(_.last(poses).sec,10)*1000+parseInt(_.last(poses).usec,10)/1000,
                 className: 'timeline'+info.color.replace('#','-'),
                 segmentation: {
                     length: poses.length,
@@ -417,7 +417,7 @@ var RawDataNavigator = new function() {
             var val = this._component.val().split('/');
             this.current.mac = val[0];
             this.current.master = val[1];
-            this.current.path = storage.mountpoint+'/camera/'+this.current.mac+'/raw/segment/'+this.current.master;
+            this.current.path = storage.mountpoint+'/rawdata/'+this.current.mac+'/master/'+this.current.master;
         },
 
         /**
@@ -668,7 +668,7 @@ var RawDataNavigator = new function() {
                 overlay.show('Loading segments from<br />'+allocation.current.path+'/');
                 this._remaining = allocation.current.segments().length;
                 $.each(allocation.current.segments(), function(index,segment) {
-                    $.getJSON('php/csps-json.php?json='+allocation.current.path+'/'+segment+'/info/rawdata-autoseg/',function(data) {
+                    $.getJSON('php/csps-json.php?json='+allocation.current.path+'/segment/'+segment+'/info/',function(data) {
                         segmentation.json.success(index,segment,data);
                     }).fail(segmentation.json.fail);
                 });
@@ -719,35 +719,46 @@ var RawDataNavigator = new function() {
                 // poses
                 $.each(data.pose, function(index,pose) {
 
+                    var knownposition = !_.isNull(pose.position);
+                    var displaymarker = !info.gps || (info.gps && knownposition);
+
+                    // position
+                    pose.lat = knownposition ? pose.position[2] : 0.0;
+                    pose.lng = knownposition ? pose.position[1] : 0.0;
+                    pose.alt = knownposition ? pose.position[0] : 0.0;
+
                     // geopoint
                     var latlng = map.helpers.latlng(pose,info,call,index);
 
                     // add on track
-                    track.push(latlng);
+                    if (displaymarker)
+                        track.push(latlng);
 
                     // add on vframes
-                    if (info.preview && pose.status=='validated')
+                    if (info.preview && pose.raw=='valid')
                         vframes.push(index);
 
                     // type
-                    if (pose.status=='trashed')
+                    if (pose.raw=='trash')
                         trashed++;
-                    else if (pose.status=='corrupted')
+                    else if (pose.raw=='corrupt')
                         corrupted++;
                     else
                         validated++;
 
                     // add on cluster
-                    cluster.addLayer(map.helpers.cluster.marker(segment,pose,latlng,info,index));
+                    if (displaymarker)
+                        cluster.addLayer(map.helpers.cluster.marker(segment,pose,latlng,info,index));
 
                     // add on poses
                     poses[index] = {
                         sec: pose.sec,
-                        usc: String(pose.usc).zeropad(6),
+                        usec: String(pose.usec).zeropad(6),
                         latlng: latlng,
                         alt: pose.alt,
-                        guess: pose.guess,
-                        status: pose.status
+                        still: pose.still,
+                        raw: pose.raw,
+                        knownposition: knownposition
                     };
 
                 });
@@ -1189,7 +1200,7 @@ var RawDataNavigator = new function() {
                     return L.marker(latlng, {
                         icon: L.divIcon({
                             html: '<div><span></span></div>',
-                            className: 'marker-pnt '+info.color.replace('#','seg-')+' type-'+pose.status,
+                            className: 'marker-pnt '+info.color.replace('#','seg-')+' type-'+pose.raw,
                             iconSize: L.point(30,30)
                         })
                     }).on('click', function() {
@@ -1275,7 +1286,7 @@ var RawDataNavigator = new function() {
             if (this._segment != segment && videoframe > -1) {
                 this.video.clear();
                 if (info.preview)
-                    this.video._player.src({type:'video/webm',src:'php/segment-video.php?src='+allocation.current.path+'/'+segment+'/preview/'+info.debayer+'/segment'});
+                    this.video._player.src({type:'video/webm',src:'php/segment-video.php?src='+allocation.current.path+'/segment/'+segment+'/preview/'+info.debayer+'/vid/25fps'});
             }
 
             // change track
@@ -1341,24 +1352,23 @@ var RawDataNavigator = new function() {
                 information.overview._component.invalidateSize();
 
                 // timestamp
-                information._component.find('.timestamp').html(pose.sec+'.'+pose.usc);
+                information._component.find('.timestamp').html(pose.sec+'.'+pose.usec);
 
                 // geo
-                if (info.gps) {
+                if (info.gps && pose.knownposition) {
+                    information._component.find('.section.geounknown').css('display','none');
                     information._component.find('.section.geo').css('display','block');
                     information._component.find('.lat').html(pose.latlng.lat);
                     information._component.find('.lng').html(pose.latlng.lng);
                     information._component.find('.alt').html(pose.alt);
                 } else {
                     information._component.find('.section.geo').css('display','none');
-                    information._component.find('.lat').html('');
-                    information._component.find('.lng').html('');
-                    information._component.find('.alt').html('');
+                    information._component.find('.section.geounknown').css('display','block');
                 }
 
                 // status
-                information._component.find('.gps').html(info.gps?(pose.guess?'Guessed':'Valid'):'No GPS fix');
-                information._component.find('.jp4').html(pose.status.charAt(0).toUpperCase()+pose.status.slice(1));
+
+                information._component.find('.jp4').html(pose.raw.charAt(0).toUpperCase()+pose.raw.slice(1));
                 information._component.find('.split').html(info.split?'Yes':'No');
 
                 // date
@@ -1368,7 +1378,7 @@ var RawDataNavigator = new function() {
 
                 // html
                 $(information._dom+' .preview').html(
-                    (!info.preview || pose.status!='validated') ? '<img src="img/def.png" alt="" width="640" height="320" />' : ''
+                    (!info.preview || pose.raw!='valid') ? '<img src="img/def.png" alt="" width="640" height="320" />' : ''
                 );
                 $(information._dom+' .nav > div').html(
                     ((index > 0) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index-1)+'\');return false;"><span class="prev"></span>Prev</a>' : '')
@@ -1559,7 +1569,8 @@ var RawDataNavigator = new function() {
                 // add on track
                 var track = [];
                 $.each(poses,function(index,pose) {
-                    track.push(pose.latlng);
+                    if (pose.knownposition)
+                        track.push(pose.latlng);
                 });
 
                 // add on map

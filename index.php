@@ -3,7 +3,7 @@
 /**
  * rawdata-navigator - Human-understandable raw data navigator
  *
- * Copyright (c) 2014 FOXEL SA - http://foxel.ch
+ * Copyright (c) 2014-2015 FOXEL SA - http://foxel.ch
  * Please read <http://foxel.ch/license> for more information.
  *
  *
@@ -92,11 +92,14 @@
         <table class="section geo">
             <tr><td class="attr">Latitude</td><td class="lat"></td></tr>
             <tr><td class="attr">Longitude</td><td class="lng"></td></tr>
-            <tr><td class="attr">Altitude</td><td class="lat"></td></tr>
+            <tr><td class="attr">Altitude</td><td class="alt"></td></tr>
+        </table>
+        <div class="section geounknown">Geo</div>
+        <table class="section geounknown">
+            <tr><td class="attr">GPS</td><td class="gps">No GPS fix</td></tr>
         </table>
         <div class="section status">Status</div>
         <table class="section status">
-            <tr><td class="attr">GPS</td><td class="gps"></td></tr>
             <tr><td class="attr">JP4</td><td class="jp4"></td></tr>
             <tr><td class="attr">Splitted</td><td class="split"></td></tr>
         </table>
