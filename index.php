@@ -52,13 +52,13 @@
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/vis.js/vis.min.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/video.js/video-js.min.css" />
     <link rel="stylesheet" type="text/css" media="all" href="css/rawdata-navigator.css" />
-    <script type="text/javascript" src="js/thirdparty/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="js/thirdparty/jquery-2.1.3.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/underscore.js/underscore-1.7.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/leaflet/leaflet-0.7.3.min.js"></script>
-    <script type="text/javascript" src="js/thirdparty/leaflet.markercluster/leaflet.markercluster-37cdfca01d.min.js"></script>
+    <script type="text/javascript" src="js/thirdparty/leaflet.markercluster/leaflet.markercluster-e63f39e5fc.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/select2/select2-3.5.2.min.js"></script>
-    <script type="text/javascript" src="js/thirdparty/vis.js/vis-3.7.2.min.js"></script>
-    <script type="text/javascript" src="js/thirdparty/video.js/video-js-4.11.1.min.js"></script>
+    <script type="text/javascript" src="js/thirdparty/vis.js/vis-3.10.0.min.js"></script>
+    <script type="text/javascript" src="js/thirdparty/video.js/video-js-4.12.0.min.js"></script>
     <script type="text/javascript" src="js/rawdata-navigator.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {

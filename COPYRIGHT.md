@@ -43,14 +43,14 @@ Public License and/or a compatible license and other copyright notices.
     Copyright (c) 2010-2011, CloudMade<br />
     Leaflet is licensed under the [BSD 2-Clause license](http://opensource.org/licenses/BSD-2-Clause).
 
-*   __Leaflet.markercluster [37cdfca01d]__<br />
-    <[https://github.com/Leaflet/Leaflet.markercluster](https://github.com/Leaflet/Leaflet.markercluster/tree/37cdfca01d2f62ad6824e7c49f647cb72986ebba)><br />
+*   __Leaflet.markercluster [e63f39e5fc]__<br />
+    <[https://github.com/Leaflet/Leaflet.markercluster](https://github.com/Leaflet/Leaflet.markercluster/tree/e63f39e5fc5488c9381d97dee72bea0677095cd1)><br />
     Copyright (c) 2012-2013, Dave Leaver, smartrak<br />
     Leaflet.markercluster is licensed under the [MIT license](http://opensource.org/licenses/MIT).
 
-*   __jQuery 2.1.1__<br />
+*   __jQuery 2.1.3__<br />
     <[http://jquery.com](http://jquery.com)><br />
-    Copyright (c) 2005, 2014 jQuery Foundation, Inc. and other contributors<br />
+    Copyright (c) 2005, 2014 jQuery Foundation, Inc.<br />
     jQuery is licensed under the [MIT license](http://opensource.org/licenses/MIT).
 
 *   __Underscore.js 1.7.0__<br />
@@ -63,12 +63,12 @@ Public License and/or a compatible license and other copyright notices.
     Copyright (c) 2014 Igor Vaynberg<br />
     Select2 is dual licensed under the [Apache License 2.0](http://opensource.org/licenses/Apache-2.0) and the [GNU GPL license v2](http://www.gnu.org/licenses/gpl-2.0.html).
 
-*   __vis.js 3.7.2__<br />
+*   __vis.js 3.10.0__<br />
     <[http://visjs.org](http://visjs.org)><br />
-    Copyright (c) 2011-2014 Almende B.V, http://almende.com<br />
+    Copyright (c) 2010-2015 Almende B.V.<br />
     vis.js is dual licensed under the [Apache License 2.0](http://opensource.org/licenses/Apache-2.0) and the [MIT license](http://opensource.org/licenses/MIT).
 
-*   __Video.js 4.11.1__<br />
+*   __Video.js 4.12.0__<br />
     <[http://videojs.com/](http://videojs.com)><br />
     Copyright (c) 2014 Brightcove, Inc<br />
     Video.js is licensed under the [Apache License 2.0](http://opensource.org/licenses/Apache-2.0).
