@@ -349,8 +349,6 @@ a, a:link, a:visited, a:hover, a:active {
         }
 
             #jump {
-                position:relative;
-                top:-1px;
                 width:30px;
                 height:12px;
                 padding-left:3px;
