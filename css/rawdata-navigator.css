@@ -118,24 +118,34 @@ a, a:link, a:visited, a:hover, a:active {
             border-color:rgba(255,0,0,0.25);
         }
 
-    .seg-0c0 div,
-    .vis.timeline .item.timeline-0c0 {
-        background-color:rgba(0,204,0,0.25);
+    .seg-0f0 div,
+    .vis.timeline .item.timeline-0f0 {
+        background-color:rgba(0,255,0,0.25);
     }
 
-        .vis.timeline .item.timeline-0c0 {
-            color:#060;
-            border-color:rgba(0,204,0,0.25);
+        .vis.timeline .item.timeline-0f0 {
+            color:#0f0;
+            border-color:rgba(0,255,0,0.25);
         }
 
     .seg-00f div,
     .vis.timeline .item.timeline-00f {
-        background-color:rgba(0,0,255,0.25);
+        background-color:rgba(34,34,255,0.25);
     }
 
         .vis.timeline .item.timeline-00f {
-            color:#00f;
-            border-color:rgba(0,0,255,0.25);
+            color:#22f;
+            border-color:rgba(34,34,255,0.25);
+        }
+
+    .seg-f0f div,
+    .vis.timeline .item.timeline-f0f {
+        background-color:rgba(255,0,255,0.25);
+    }
+
+        .vis.timeline .item.timeline-f0f {
+            color:#f0f;
+            border-color:rgba(255,0,255,0.25);
         }
 
     .vis.timeline .item.selected {

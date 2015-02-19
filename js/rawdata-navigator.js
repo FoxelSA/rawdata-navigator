@@ -557,7 +557,7 @@ var RawDataNavigator = new function() {
     var segmentation = {
 
         _items: {},
-        _colors: ['#f00','#0c0','#00f'],
+        _colors: ['#f00','#0f0','#00f','#f0f'],
 
         /**
          * segmentation.items()
