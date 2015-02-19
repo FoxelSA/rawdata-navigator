@@ -3420,7 +3420,7 @@ var DAV = new function() {
 
             } else {
               coords={
-                lon: panel.panorama.lon-90, 
+                lon: panel.panorama.lon, 
                 lat: panel.panorama.lat
               }
             }
@@ -3480,14 +3480,10 @@ var DAV = new function() {
               e.stopPropagation();
               e.preventDefault();
 
-              var mc=panel.panorama.getMouseCoords(e);
-              mc.lon-=180;
-              mc.lat+=panel.panorama.lat;
-              mc.lon+=panel.panorama.lon;
+              panel.panorama.getMouseCoords(e);
+              var mc=panel.panorama.mouseCoords;
 
-              panel.panorama.poi.list.cursor.instance.coords.lon=mc.lon%360;
-              panel.panorama.poi.list.cursor.instance.coords.lat=mc.lat%180;
-              if (panel.panorama.poi.list.cursor.instance.coords.lon<0) panel.panorama.poi.list.cursor.instance.coords.lon+=360;
+              panel.panorama.poi.list.cursor.instance.setCoords(mc);
 
               panel.panorama.drawScene();
 
@@ -3514,21 +3510,8 @@ var DAV = new function() {
              .css('cursor','');
 
             var panorama=panel.panorama;
-            poicursor.coords=panorama.getMouseCoords(e);
-            poicursor.coords.lon-=180;
-
-
-            poicursor.coords.lon+=panorama.lon;
-            poicursor.coords.lat+=panorama.lat;
-
-            var lat=poicursor.coords.lat;
-            var lon=poicursor.coords.lon-90;
-
-            if (lon<0) lon+=360;
-            if (lon>360) lon-=360;
-            if (lat>90) lat-=180;
-            if (lat<-90) lat+=180;
-            console.log('textureCoords=',panorama.sphere.texture.height/180*lon,panorama.sphere.texture.height/180*lat+panorama.sphere.texture.height/2);
+            panorama.getMouseCoords(e);
+            poicursor.coords=$.extend({},panorama.mouseCoords);
 
             if (!$('#poipanel_edit',panel._dom).is(':visible')) {
               panel.edit(panel.currentPOI);
