@@ -1,7 +1,7 @@
 /*
  * rawdata-navigator - Human-understandable raw data navigator
  *
- * Copyright (c) 2014 FOXEL SA - http://foxel.ch
+ * Copyright (c) 2014-2015 FOXEL SA - http://foxel.ch
  * Please read <http://foxel.ch/license> for more information.
  *
  *
@@ -186,8 +186,8 @@ var RawDataNavigator = new function() {
             this._items.push({
                 id: segment,
                 content: '<div id="timeline_'+segment+'"></div><strong>'+segment+'</strong>',
-                start: parseInt(_.first(poses).sec,10)*1000+parseInt(_.first(poses).usc,10)/1000,
-                end: parseInt(_.last(poses).sec,10)*1000+parseInt(_.last(poses).usc,10)/1000,
+                start: parseInt(_.first(poses).sec,10)*1000+parseInt(_.first(poses).usec,10)/1000,
+                end: parseInt(_.last(poses).sec,10)*1000+parseInt(_.last(poses).usec,10)/1000,
                 className: 'timeline'+info.color.replace('#','-'),
                 segmentation: {
                     length: poses.length,
@@ -417,7 +417,7 @@ var RawDataNavigator = new function() {
             var val = this._component.val().split('/');
             this.current.mac = val[0];
             this.current.master = val[1];
-            this.current.path = storage.mountpoint+'/camera/'+this.current.mac+'/raw/segment/'+this.current.master;
+            this.current.path = storage.mountpoint+'/rawdata/'+this.current.mac+'/master/'+this.current.master;
         },
 
         /**
@@ -557,7 +557,7 @@ var RawDataNavigator = new function() {
     var segmentation = {
 
         _items: {},
-        _colors: ['#f00','#0c0','#00f'],
+        _colors: ['#f00','#0f0','#00f','#f0f'],
 
         /**
          * segmentation.items()
@@ -668,7 +668,7 @@ var RawDataNavigator = new function() {
                 overlay.show('Loading segments from<br />'+allocation.current.path+'/');
                 this._remaining = allocation.current.segments().length;
                 $.each(allocation.current.segments(), function(index,segment) {
-                    $.getJSON('php/csps-json.php?json='+allocation.current.path+'/'+segment+'/info/rawdata-autoseg/',function(data) {
+                    $.getJSON('php/csps-json.php?json='+allocation.current.path+'/segment/'+segment+'/info/',function(data) {
                         segmentation.json.success(index,segment,data);
                     }).fail(segmentation.json.fail);
                 });
@@ -719,35 +719,62 @@ var RawDataNavigator = new function() {
                 // poses
                 $.each(data.pose, function(index,pose) {
 
+                    var knownposition = !_.isNull(pose.position);
+                    var displaymarker = !info.gps || (info.gps && knownposition);
+                    var knownorientation = !_.isNull(pose.orientation);
+
+                    // position
+                    pose.lat = knownposition ? pose.position[2] : 0.0;
+                    pose.lng = knownposition ? pose.position[1] : 0.0;
+
                     // geopoint
                     var latlng = map.helpers.latlng(pose,info,call,index);
 
                     // add on track
-                    track.push(latlng);
+                    if (displaymarker)
+                        track.push(latlng);
 
                     // add on vframes
-                    if (info.preview && pose.status=='validated')
+                    if (info.preview && pose.raw=='valid')
                         vframes.push(index);
 
                     // type
-                    if (pose.status=='trashed')
+                    if (pose.raw=='trash')
                         trashed++;
-                    else if (pose.status=='corrupted')
+                    else if (pose.raw=='corrupt')
                         corrupted++;
                     else
                         validated++;
 
                     // add on cluster
-                    cluster.addLayer(map.helpers.cluster.marker(segment,pose,latlng,info,index));
+                    if (displaymarker)
+                        cluster.addLayer(map.helpers.cluster.marker(segment,pose,latlng,info,index));
 
                     // add on poses
                     poses[index] = {
+                        still: pose.still,
+                        raw: pose.raw,
                         sec: pose.sec,
-                        usc: String(pose.usc).zeropad(6),
-                        latlng: latlng,
-                        alt: pose.alt,
-                        guess: pose.guess,
-                        status: pose.status
+                        usec: String(pose.usec).zeropad(6),
+                        position: {
+                            known: knownposition,
+                            latlng: latlng,
+                            alt: knownposition ? pose.position[0] : 0.0,
+                            robustness: knownposition ? pose.position[3] : 0.0
+                        },
+                        orientation: {
+                            known: knownorientation,
+                            rotation00: knownorientation ? pose.orientation[0] : 0.0,
+                            rotation01: knownorientation ? pose.orientation[1] : 0.0,
+                            rotation02: knownorientation ? pose.orientation[2] : 0.0,
+                            rotation10: knownorientation ? pose.orientation[3] : 0.0,
+                            rotation11: knownorientation ? pose.orientation[4] : 0.0,
+                            rotation12: knownorientation ? pose.orientation[5] : 0.0,
+                            rotation20: knownorientation ? pose.orientation[6] : 0.0,
+                            rotation21: knownorientation ? pose.orientation[7] : 0.0,
+                            rotation22: knownorientation ? pose.orientation[8] : 0.0,
+                            robustness: knownorientation ? pose.orientation[9] : 0.0
+                        }
                     };
 
                 });
@@ -806,11 +833,12 @@ var RawDataNavigator = new function() {
                 zoom: this.zoom.default,
                 minZoom: this.zoom.min,
                 maxZoom: this.zoom.max,
-                center: [46.205007,6.145134]
+                center: [46.205007,6.145134],
+                zoomControl: false
             });
 
             // scale
-            L.control.scale().addTo(this._component);
+            L.control.scale({position:'bottomright'}).addTo(this._component);
 
             // tiles
             this.tiles.init();
@@ -831,7 +859,7 @@ var RawDataNavigator = new function() {
          */
         resize: function() {
             $(this._dom).width($(window).width());
-            $(this._dom).height($(window).height()-$(timeline._dom).outerHeight(true));
+            $(this._dom).height($(window).height()-$(timeline._dom).outerHeight(true)-$('#header').outerHeight(true));
         },
 
         /**
@@ -906,8 +934,13 @@ var RawDataNavigator = new function() {
              */
             init: function() {
 
+                // layers
                 this.control = L.control.layers({},{}).addTo(map._component);
 
+                // zoom
+                L.control.zoom({position:'topright'}).addTo(map._component);
+
+                // tiles
                 this.maps();
                 this.static();
 
@@ -923,25 +956,29 @@ var RawDataNavigator = new function() {
 
                 // sources
                 var sources = [{
-                    description: 'OpenStreetMap Mapnik',
-                    url: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
-                                    + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>'
-                },
-                /*
-                {
-                    description: 'OpenStreetMap Black and White',
-                    url: 'http://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png',
-                    attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
-                                    + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>'
-                },
-                */
-                {
-                    description: 'Esri World Imagery',
-                    url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-                    attribution: 'Tiles &copy; Esri, '
-                                    + 'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-                }];
+                  description: 'Mapbox Bright',
+                  url: 'https://{s}.tiles.mapbox.com/v3/dennisl.4e2aab76/{z}/{x}/{y}.png',
+                  attribution: '&copy; <a href="https://www.mapbox.com/about/maps">Mapbox</a>, '
+                                  + '<a href="http://openstreetmap.org/copyright">OpenStreetMap</a>'
+              },
+              {
+                  description: 'OpenStreetMap Mapnik',
+                  url: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
+                                  + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>'
+              },
+              {
+                  description: 'Esri World Imagery',
+                  url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                  attribution: 'Tiles &copy; Esri, '
+                                  + 'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+              },
+              {
+                  description: 'Mapbox Labelled Satellite',
+                  url: 'https://{s}.tiles.mapbox.com/v3/dennisl.map-6g3jtnzm/{z}/{x}/{y}.png',
+                  attribution: '&copy; <a href="https://www.mapbox.com/about/maps">Mapbox</a>, '
+                                  + '<a href="http://openstreetmap.org/copyright">OpenStreetMap</a>'
+              }];
 
                 // layers
                 $.each(sources, function(index,source) {
@@ -1189,7 +1226,7 @@ var RawDataNavigator = new function() {
                     return L.marker(latlng, {
                         icon: L.divIcon({
                             html: '<div><span></span></div>',
-                            className: 'marker-pnt '+info.color.replace('#','seg-')+' type-'+pose.status,
+                            className: 'marker-pnt '+info.color.replace('#','seg-')+' type-'+pose.raw,
                             iconSize: L.point(30,30)
                         })
                     }).on('click', function() {
@@ -1210,6 +1247,7 @@ var RawDataNavigator = new function() {
 
         _component: null,
         _dom: '#info',
+        _scrollbar: null,
 
         _segment: null,
         _index: null,
@@ -1219,10 +1257,31 @@ var RawDataNavigator = new function() {
          * information.init()
          */
         init: function() {
+
             this._component = $(this._dom+' .data');
+
+            this.scrollbar();
             this.events();
+            this.resize();
+
             this.video.init();
             this.overview.init();
+
+        },
+
+        /**
+         * information.scrollbar()
+         */
+        scrollbar: function() {
+            this._scrollbar = $(this._dom+' .scrollable');
+            this._scrollbar.mCustomScrollbar({
+                axis: 'y',
+                theme: 'light-thin',
+                autoHideScrollbar: true,
+                advanced: {
+                    updateOnContentResize: true
+                }
+            });
         },
 
         /**
@@ -1230,10 +1289,13 @@ var RawDataNavigator = new function() {
          */
         events: function() {
 
+            // resize
+            $(window).on('resize',function() {
+                information.resize();
+            });
+
             // close
-            $(this._dom+' .close a').on('click',function(e) {
-                e.preventDefault();
-                e.stopPropagation();
+            $(this._dom+' .close').on('click',function(e) {
                 information.close();
             });
 
@@ -1260,6 +1322,18 @@ var RawDataNavigator = new function() {
 
             });
 
+            // closeable
+            $(this._dom+' .block .section').on('click',function(e) {
+                var element = $(this);
+                var closed = $(this).hasClass('closed');
+                $(this).siblings('.closeable').slideToggle(150,function() {
+                    if (closed)
+                        element.removeClass('closed');
+                    else
+                        element.addClass('closed');
+                });
+            });
+
         },
 
         /**
@@ -1275,7 +1349,7 @@ var RawDataNavigator = new function() {
             if (this._segment != segment && videoframe > -1) {
                 this.video.clear();
                 if (info.preview)
-                    this.video._player.src({type:'video/webm',src:'php/segment-video.php?src='+allocation.current.path+'/'+segment+'/preview/'+info.debayer+'/segment'});
+                    this.video._player.src({type:'video/webm',src:'php/segment-video.php?src='+allocation.current.path+'/segment/'+segment+'/preview/'+info.debayer+'/vid/25fps'});
             }
 
             // change track
@@ -1316,7 +1390,7 @@ var RawDataNavigator = new function() {
             // static marker
             if (_.isNull(this._layer)) {
 
-                this._layer = L.marker(pose.latlng,{icon:L.icon({
+                this._layer = L.marker(pose.position.latlng,{icon:L.icon({
                     iconUrl: 'img/pose-icon.png',
                     iconRetinaUrl: 'img/pose-icon-2x.png',
                     iconSize: [25, 41],
@@ -1329,37 +1403,61 @@ var RawDataNavigator = new function() {
             }
 
             // place static marker
-            this._layer.setLatLng(pose.latlng);
+            this._layer.setLatLng(pose.position.latlng);
 
             // track marker
             information.overview.marker(segment,pose);
 
             // show
-            $(this._dom).stop(true,false).slideDown('fast',function() {
+            $(this._dom).stop(true,false).animate({left:0},250,function() {
 
                 // fix overview
                 information.overview._component.invalidateSize();
 
                 // timestamp
-                information._component.find('.timestamp').html(pose.sec+'.'+pose.usc);
+                information._component.find('.timestamp').html(pose.sec+'.'+pose.usec);
 
                 // geo
-                if (info.gps) {
-                    information._component.find('.section.geo').css('display','block');
-                    information._component.find('.lat').html(pose.latlng.lat);
-                    information._component.find('.lng').html(pose.latlng.lng);
-                    information._component.find('.alt').html(pose.alt);
+                if (info.gps && pose.position.known) {
+                    information._component.find('.section.geo.unknown').css('display','none');
+                    information._component.find('.section.geo.known').css('display','block');
+                    information._component.find('.lat').html(pose.position.latlng.lat);
+                    information._component.find('.lng').html(pose.position.latlng.lng);
+                    information._component.find('.alt').html(pose.position.alt);
+                    information._component.find('.still').html(pose.still?'Yes':'No');
+                    information._component.find('.geo .robustness').html(pose.position.robustness);
                 } else {
-                    information._component.find('.section.geo').css('display','none');
-                    information._component.find('.lat').html('');
-                    information._component.find('.lng').html('');
-                    information._component.find('.alt').html('');
+                    information._component.find('.section.geo.known').css('display','none');
+                    information._component.find('.section.geo.unknown').css('display','block');
+                }
+
+                // orientation
+                if (pose.orientation.known) {
+                    information._component.find('.section.orientation.unknown').css('display','none');
+                    information._component.find('.section.orientation.known').css('display','block');
+                    information._component.find('.rot00').html(pose.orientation.rotation00);
+                    information._component.find('.rot01').html(pose.orientation.rotation01);
+                    information._component.find('.rot02').html(pose.orientation.rotation02);
+                    information._component.find('.rot10').html(pose.orientation.rotation10);
+                    information._component.find('.rot11').html(pose.orientation.rotation11);
+                    information._component.find('.rot12').html(pose.orientation.rotation12);
+                    information._component.find('.rot20').html(pose.orientation.rotation20);
+                    information._component.find('.rot21').html(pose.orientation.rotation21);
+                    information._component.find('.rot22').html(pose.orientation.rotation22);
+                    information._component.find('.orientation .robustness').html(pose.orientation.robustness);
+                } else {
+                    information._component.find('.section.orientation.known').css('display','none');
+                    information._component.find('.section.orientation.unknown').css('display','block');
                 }
 
                 // status
-                information._component.find('.gps').html(info.gps?(pose.guess?'Guessed':'Valid'):'No GPS fix');
-                information._component.find('.jp4').html(pose.status.charAt(0).toUpperCase()+pose.status.slice(1));
-                information._component.find('.split').html(info.split?'Yes':'No');
+                if (info.split)
+                    information._component.find('.jp4').html(pose.raw.charAt(0).toUpperCase()+pose.raw.slice(1));
+                else
+                    information._component.find('.jp4').html('Not splitted yet');
+                information._component.find('.master').html(allocation.current.master);
+                information._component.find('.segment').html(segment);
+                information._component.find('.camera').html(allocation.current.mac);
 
                 // date
                 var date = new Date(parseInt(pose.sec,10)*1000);
@@ -1368,16 +1466,14 @@ var RawDataNavigator = new function() {
 
                 // html
                 $(information._dom+' .preview').html(
-                    (!info.preview || pose.status!='validated') ? '<img src="img/def.png" alt="" width="640" height="320" />' : ''
+                    (!info.preview || pose.raw!='valid') ? '<img src="img/def.png" alt="" width="498" height="249" />' : ''
                 );
                 $(information._dom+' .nav > div').html(
-                    ((index > 0) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index-1)+'\');return false;"><span class="prev"></span>Prev</a>' : '')
-                    + ((index+1 < poses.length) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index+1)+'\');return false;">Next<span class="next"></span></a>' : '')
+                    ((index > 0) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index-1)+'\');return false;"><span class="prev"></span></a>' : '')
+                    + ((index+1 < poses.length) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index+1)+'\');return false;"><span class="next"></span></a>' : '')
                 );
-                $(information._dom+' .pose').html(
-                    'Segment '+segment+' &nbsp; &nbsp; &nbsp; '
-                    + 'Pose '+(index+1)+' of '+poses.length
-                );
+                $(information._dom+' #jump').val((index+1));
+                $(information._dom+' .poses').html(poses.length);
 
             });
 
@@ -1394,7 +1490,7 @@ var RawDataNavigator = new function() {
 
             // wait for the player to stop
             setTimeout(function() {
-                $(information._dom).stop(true,false).slideUp('fast');
+                $(information._dom).stop(true,false).animate({left:-($(information._dom).width())},250);
             },250);
 
         },
@@ -1408,6 +1504,14 @@ var RawDataNavigator = new function() {
             this._layer = null;
             this._segment = null;
             this._index = null;
+        },
+
+        /**
+         * information.resize()
+         */
+        resize: function() {
+            $(this._dom).height($(window).height()-$(timeline._dom).outerHeight(true)-$('#header').outerHeight(true));
+            this._scrollbar.height($(this._dom).height());
         },
 
         /**
@@ -1546,7 +1650,7 @@ var RawDataNavigator = new function() {
                 var poses = segmentation.poses(segment);
 
                 // hide map
-                $(this._dom).css('visibility','hidden');
+                $(this._dom).css('display','none');
 
                 // clear track
                 if (!_.isNull(this._track))
@@ -1559,7 +1663,8 @@ var RawDataNavigator = new function() {
                 // add on track
                 var track = [];
                 $.each(poses,function(index,pose) {
-                    track.push(pose.latlng);
+                    if (pose.position.known)
+                        track.push(pose.position.latlng);
                 });
 
                 // add on map
@@ -1569,17 +1674,36 @@ var RawDataNavigator = new function() {
                 // bounds
                 var bounds = this._track.getBounds();
 
+                // show map
+                $(information.overview._dom).css('visibility','hidden');
+                $(information.overview._dom).css('display','block');
+
                 // wait a bit (leaflet take some time to be ready)
                 setTimeout(function () {
 
-                    // show map
-                    $(information.overview._dom).css('visibility','visible');
+                    // size
+                    information.overview._component.invalidateSize({
+                        reset: true,
+                        pan: {
+                            animate: true
+                        },
+                        zoom: {
+                            animate: true
+                        },
+                        animate: true
+                    });
 
                     // fit
                     information.overview._component.fitBounds(bounds);
 
                     // center
                     information.overview._component.panTo(bounds.getCenter());
+
+                    // unzoom
+                    information.overview._component.setZoom(information.overview._component.getZoom()-1);
+
+                    // show
+                    $(information.overview._dom).css('visibility','visible');
 
                 },500);
 
@@ -1593,7 +1717,7 @@ var RawDataNavigator = new function() {
                 // track marker
                 if (_.isNull(this._marker)) {
 
-                    this._marker = L.marker(pose.latlng,{icon:L.icon({
+                    this._marker = L.marker(pose.position.latlng,{icon:L.icon({
                         iconUrl: 'img/pose-icon.png',
                         iconRetinaUrl: 'img/pose-icon-2x.png',
                         iconSize: [25, 41],
@@ -1606,7 +1730,7 @@ var RawDataNavigator = new function() {
                 }
 
                 // place track marker
-                this._marker.setLatLng(pose.latlng);
+                this._marker.setLatLng(pose.position.latlng);
 
             }
 

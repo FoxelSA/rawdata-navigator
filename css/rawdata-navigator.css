@@ -1,7 +1,7 @@
 /*
  * rawdata-navigator - Human-understandable raw data navigator
  *
- * Copyright (c) 2014 FOXEL SA - http://foxel.ch
+ * Copyright (c) 2014-2015 FOXEL SA - http://foxel.ch
  * Please read <http://foxel.ch/license> for more information.
  *
  *
@@ -44,20 +44,71 @@
     src:url('fonts/FontAwesome/fontawesome-webfont.eot?#iefix&v=4.0.3') format('embedded-opentype'), url('fonts/FontAwesome/fontawesome-webfont.woff?v=4.0.3') format('woff'), url('fonts/FontAwesome/fontawesome-webfont.ttf?v=4.0.3') format('truetype'), url('fonts/FontAwesome/fontawesome-webfont.svg?v=4.0.3#fontawesomeregular') format('svg');
 }
 
+.spin {
+    -webkit-animation-name:spin;
+    -webkit-animation-duration:2000ms;
+    -webkit-animation-iteration-count:infinite;
+    -webkit-animation-timing-function:ease;
+    animation-name:spin;
+    animation-duration:2000ms;
+    animation-iteration-count:infinite;
+    animation-timing-function:ease;
+}
+
+@-webkit-keyframes spin {
+    from { -webkit-transform:rotate(0deg); }
+    to { -webkit-transform:rotate(360deg); }
+}
+@keyframes spin {
+    from { transform:rotate(0deg); }
+    to { transform:rotate(360deg); }
+}
+
 html,body {
     margin:0;
     padding:0;
     font-family:'open sans',arial,helvetica,sans;
     font-size:13px;
+    overflow:hidden;
 }
 
 a, a:link, a:visited, a:hover, a:active {
     text-decoration:none;
 }
 
+#header {
+    width:100%;
+    height:70px;
+    background-color:#000;
+}
+
+    #header a {
+        outline:none;
+    }
+
+    #header .logo {
+        position:absolute;
+        top:21px;
+        left:20px;
+    }
+
+    #header .dataset {
+        position:absolute;
+        top:31px;
+        left:300px;
+        font-weight:700;
+        font-size:11px;
+        color:#fff;
+        text-transform:uppercase;
+    }
+
 #map {
     width:100%;
 }
+
+    .leaflet-control-zoom {
+        margin-right:15px !important;
+    }
 
     .leaflet-popup-content-wrapper {
         border-radius:0;
@@ -87,24 +138,34 @@ a, a:link, a:visited, a:hover, a:active {
             border-color:rgba(255,0,0,0.25);
         }
 
-    .seg-0c0 div,
-    .vis.timeline .item.timeline-0c0 {
-        background-color:rgba(0,204,0,0.25);
+    .seg-0f0 div,
+    .vis.timeline .item.timeline-0f0 {
+        background-color:rgba(0,255,0,0.25);
     }
 
-        .vis.timeline .item.timeline-0c0 {
-            color:#060;
-            border-color:rgba(0,204,0,0.25);
+        .vis.timeline .item.timeline-0f0 {
+            color:#0f0;
+            border-color:rgba(0,255,0,0.25);
         }
 
     .seg-00f div,
     .vis.timeline .item.timeline-00f {
-        background-color:rgba(0,0,255,0.25);
+        background-color:rgba(34,34,255,0.25);
     }
 
         .vis.timeline .item.timeline-00f {
-            color:#00f;
-            border-color:rgba(0,0,255,0.25);
+            color:#22f;
+            border-color:rgba(34,34,255,0.25);
+        }
+
+    .seg-f0f div,
+    .vis.timeline .item.timeline-f0f {
+        background-color:rgba(255,0,255,0.25);
+    }
+
+        .vis.timeline .item.timeline-f0f {
+            color:#f0f;
+            border-color:rgba(255,0,255,0.25);
         }
 
     .vis.timeline .item.selected {
@@ -128,8 +189,8 @@ a, a:link, a:visited, a:hover, a:active {
             line-height:30px;
         }
 
-            .marker-pnt.type-trashed span,
-            .marker-pnt.type-corrupted span {
+            .marker-pnt.type-trash span,
+            .marker-pnt.type-corrupt span {
                 color:#000;
             }
 
@@ -137,19 +198,15 @@ a, a:link, a:visited, a:hover, a:active {
                 content:"\f0e7";
             }
 
-            .marker-pnt.type-guess span:before {
-                content:"\f0c3";
-            }
-
-            .marker-pnt.type-validated span:before {
+            .marker-pnt.type-valid span:before {
                 content:"\f00c";
             }
 
-            .marker-pnt.type-trashed span:before {
+            .marker-pnt.type-trash span:before {
                 content:"\f00d";
             }
 
-            .marker-pnt.type-corrupted span:before {
+            .marker-pnt.type-corrupt span:before {
                 content:"\f071";
             }
 
@@ -173,11 +230,19 @@ a, a:link, a:visited, a:hover, a:active {
             background-color:transparent;
         }
 
-        #overlay img {
-            padding-bottom:15px;
+        #overlay span {
+            font-family:'FontAwesome';
+            font-size:40px;
+            font-style:normal;
+            font-weight:normal;
         }
 
+            #overlay span:before {
+                content:"\f1ce";
+            }
+
         #overlay .txt {
+            margin-top:15px;
             font-size:10px;
             font-weight:700;
             text-transform:uppercase;
@@ -187,10 +252,14 @@ a, a:link, a:visited, a:hover, a:active {
 #allocation {
     display:none;
     position:absolute;
-    left:50px;
-    top:10px;
+    left:370px;
+    top:23px;
     width:500px;
 }
+
+    .select2-container a.select2-choice {
+        border-radius:0;
+    }
 
     .allocation {
         padding-top:2px;
@@ -244,14 +313,15 @@ a, a:link, a:visited, a:hover, a:active {
         }
 
 #info {
-    display:none;
     position:absolute;
-    bottom:90px; /* see #timeline.height */
-    left:0;
-    width:100%;
-    height:390px;
+    top:70px; /* see #header.height */
+    left:-600px;
+    width:600px;
+    height:auto;
     color:#fff;
     background-color:rgba(0,0,0,0.9);
+    z-index:900;
+    overflow:hidden;
 }
 
     #info a {
@@ -260,17 +330,13 @@ a, a:link, a:visited, a:hover, a:active {
 
     #info .close {
         position:absolute;
-        top:8px;
-        right:10px;
-        font-size:10px;
-        font-weight:700;
-        text-transform:uppercase;
+        top:12px;
+        right:14px;
+        z-index:950;
+        cursor:pointer;
     }
 
         #info .close span {
-            position:relative;
-            top:3px;
-            margin-left:6px;
             font-family:'FontAwesome';
             font-size:20px;
             font-style:normal;
@@ -278,111 +344,120 @@ a, a:link, a:visited, a:hover, a:active {
         }
 
             #info .close span:before {
-                content:"\f103";
+                content:"\f00d";
             }
 
-    #info .nav {
-        position:absolute;
-        top:8px;
-        right:660px;
-        font-size:10px;
-        font-weight:700;
-        text-transform:uppercase;
+    #info .head {
+        margin:50px;
+        margin-bottom:0;
     }
 
-        #info .nav > div {
-            position:absolute;
-            top:0;
-            left:10px;
+        #info a {
+            outline:none;
         }
 
-        #info .nav a {
-            margin-right:20px;
+        #info .nav {
+            float:left;
+            margin-left:15px;
         }
 
-        #info .nav span {
-            position:relative;
-            top:2px;
-            margin-left:6px;
-            font-family:'FontAwesome';
-            font-size:20px;
-            font-style:normal;
-            font-weight:normal;
-        }
-
-            #info .nav span.prev {
-                margin-left:0;
-                margin-right:6px;
+            #info .nav span {
+                position:relative;
+                top:-4px;
+                font-family:'FontAwesome';
+                font-size:20px;
+                font-style:normal;
+                font-weight:normal;
+                margin-right:10px;
             }
 
-            #info .nav span:before {
-                content:"\f105";
-            }
+                #info .nav span:before {
+                    content:"\f0a9";
+                }
 
-            #info .nav span.prev:before {
-                content:"\f104";
-            }
+                #info .nav span.prev:before {
+                    content:"\f0a8";
+                }
 
-    #info .pose {
-        position:absolute;
-        top:16px;
-        right:175px;
-        font-size:10px;
-        font-weight:700;
-        text-transform:uppercase;
-    }
-
-    #info .jump {
-        position:absolute;
-        top:14px;
-        right:425px;
-        font-size:10px;
-        font-weight:700;
-        text-transform:uppercase;
-    }
-
-        #jump {
-            position:relative;
-            top:-1px;
-            width:30px;
-            height:12px;
-            padding-left:3px;
-            padding-right:3px;
+        #info .jump {
+            float:left;
             font-size:10px;
             font-weight:700;
             text-transform:uppercase;
-            color:#fff;
-            border:solid 1px #4f4f4f;
-            background-color:transparent;
         }
 
+            #jump {
+                width:30px;
+                height:12px;
+                padding-left:3px;
+                padding-right:3px;
+                font-size:10px;
+                font-weight:700;
+                text-transform:uppercase;
+                text-align:right;
+                color:#fff;
+                border:solid 1px #4f4f4f;
+                background-color:transparent;
+            }
+
     #info .data {
-        position:absolute;
-        top:70px;
-        right:720px;
-        width:300px;
+        position:relative;
+        margin-left:50px;
+        margin-bottom:20px;
         font-size:11px;
     }
 
-        #info .data .timestamp {
-            padding-bottom:13px;
-            font-size:14px;
-            font-weight:700;
+        #info .data .block {
+            float:left;
+            width:240px;
+            margin-right:20px;
         }
 
+            #info .data .block .closeable {
+                margin-bottom:30px;
+            }
+
+                #info .data .block .closeable.closed {
+                    display:none;
+                }
+
         #info .data div.section {
-            padding-bottom:3px;
-            margin-top:20px;
-            margin-bottom:10px;
+            padding-bottom:5px;
+            margin-top:10px;
+            margin-bottom:20px;
             font-size:10px;
             font-weight:700;
             text-transform:uppercase;
             border-bottom:solid 1px #fff;
         }
 
+            #info .data div.section.control {
+                cursor:pointer;
+            }
+
+                #info .data div.section.control span {
+                    margin-right:6px;
+                    font-family:'FontAwesome';
+                    font-size:14px;
+                    font-style:normal;
+                    font-weight:normal;
+                }
+
+                    #info .data div.section.control span:before {
+                        content:"\f150";
+                    }
+
+                     #info .data div.section.control.closed span:before {
+                        content:"\f152";
+                    }
+
         #info .data table {
             border-collapse:collapse;
         }
+
+            #info .data tr.space td {
+                padding-top:8px;
+            }
 
             #info .data td {
                 padding-left:0;
@@ -390,35 +465,39 @@ a, a:link, a:visited, a:hover, a:active {
             }
 
                 #info .data td.attr {
-                    width:100px;
+                    width:85px;
                 }
 
-    #info .preview {
-        position:absolute;
-        bottom:25px;
-        right:10px;
-        width:650px;
-        text-align:right;
+    #info .viewer {
+        position:relative;
+        height:250px;
+        margin:50px;
+        margin-top:20px;
+        margin-bottom:30px;
     }
 
-        #info .preview img {
+        #info .video {
+            position:absolute;
+            top:0;
+            left:0;
             border:solid 1px #4f4f4f;
         }
 
-    #info .video {
-        position:absolute;
-        bottom:28px;
-        right:10px;
-        width:640px;
-        border:solid 1px #4f4f4f;
-    }
+        #info .preview {
+            position:absolute;
+            top:0;
+            left:0;
+        }
+
+            #info .preview img {
+                border:solid 1px #4f4f4f;
+            }
 
     #overview {
-        position:absolute;
-        bottom:28px;
-        right:1085px;
-        width:400px;
-        height:320px;
+        width:500px;
+        height:280px;
+        margin-left:50px;
+        margin-bottom:40px;
         border:solid 1px #4f4f4f;
     }
 
@@ -428,7 +507,7 @@ a, a:link, a:visited, a:hover, a:active {
     left:0;
     width:100%;
     height:90px; /* see #info.bottom */
-    background-color:#ebebeb;
+    background-color:#000;
     font-size:11px;
 }
 
@@ -440,6 +519,14 @@ a, a:link, a:visited, a:hover, a:active {
             top:12px !important;
             border-width:5px;
         }
+
+    .vis.timeline {
+        border:none !important;
+    }
+    .vis.timeline .vispanel,
+    .vis.timeline .grid.vertical {
+        border-color:#222 !important;
+    }
 
 #statistics {
     display:none;
