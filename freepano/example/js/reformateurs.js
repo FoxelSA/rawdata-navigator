@@ -1241,9 +1241,9 @@ $(document).on('filesloaded', function(){
 
       precision: 'highp',
 
-      antialias: false,
+      antialias: true,
 
-      alpha: false
+      alpha: true
 
     },
 
@@ -1275,6 +1275,7 @@ $(document).on('filesloaded', function(){
 */
 
     pointCloud: {
+      active: true
     },
 
     postProcessing: {
