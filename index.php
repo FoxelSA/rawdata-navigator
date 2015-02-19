@@ -177,7 +177,7 @@
 
 <div id="overlay">
     <div>
-        <img src="img/ajax-loader.gif" width="24" height="24" alt="" />
+        <div class="spin"><span></span></div>
         <div class="txt"></div>
     </div>
 </div>
