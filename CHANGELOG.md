@@ -2,6 +2,19 @@
 ## Changelog
 
 
+### 1.3.0 (February 19, 2015)
+
+- `FIXED` Overview map size is invalidated following the API.
+- `FIXED` Information panel is on the left of the screen, scrollable.
+- `FIXED` Timeline uses a dark theme to focus user on the map.
+- `FIXED` Allocation selector goes on the top of the screen to avoid map interference.
+- `FIXED` Loader image as font and CSS3 animation.
+- `ADDED` JSON additional information is reflected on the information panel.
+- `ADDED` Mapbox Bright and Labelled Satellite tiles are available.
+- `UPDATED` JSON discovery is updated according to the new raw data structure.
+- `UPDATED` Third party libraries are updated to their latest versions.
+
+
 ### 1.2.0 (December 17, 2014)
 
 - `FIXED` Remove the _data_ symbolic link dependency as video streaming is allowed now.
