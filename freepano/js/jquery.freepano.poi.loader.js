@@ -102,4 +102,3 @@ $.extend(true,Panorama.prototype,{
 });
 
 Panorama.prototype.setupCallback(POI_loader.prototype);
-

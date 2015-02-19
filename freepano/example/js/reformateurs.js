@@ -1274,6 +1274,9 @@ $(document).on('filesloaded', function(){
     },
 */
 
+    pointCloud: {
+    },
+
     postProcessing: {
       enabled: false,
 

@@ -313,6 +313,8 @@ function Panorama(options) {
     return new Panorama(options);
   }
 
+  window.p=this;
+
   $.extend(true,this,this.defaults,options);
 
   this.init();
@@ -347,6 +349,7 @@ $.extend(true,Panorama.prototype,{
       lat: 0,
       phi: 0,
       theta: 0,
+      mouseCoords: new THREE.Vector3(),
       rotation: {
         heading: 0,
         tilt: 0,
@@ -382,6 +385,7 @@ $.extend(true,Panorama.prototype,{
           panorama.sphere=new Sphere($.extend(true,{
             panorama: panorama,
             callback: function(){
+              panorama.updateRotationMatrix();
               panorama.callback('resize');
               panorama.callback('ready');
             }
@@ -389,8 +393,6 @@ $.extend(true,Panorama.prototype,{
         }
         panorama.scene.add(panorama.sphere.object3D);
       }
-
-      panorama.updateRotationMatrix();
 
       // instantiate renderer
       if (!(panorama.renderer instanceof THREE.WebGLRenderer)) {
@@ -508,7 +510,7 @@ $.extend(true,Panorama.prototype,{
       R.multiply((new THREE.Matrix4()).makeRotationAxis(new THREE.Vector3(1,0,0),THREE.Math.degToRad(panorama.rotation.tilt)));
       R.multiply((new THREE.Matrix4()).makeRotationAxis(new THREE.Vector3(0,0,1),THREE.Math.degToRad(panorama.rotation.roll)));
 
-      panorama.rotation._matrix=R;
+      panorama.sphere.object3D.rotation.setFromRotationMatrix(R);
 
     }, // panorama_updateRotationMatrix
 
@@ -606,10 +608,9 @@ $.extend(true,Panorama.prototype,{
         y: e.clientY-offset.top
       }
 
-
+    var modelViewMatrix=new THREE.Matrix4().multiplyMatrices(panorama.camera.instance.matrixWorldInverse,panorama.sphere.object3D.matrixWorld);
+    var mat_view = modelViewMatrix.elements;
     var mat_proj = panorama.camera.instance.projectionMatrix.elements;
-    //var mat_view = panorama.sphere.object3D._modelViewMatrix.elements;
-    var mat_view = panorama.sphere.object3D.matrix.elements;
 
     /* Retrieve frustum parameters from projection matrix */
     var near = mat_proj[14] / ( 2.0 * ( mat_proj[10] - 1.0 ) );
@@ -618,8 +619,9 @@ $.extend(true,Panorama.prototype,{
 
     /* Compute sphere point vector in OpenGL frame */
     var posi = Array(3);
-    posi[0] = - righ + righ * 2.0 * ( (mouseRel.x * 1.0) / ( ($(canvas).width() * 1.0) - 1 ) );
-    posi[1] = + heig - heig * 2.0 * ( (mouseRel.y * 1.0) / ( ($(canvas).height() * 1.0) - 1 ) );
+
+    posi[0] = - righ + righ * 2.0 * mouseRel.x / ( canvas.width - 1 ) ;
+    posi[1] = + heig - heig * 2.0 * mouseRel.y / ( canvas.height - 1 ) ;
     posi[2] = - near;
 
     /* Compute sphere point vector norm */
@@ -672,11 +674,18 @@ $.extend(true,Panorama.prototype,{
     console.log("pixel_x = "+pixel_x);
     console.log("pixel_y = "+pixel_y);
 
-    var m=panorama.mouseCoords=new THREE.Vector3(posf[0],posf[1],posf[2]).multiplyScalar(panorama.sphere.radius);
+    var m=panorama.mouseCoords;
+    var r=panorama.sphere.radius;
+    m.set(posf[0]*r,posf[1]*r,posf[2]*r);
     m.phi=phi;
     m.theta=lam;
     m.lon=deg_lam;
     m.lat=deg_phi;
+
+    // adjust lon/lat    
+    m.lon = -(90 - m.lon) - 90;
+    m.lat = 90 - m.lat;
+    if (m.lon < 0) m.lon += 360;
 
     panorama.showMouseDebugInfo(m);
 
@@ -684,6 +693,67 @@ $.extend(true,Panorama.prototype,{
       lon: cursor.lon,
       lat: cursor.lat
     }
+
+    }, // panorama_getMouseCoords
+
+    getMouseCoords2: function panorama_getMouseCoords(event) {
+
+      var panorama=this;
+      var canvas = panorama.renderer.domElement;
+
+      var offset=$(canvas).offset();
+      // get normalized mouse coordinates
+      var vector = new THREE.Vector3(((event.clientX-offset.left) / canvas.width) * 2 - 1, -((event.clientY-offset.top) / canvas.height) * 2 + 1, 0.5);
+
+      // get mouse coordinates in the camera referential
+      vector.applyMatrix4(new THREE.Matrix4().getInverse(panorama.camera.instance.projectionMatrix));
+      vector.normalize();
+
+      // store mouse coordinates in the camera referential
+      var cursor=panorama.cursorCoords= {
+        vector: vector.clone().multiplyScalar(panorama.sphere.radius),
+        phi: Math.acos(vector.y),
+        theta: Math.atan2(vector.z,vector.x)
+      }
+      cursor.lon=THREE.Math.radToDeg(cursor.theta);
+      cursor.lat=THREE.Math.radToDeg(cursor.phi);
+
+      var info=cursor.vector.clone();
+      info.lat=cursor.lat;
+      info.lon=cursor.lon;
+//      panorama.showMouseDebugInfo(info);
+
+      // get mouse coordinates in the sphere referential
+      vector.applyMatrix4(panorama.camera.instance.matrixWorld);
+      vector.applyMatrix4(new THREE.Matrix4().getInverse(panorama.sphere.object3D.matrix));
+
+      // cartesian to spheric coordinates
+      var m=panorama.mouseCoords=vector;
+      var phi = Math.acos(m.y);
+      var theta = Math.atan2(m.z, m.x);
+
+      // adjust lon/lat    
+      m.lon = -(90 - THREE.Math.radToDeg(theta)) - 90;
+      m.lat = 90 - THREE.Math.radToDeg(phi);
+      if (m.lon < 0) m.lon += 360;
+
+      panorama.showMouseDebugInfo(m);
+
+      // store mouse coordinates in the sphere referential
+      m.multiplyScalar(panorama.sphere.radius);
+      this.mouseCoords={
+        lon: m.lon,
+        lat: m.lat,
+        x: m.x,
+        y: m.y,
+        z: m.z
+      };
+
+      // return coordinates in the camera referential
+      return {
+        lon: cursor.lon,
+        lat: cursor.lat
+      };
 
     }, // panorama_getMouseCoords
 
@@ -698,10 +768,6 @@ $.extend(true,Panorama.prototype,{
           cursorCoords: this.getMouseCoords(e),
           textureCoords: this.getTextureCoordinates(this.mouseCoords.lon,this.mouseCoords.lat)
         };
-        var wc=this.textureToWorldCoords(this.mousedownPos.textureCoords.left,this.mousedownPos.textureCoords.top);
-        console.log('fixme: '+this.mouseCoords.lon+'=='+wc.lon,this.mouseCoords.lat+'=='+wc.lat);
-        console.log(this.mousedownPos.textureCoords);
-        //TODO something is wrong: this.mousedownPos.textureCoords.latitude != wc.latitude
       }
     },
 
@@ -718,6 +784,7 @@ $.extend(true,Panorama.prototype,{
           this.lon=(this.mousedownPos.lon-(cursorCoords.lon-this.mousedownPos.cursorCoords.lon))%360;
           this.lat=this.mousedownPos.lat+(cursorCoords.lat-this.mousedownPos.cursorCoords.lat);
           if (this.lon<0) this.lon+=360;
+console.log(this.lon,this.lat);
           this.drawScene();
         }
       } else {
@@ -823,15 +890,23 @@ $.extend(true,Panorama.prototype,{
       if (!panorama.sphere.done) {
         return;
       }
-      panorama.lat=Math.max(panorama.limits.lat.min,Math.min(panorama.limits.lat.max,panorama.lat));
+//      panorama.lat=Math.max(panorama.limits.lat.min,Math.min(panorama.limits.lat.max,panorama.lat));
 
-      // set sphere rotation
-      panorama.viewRotationMatrix=(new THREE.Matrix4()).makeRotationAxis(new THREE.Vector3(0,0,1),THREE.Math.degToRad(panorama.lat));
-      panorama.viewRotationMatrix.multiply((new THREE.Matrix4()).makeRotationAxis(new THREE.Vector3(0,1,0),THREE.Math.degToRad(panorama.lon)));
+      // update camera rotation
+      panorama.theta=panorama.lon*Math.PI/180;
+      panorama.phi=(90-panorama.lat)*Math.PI/180;
 
-      panorama.sphere.object3D.matrixAutoUpdate=false;
-      panorama.sphere.object3D.matrix.copy(panorama.rotation._matrix);
-      panorama.sphere.object3D.matrix.multiply(panorama.viewRotationMatrix);
+      // set camera lookAt vector
+      panorama.lookAtVec=new THREE.Vector3(
+        Math.sin(panorama.phi)*Math.cos(panorama.theta),
+        Math.cos(panorama.phi),
+        Math.sin(panorama.phi)*Math.sin(panorama.theta)
+      );
+
+      // adjust camera lookAt vector by inverse sphere rotation
+      panorama.lookAtVec.applyMatrix4(new THREE.Matrix4().getInverse(panorama.sphere.object3D.matrix));
+
+      panorama.camera.instance.lookAt(panorama.lookAtVec);
 
       panorama.callback('update');
 
