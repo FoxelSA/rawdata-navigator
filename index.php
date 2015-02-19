@@ -51,6 +51,7 @@
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/select2/select2.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/vis.js/vis.min.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/video.js/video-js.min.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/jquery.mCustomScrollbar/jquery.mCustomScrollbar.min.css" />
     <link rel="stylesheet" type="text/css" media="all" href="css/rawdata-navigator.css" />
     <script type="text/javascript" src="js/thirdparty/jquery-2.1.3.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/underscore.js/underscore-1.7.min.js"></script>
@@ -59,6 +60,7 @@
     <script type="text/javascript" src="js/thirdparty/select2/select2-3.5.2.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/vis.js/vis-3.10.0.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/video.js/video-js-4.12.0.min.js"></script>
+    <script type="text/javascript" src="js/thirdparty/jquery.mCustomScrollbar/jquery.mCustomScrollbar-3.0.7.min.js"></script>
     <script type="text/javascript" src="js/rawdata-navigator.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
@@ -86,86 +88,88 @@
 
 <div id="info">
     <div class="close"><span></span></div>
-    <div class="head">
-        <div class="jump">
-            Pose <input id="jump" name="jump" type="text" value="" /> of <span class="poses"></span>
-        </div>
-        <div class="nav"><div></div></div>
-        <div style="clear:both;"></div>
-    </div>
-    <div class="viewer">
-        <div class="video">
-            <video id="vid" class="video-js vjs-default-skin" width="498" height="249">
-                <p class="vjs-no-js">Please consider using a web browser that supports <a href="http://videojs.com/html5-video-support/" target="_blank">HTML5</a>.</p>
-            </video>
-        </div>
-        <div class="preview"></div>
-    </div>
-    <div class="data">
-        <div>
-            <div class="block">
-                <div class="section status control closed"><span></span>Run</div>
-                <div class="closeable closed">
-                    <table class="section status">
-                        <tr><td class="attr">JP4</td><td class="jp4"></td></tr>
-                        <tr class="space"><td class="attr">Master</td><td class="master"></td></tr>
-                        <tr><td class="attr">Segment</td><td class="segment"></td></tr>
-                        <tr class="space"><td class="attr">MAC address</td><td class="camera"></td></tr>
-                    </table>
-                </div>
+    <div class="scrollable">
+        <div class="head">
+            <div class="jump">
+                Pose <input id="jump" name="jump" type="text" value="" /> of <span class="poses"></span>
             </div>
-            <div class="block">
-                <div class="section date control closed"><span></span>Date</div>
-                <div class="closeable closed">
-                    <table class="section date">
-                        <tr><td class="attr">Trigger</td><td class="timestamp"></td></tr>
-                        <tr class="space"><td class="attr">UTC</td><td class="utc"></td></tr>
-                        <tr><td class="attr">Local time</td><td class="gmt"></td></tr>
-                    </table>
-                </div>
-            </div>
+            <div class="nav"><div></div></div>
             <div style="clear:both;"></div>
         </div>
-        <div>
-            <div class="block">
-                <div class="section geo control closed"><span></span>Position</div>
-                <div class="closeable closed">
-                    <table class="section geo known">
-                        <tr><td class="attr">Latitude</td><td class="lat"></td></tr>
-                        <tr><td class="attr">Longitude</td><td class="lng"></td></tr>
-                        <tr class="space"><td class="attr">Altitude</td><td class="alt"></td></tr>
-                        <tr class="space"><td class="attr">Still</td><td class="still"></td></tr>
-                        <tr><td class="attr">Robustness</td><td class="robustness"></td></tr>
-                    </table>
-                    <table class="section geo unknown">
-                        <tr><td class="attr">GPS</td><td>No GPS fix</td></tr>
-                    </table>
-                </div>
+        <div class="viewer">
+            <div class="video">
+                <video id="vid" class="video-js vjs-default-skin" width="498" height="249">
+                    <p class="vjs-no-js">Please consider using a web browser that supports <a href="http://videojs.com/html5-video-support/" target="_blank">HTML5</a>.</p>
+                </video>
             </div>
-            <div class="block">
-                <div class="section orientation control closed"><span></span>Orientation</div>
-                <div class="closeable closed">
-                    <table class="section orientation known">
-                        <tr><td class="attr">Robustness</td><td class="robustness"></td></tr>
-                        <tr class="space"><td class="attr">Rotation 0,0</td><td class="rot00"></td></tr>
-                        <tr><td class="attr">Rotation 0,1</td><td class="rot01"></td></tr>
-                        <tr><td class="attr">Rotation 0,2</td><td class="rot02"></td></tr>
-                        <tr class="space"><td class="attr">Rotation 1,0</td><td class="rot10"></td></tr>
-                        <tr><td class="attr">Rotation 1,1</td><td class="rot11"></td></tr>
-                        <tr><td class="attr">Rotation 1,2</td><td class="rot12"></td></tr>
-                        <tr class="space"><td class="attr">Rotation 2,0</td><td class="rot20"></td></tr>
-                        <tr><td class="attr">Rotation 2,1</td><td class="rot21"></td></tr>
-                        <tr><td class="attr">Rotation 2,2</td><td class="rot22"></td></tr>
-                    </table>
-                    <table class="section orientation unknown">
-                        <tr><td class="attr">IMU</td><td>No IMU data</td></tr>
-                    </table>
-                </div>
-            </div>
-            <div style="clear:both;"></div>
+            <div class="preview"></div>
         </div>
+        <div class="data">
+            <div>
+                <div class="block">
+                    <div class="section status control closed"><span></span>Run</div>
+                    <div class="closeable closed">
+                        <table class="section status">
+                            <tr><td class="attr">JP4</td><td class="jp4"></td></tr>
+                            <tr class="space"><td class="attr">Master</td><td class="master"></td></tr>
+                            <tr><td class="attr">Segment</td><td class="segment"></td></tr>
+                            <tr class="space"><td class="attr">MAC address</td><td class="camera"></td></tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="block">
+                    <div class="section date control closed"><span></span>Date</div>
+                    <div class="closeable closed">
+                        <table class="section date">
+                            <tr><td class="attr">Trigger</td><td class="timestamp"></td></tr>
+                            <tr class="space"><td class="attr">UTC</td><td class="utc"></td></tr>
+                            <tr><td class="attr">Local time</td><td class="gmt"></td></tr>
+                        </table>
+                    </div>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
+            <div>
+                <div class="block">
+                    <div class="section geo control closed"><span></span>Position</div>
+                    <div class="closeable closed">
+                        <table class="section geo known">
+                            <tr><td class="attr">Latitude</td><td class="lat"></td></tr>
+                            <tr><td class="attr">Longitude</td><td class="lng"></td></tr>
+                            <tr class="space"><td class="attr">Altitude</td><td class="alt"></td></tr>
+                            <tr class="space"><td class="attr">Still</td><td class="still"></td></tr>
+                            <tr><td class="attr">Robustness</td><td class="robustness"></td></tr>
+                        </table>
+                        <table class="section geo unknown">
+                            <tr><td class="attr">GPS</td><td>No GPS fix</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="block">
+                    <div class="section orientation control closed"><span></span>Orientation</div>
+                    <div class="closeable closed">
+                        <table class="section orientation known">
+                            <tr><td class="attr">Robustness</td><td class="robustness"></td></tr>
+                            <tr class="space"><td class="attr">Rotation 0,0</td><td class="rot00"></td></tr>
+                            <tr><td class="attr">Rotation 0,1</td><td class="rot01"></td></tr>
+                            <tr><td class="attr">Rotation 0,2</td><td class="rot02"></td></tr>
+                            <tr class="space"><td class="attr">Rotation 1,0</td><td class="rot10"></td></tr>
+                            <tr><td class="attr">Rotation 1,1</td><td class="rot11"></td></tr>
+                            <tr><td class="attr">Rotation 1,2</td><td class="rot12"></td></tr>
+                            <tr class="space"><td class="attr">Rotation 2,0</td><td class="rot20"></td></tr>
+                            <tr><td class="attr">Rotation 2,1</td><td class="rot21"></td></tr>
+                            <tr><td class="attr">Rotation 2,2</td><td class="rot22"></td></tr>
+                        </table>
+                        <table class="section orientation unknown">
+                            <tr><td class="attr">IMU</td><td>No IMU data</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
+        </div>
+        <div id="overview"></div>
     </div>
-    <div id="overview"></div>
 </div>
 
 <div id="timeline"></div>

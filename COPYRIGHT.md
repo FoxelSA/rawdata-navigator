@@ -4,7 +4,7 @@
 rawdata-navigator - Human-understandable raw data navigator<br />
 This program is part of the FOXEL project <[http://foxel.ch](http://foxel.ch)>.
 
-Copyright (c) 2014 FOXEL SA - [http://foxel.ch](http://foxel.ch)<br />
+Copyright (c) 2014-2015 FOXEL SA - [http://foxel.ch](http://foxel.ch)<br />
 Please read <[http://foxel.ch/license](http://foxel.ch/license)> for more
 information.
 
@@ -72,6 +72,11 @@ Public License and/or a compatible license and other copyright notices.
     <[http://videojs.com/](http://videojs.com)><br />
     Copyright (c) 2014 Brightcove, Inc<br />
     Video.js is licensed under the [Apache License 2.0](http://opensource.org/licenses/Apache-2.0).
+
+*   __Malihu jQuery Custom Scrollbar Plugin 3.0.7__<br />
+    <[http://manos.malihu.gr/jquery-custom-content-scroller/](http://manos.malihu.gr/jquery-custom-content-scroller/)><br />
+    Copyright (c) 2014 Manos Malihutsakis, http://manos.malihu.gr<br />
+    Malihu jQuery Custom Scrollbar Plugin is licensed under the [MIT license](http://opensource.org/licenses/MIT).
 
 *   __MP4Streaming [3860cbccc8]__<br />
     <[https://github.com/tuxxin/MP4Streaming](https://github.com/tuxxin/MP4Streaming/tree/3860cbccc8fa83bd1851d84b3d0d79a6c0e70ac2)><br />

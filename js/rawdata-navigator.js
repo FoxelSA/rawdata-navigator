@@ -1247,6 +1247,7 @@ var RawDataNavigator = new function() {
 
         _component: null,
         _dom: '#info',
+        _scrollbar: null,
 
         _segment: null,
         _index: null,
@@ -1256,11 +1257,31 @@ var RawDataNavigator = new function() {
          * information.init()
          */
         init: function() {
+
             this._component = $(this._dom+' .data');
+
+            this.scrollbar();
             this.events();
             this.resize();
+
             this.video.init();
             this.overview.init();
+
+        },
+
+        /**
+         * information.scrollbar()
+         */
+        scrollbar: function() {
+            this._scrollbar = $(this._dom+' .scrollable');
+            this._scrollbar.mCustomScrollbar({
+                axis: 'y',
+                theme: 'light-thin',
+                autoHideScrollbar: true,
+                advanced: {
+                    updateOnContentResize: true
+                }
+            });
         },
 
         /**
@@ -1490,6 +1511,7 @@ var RawDataNavigator = new function() {
          */
         resize: function() {
             $(this._dom).height($(window).height()-$(timeline._dom).outerHeight(true)-$('#header').outerHeight(true));
+            this._scrollbar.height($(this._dom).height());
         },
 
         /**
@@ -1628,7 +1650,7 @@ var RawDataNavigator = new function() {
                 var poses = segmentation.poses(segment);
 
                 // hide map
-                $(this._dom).css('visibility','hidden');
+                $(this._dom).css('display','none');
 
                 // clear track
                 if (!_.isNull(this._track))
@@ -1652,11 +1674,24 @@ var RawDataNavigator = new function() {
                 // bounds
                 var bounds = this._track.getBounds();
 
+                // show map
+                $(information.overview._dom).css('visibility','hidden');
+                $(information.overview._dom).css('display','block');
+
                 // wait a bit (leaflet take some time to be ready)
                 setTimeout(function () {
 
-                    // show map
-                    $(information.overview._dom).css('visibility','visible');
+                    // size
+                    information.overview._component.invalidateSize({
+                        reset: true,
+                        pan: {
+                            animate: true
+                        },
+                        zoom: {
+                            animate: true
+                        },
+                        animate: true
+                    });
 
                     // fit
                     information.overview._component.fitBounds(bounds);
@@ -1666,6 +1701,9 @@ var RawDataNavigator = new function() {
 
                     // unzoom
                     information.overview._component.setZoom(information.overview._component.getZoom()-1);
+
+                    // show
+                    $(information.overview._dom).css('visibility','visible');
 
                 },500);
 

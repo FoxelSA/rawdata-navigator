@@ -293,7 +293,7 @@ a, a:link, a:visited, a:hover, a:active {
     #info .close {
         position:absolute;
         top:12px;
-        right:10px;
+        right:14px;
         z-index:950;
         cursor:pointer;
     }
@@ -459,6 +459,7 @@ a, a:link, a:visited, a:hover, a:active {
         width:500px;
         height:280px;
         margin-left:50px;
+        margin-bottom:40px;
         border:solid 1px #4f4f4f;
     }
 
