@@ -1,3 +1,40 @@
+/*
+ * freepano - WebGL panorama viewer
+ *
+ * Copyright (c) 2015 FOXEL SA - http://foxel.ch
+ * Please read <http://foxel.ch/license> for more information.
+ *
+ *
+ * Author(s):
+ *
+ *      Luc Deschenaux <l.deschenaux@foxel.ch>
+ *
+ *
+ * This file is part of the FOXEL project <http://foxel.ch>.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional Terms:
+ *
+ *      You are required to preserve legal notices and author attributions in
+ *      that material or in the Appropriate Legal Notices displayed by works
+ *      containing it.
+ *
+ *      You are required to attribute the work as explained in the "Usage and
+ *      Attribution" section of <http://foxel.ch/license>.
+ */
 
 function PointCloud(options) {
   if (!(this instanceof PointCloud)) {
@@ -121,7 +158,7 @@ $.extend(true,PointCloud.prototype,{
 
       error: function() {
         // trigger pointcloud 'loaderror' event
-        pointCloud.callback('loaderror',Array.prototype.slice.call(arguments));
+        pointCloud.dispatch('loaderror',Array.prototype.slice.call(arguments));
       }, // error
 
       success: function(json){
@@ -129,7 +166,7 @@ $.extend(true,PointCloud.prototype,{
         // no data available ?
         if (!json.points) {
           // trigger pointcloud 'loaderror' event
-          pointCloud.callback('loaderror',Array.prototype.slice.call(arguments));
+          pointCloud.dispatch('loaderror',Array.prototype.slice.call(arguments));
           return;
         }
 
@@ -137,7 +174,7 @@ $.extend(true,PointCloud.prototype,{
         pointCloud.fromJSON(json);
 
         // trigger pointcloud 'load' event
-        pointCloud.callback('load');
+        pointCloud.dispatch('load');
 
       } // success
 
@@ -191,16 +228,31 @@ $.extend(true,PointCloud.prototype,{
   on_panorama_render: function pointCloud_on_panorama_render(){
 
     var panorama=this;
+    if (!panorama.pointCloud) {
+      return;
+    }
+
     var pointCloud=panorama.pointCloud.instance;
+    if (!pointCloud) {
+      return;
+    }
+
+    var cursor=pointCloud.cursor;
+    if (cursor) {
+      var scale=0.1/p.getZoom();
+      cursor.sprite.scale.set(scale,scale,scale);
+    }
 
     if (pointCloud.overlay) {
       panorama.renderer.clearDepth();
       panorama.renderer.render(pointCloud.scene,panorama.camera.instance);  
     }
 
+    pointCloud.dispatch('render');
+
   }, // on_panorama_render
 
-  // trigger pointcloud 'mouseover' event on particle mouseover
+  // trigger pointcloud 'particlemouseover' event on particle mouseover
   on_panorama_mousemove: function pointCloud_on_panorama_mousemove(e){
 
     var panorama=this;
@@ -233,28 +285,60 @@ $.extend(true,PointCloud.prototype,{
 
     // trigger pointcloud mouseover event
     if (intersections.length) {
-      pointCloud.instance.callback({
-          type: 'mouseover',
+      pointCloud.instance.dispatch({
+          type: 'particlemouseover',
           target: intersections,
           originalEvent: e
       });
+    } else {
+      if (pointCloud.hover){
+        pointCloud.instance.dispatch({
+            type: 'particlemouseout',
+            target: pointCloud.hover.index
+        });
+      }
     }
 
   }, // pointCloud_on_panorama_render
 
   // snap to nearest intersecting particle
-  onmouseover: function on_pointcloud_mouseover(e){
+  onparticlemouseover: function on_pointcloud_particlemouseover(e){
 
     var pointCloud=this;
     var panorama=pointCloud.panorama;
+
     var particle_list=e.target;
 
+    // get nearest point index
     panorama.getMouseCoords(e.originalEvent);
     var hover=pointCloud.nearestParticle(panorama.mouseCoords,particle_list);
+
+    // if we were already hovering
+    if (pointCloud.hover) {
+      // and it was another point
+      if (hover.index != pointCloud.hover.index){
+        // then trigger 'particlemouseout'
+        var e={
+            type: 'particlemouseout',
+            target: pointCloud.hover.index
+        }
+        // unless event handler doesnt agree to remove hover attribute
+        if (pointCloud.dispatch(e)===false) {
+          return false;
+        }
+      } else {
+        // already hovering the same point, return
+        return 
+      }
+    }
+
+    // mousein
+    pointCloud.hover=hover;
 
     var material;
     var cursor=pointCloud.cursor;
 
+    // instantiate cursor if needed
     if (!cursor) {
       cursor=pointCloud.cursor={
         material: new THREE.SpriteMaterial({
@@ -270,13 +354,25 @@ $.extend(true,PointCloud.prototype,{
     }
 
     cursor.sprite.position.copy(new THREE.Vector3().copy(pointCloud.getParticlePosition(hover.index)).normalize().multiplyScalar(10));
-    var scale=0.1/p.getZoom();
-    cursor.sprite.scale.set(scale,scale,scale);
-    pointCloud.showParticleInfo(hover.index);
 
     pointCloud.panorama.drawScene();
 
-  }, // pointCloud_onmouseover
+    pointCloud.dispatch({
+        type: 'particlemousein',
+        target: hover.index
+    });
+
+  }, // pointCloud_particleonmouseover
+
+  onparticlemousein: function pointCloud_onparticlemousein(e) {
+    var pointCloud=this;
+    pointCloud.showParticleInfo(pointCloud.hover.index);
+  }, // pointCloud_onparticlemousein
+
+  onparticlemouseout: function pointCloud_onparticlemouseout(e) {
+    var pointCloud=this;
+    pointCloud.hideParticleInfo();
+  }, // pointCloud_onparticlemousein
 
   // return particle with least square distance from coords in radians
   nearestParticle: function pointCloud_nearestParticle(coords,particle_list) {
@@ -365,6 +461,10 @@ $.extend(true,PointCloud.prototype,{
 
   }, // pointCloud_showParticleInfo
 
+  hideParticleInfo: function pointCloud_hideParticleInfo(){
+    $('#particleInfo').hide(0);
+  }, // pointCloud_hideParticleInfo
+
   // instantiate point cloud on panorama_ready
   on_panorama_ready: function pointCloud_on_panorama_ready(e) {
 
@@ -395,51 +495,11 @@ $.extend(true,PointCloud.prototype,{
       scene.remove(panorama.pointCloud.instance.object3D);
       delete panorama.pointCloud.instance;
     }
-  }, // pointCloud_on_panorama_dispose
-
-  // asynchronous callback external methods can hook to using setupCallback below
-  callback: function pointCloud_callback(e){
-    var pointCloud=this;
-    if (typeof(e)=='string') {
-      e={
-        target: pointCloud,
-        type: e,
-        args: Array.prototype.slice.call(arguments).slice(1)
-      };
-    }
-    var method='on'+e.type;
-    if (pointCloud[method]) {
-      pointCloud[method].apply(pointCloud,[e]);
-    }
-  }, // pointCloud_callback
-   
-  // setup pointCloud_callback hook for specified instance or prototype
-  setupCallback: function pointCloud_setupCallback(obj) {
-   
-    obj.pointCloud_prototype_callback=PointCloud.prototype.callback;
-   
-    obj.pointCloud_callback=function(e) {
-       var pointCloud=this;
-       if (typeof(e)=="string") {
-         e={
-           type: e,
-           target: pointCloud,
-           args: Array.prototype.slice.call(arguments).slice(1)
-         }
-       }
-       if (obj['on_pointcloud_'+e.type]) {
-         if (obj['on_pointcloud_'+e.type].apply(pointCloud,[e])===false) {
-            return false;
-         }
-       }
-       return obj.pointcloud_prototype_callback.apply(e.target,[e]);
-    }
-   
-    PointCloud.prototype.callback=obj.pointcloud_callback;
-   
-  } // pointcloud_setupCallback
-
+  } // pointCloud_on_panorama_dispose
 
 });
 
-Panorama.prototype.setupCallback(PointCloud.prototype);
+setupEventDispatcher(PointCloud.prototype);
+
+// subscribe to panorama events
+Panorama.prototype.dispatchEventsTo(PointCloud.prototype);

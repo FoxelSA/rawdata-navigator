@@ -1243,7 +1243,9 @@ $(document).on('filesloaded', function(){
 
       antialias: true,
 
-      alpha: true
+      alpha: true,
+
+      logarithmicDepthBuffer: true
 
     },
 

@@ -1,7 +1,7 @@
 /*
  * freepano - WebGL panorama viewer
  *
- * Copyright (c) 2014-2015 FOXEL SA - http://foxel.ch
+ * Copyright (c) 2014, 2015 FOXEL SA - http://foxel.ch
  * Please read <http://foxel.ch/license> for more information.
  *
  *
@@ -143,9 +143,6 @@ $.extend(true,Controls.prototype, {
         }
 
     },
-
-    // panorama_init() method
-    panorama_init: Panorama.prototype.init,
 
     // init() method
     init: function() {
@@ -1134,4 +1131,4 @@ $.extend(true,Controls.prototype, {
 
 });
 
-Panorama.prototype.setupCallback(Controls.prototype);
+Panorama.prototype.dispatchEventsTo(Controls.prototype);

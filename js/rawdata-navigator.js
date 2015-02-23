@@ -3184,7 +3184,7 @@ var DAV = new function() {
     var vignettes = this.vignettes = new Vignettes();
 
     /*
-     * viewer
+     * panorama viewer
      */
     this.viewFreepano = function(item) {
         var panel=window._panels['freepanel'];
@@ -3192,11 +3192,12 @@ var DAV = new function() {
         overlay.show('Loading panorama viewer...');
         if ($('iframe',panel._dom).attr('src')!=$(item).data('href')) {
           $('iframe',panel._dom).attr('src',$(item).data('href')).off('load').on('load',function(){
+            // PANORAMA VIEWER onload (see below for poi editor)
             overlay.hide();
             panel.window=iframe[0].contentWindow;
             panel.$=panel.window.$;
             panel.panorama=panel.$('#pano').data('pano');
-            panel.panorama.setupCallback(panel);
+            panel.panorama.dispatchEventsTo(panel);
             panel.toggle();
             setTimeout(function(){panel.resize()},1000);
           });
@@ -3207,7 +3208,7 @@ var DAV = new function() {
     };
 
     /*
-     * viewer
+     * pointcloud viewer
      */
     this.viewPotree = function(item) {
         var panel=window._panels['pointcloudpanel'];
@@ -3219,7 +3220,7 @@ var DAV = new function() {
     };
 
     /*
-     * poiPanel
+     * poi viewer
      */
     var poiPanel = this.poiPanel = new Panel({
 
@@ -3246,17 +3247,18 @@ var DAV = new function() {
             overlay.show('Loading POI editor...');
             panel.inventory_clear();
             iframe.attr('src',$(elem).data('href')).off('load').on('load',function(){
+              // POI EDITOR onload (see above for panorama viewer)
               overlay.hide();
               panel.window=iframe[0].contentWindow;
               panel.$=panel.window.$;
               panel.panorama=panel.$('#pano').data('pano');
-              panel.panorama.setupCallback(panel);
-              poiPanel.window.POI_list.prototype.setupCallback(poiPanel);
-              poiPanel.window.POI.prototype.setupCallback(poiPanel);
+              panel.panorama.dispatchEventsTo(panel);
+              panel.window.POI_thumb.prototype.dispatchEventsTo(panel);
+//              panel.window.POI_list.prototype.dispatchEventsTo(panel);
+              panel.window.POI.prototype.dispatchEventsTo(panel);
               panel.toggle();
               setTimeout(function(){panel.resize()},1000);
             });
-
 
           } else {
             panel.toggle();
@@ -3345,14 +3347,14 @@ var DAV = new function() {
                 poi.selected=false;
                 poi.setColor(poi.color.normal);
                 poi.scale(poi.initialScale);
-                poi.radius=panel.panorama.sphere.radius-1;
+                poi.radius=panel.panorama.sphere.radius*95/100;
                 $('#'+name,panel._dom).removeClass('selected');
               }
             } else {
               if (!poi.selected) {
                 poi.selected=true;
                 poi.scale(poi.initialScale*2.5);
-                poi.radius=panel.panorama.sphere.radius-2;
+                poi.radius=panel.panorama.sphere.radius;
                 poi.setColor(poi.color.selected);
                 $('#'+name,panel._dom).addClass('selected');
               }
@@ -3375,17 +3377,17 @@ var DAV = new function() {
         },
 
         on_panorama_ready: function poiPanel_on_panorama_ready() {
+
         },
 
-        on_poi_list_ready: function poiPanel_on_poilist_ready(e) {
+        on_poi_thumb_ready: function poiPanel_on_poi_thumb_ready(e) {
           var panel=this;
           if (!$('#p0',panel._dom).length) { // fixme: on_poi_list_ready is called twice -- should be fixed already
             poiPanel.inventory_update();
           } else {
             console.log('fixme')
           }
-
-        }, // poiPanel_on_poi_list_ready
+        }, // poiPanel_on_poi_thumb_ready
 
         addPOI: function poiPanel_addPOI() {
           var panel=this;

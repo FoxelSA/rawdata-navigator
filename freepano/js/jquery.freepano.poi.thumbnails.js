@@ -1,7 +1,7 @@
 /*                                                                                                                                                                                                                 
  * freepano - WebGL panorama viewer
  *
- * Copyright (c) 2014 FOXEL SA - http://foxel.ch
+ * Copyright (c) 2015 FOXEL SA - http://foxel.ch
  * Please read <http://foxel.ch/license> for more information.
  *
  *
@@ -94,6 +94,8 @@ $.extend(POI_thumb.prototype,{
 
       poiThumb.update();
 
+      poiThumb.dispatch('ready');
+
     }, // poiThumb_onPanoramaReady
 
     update: function poiThumb_update(name){
@@ -142,7 +144,11 @@ $.extend(POI_thumb.prototype,{
       this.init();
     },
 
-    panorama_prototype_init: Panorama.prototype.init
+    // instantiate panorama.poiThumb on panorama init
+    on_panorama_preinit: function poiThumb_on_panorama_preinit() {
+      var panorama=this;
+      panorama.poiThumb=new POI_thumb({panorama: panorama});
+    } // on_panorama_preinit
 
 });
 
@@ -198,14 +204,9 @@ $.extend(true,POI_thumb.prototype.image.prototype,{
 
 });
 
-// instantiate panorama.poiThumb on panorama init
-$.extend(true,Panorama.prototype,{
-    init: function poiThumb_panorama_prototype_init() {
-      var panorama=this;
-      panorama.poiThumb=new POI_thumb({panorama: panorama});
-      panorama.poiThumb.panorama_prototype_init.call(panorama);
-    }
-});
+// subscribe to Panorama events
+Panorama.prototype.dispatchEventsTo(POI_thumb.prototype);
 
-Panorama.prototype.setupCallback(POI_thumb.prototype);
+// setup event dispatcher for POI_thumb
+setupEventDispatcher(POI_thumb.prototype);
 
