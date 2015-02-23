@@ -157,14 +157,21 @@ $.extend(true,POI_thumb.prototype.image.prototype,{
       var panorama=this.panorama;
       var poiThumb=panorama.poiThumb;
 
-      // set sphere rotation
-      var viewRotationMatrix=(new THREE.Matrix4()).makeRotationAxis(new THREE.Vector3(1,0,0),THREE.Math.degToRad(panorama.poi.list[image.poiname].coords.lat));
-      viewRotationMatrix.multiply((new THREE.Matrix4()).makeRotationAxis(new THREE.Vector3(0,1,0),THREE.Math.degToRad(panorama.poi.list[image.poiname].coords.lon)));
-      panorama.sphere.object3D.matrixAutoUpdate=false;
-      //panorama.sphere.object3D.matrix.copy(panorama.rotation.matrix.clone());
-      //panorama.sphere.object3D.matrix.multiply(viewRotationMatrix);
-      panorama.sphere.object3D.matrix.copy(viewRotationMatrix);
+      var vector;
+      if (panorama.poi.list[image.poiname].instance) {
+          vector=panorama.poi.list[image.poiname].instance.object3D.position;
+      } else {
+        // compute object position
+        var poi=panorama.poi.list[image.poiname];
+        var coords=poi.coords;
+        var phi=coords.lon*Math.PI/180;
+        var theta=coords.lat*Math.PI/180;
+        vector=new THREE.Vector3(0,0,-1);
+        vector.applyAxisAngle(new THREE.Vector3(1,0,0),theta);
+        vector.applyAxisAngle(new THREE.Vector3(0,1,0),-phi);
+      }
 
+      poiThumb.camera.lookAt(vector);
       // render thumbnail to framebuffer
       panorama.renderer.render(poiThumb.scene,poiThumb.camera,poiThumb.renderTarget,true);
 
