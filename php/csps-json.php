@@ -41,7 +41,59 @@
 if (!isset($_GET['json']) || empty($_GET['json']) || !file_exists($_GET['json'].'/segment.json'))
     exit();
 
+$json = explode('/',$_GET['json']);
+$len = count($json);
+
 // output
 header('Content-Type: application/json');
 header('Cache-Control: no-cache, must-revalidate');
-echo file_get_contents($_GET['json'].'/segment.json');
+
+// back to old format
+if ((int)($json[$len-4]) == 1423492626) {
+
+    $data = json_decode(file_get_contents($_GET['json'].'/segment.json'));
+
+    $data->gps = true;
+
+    $keep = array();
+
+    foreach ($data->pose as $pose) {
+        unset($pose->orientation);
+        if (!is_null($pose->position)) {
+            $pose->alt = $pose->position[0];
+            $pose->lng = $pose->position[1];
+            $pose->lat = $pose->position[2];
+        } else {
+            $pose->alt = 0.0;
+            $pose->lng = 0.0;
+            $pose->lat = 0.0;
+        }
+        $pose->usc = $pose->usec;
+        unset($pose->usec);
+        $pose->status = $pose->raw;
+        if ($pose->status == 'valid')
+            $pose->status = 'validated';
+        elseif ($pose->status == 'trash')
+            $pose->status = 'trashed';
+        elseif ($pose->status == 'corrupt')
+            $pose->status = 'corrupted';
+        unset($pose->raw);
+        $pose->folder = '0';
+        $pose->guess = false;
+        unset($pose->still);
+
+        if (!is_null($pose->position)) {
+            $keep[] = $pose;
+        }
+        unset($pose->position);
+
+    }
+
+    $data->pose = $keep;
+
+    echo json_encode($data);
+
+// normal output
+} else {
+    echo file_get_contents($_GET['json'].'/segment.json');
+}

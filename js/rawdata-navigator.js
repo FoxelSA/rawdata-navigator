@@ -555,6 +555,7 @@ var DAV = new function() {
             group2.append($('<option>',{'value':'both'}).text('POI'));
             group2.append($('<option>',{'value':'dufour'}).text('Statue Dufour'));
             group2.append($('<option>',{'value':'both'}).text('Street View'));
+            group2.append($('<option>',{'value':'ssa'}).text('SSA'));
 
             group3.append($('<option>',{'value':'raw'}).text('RAW'));
             group3.append($('<option>',{'value':'panorama'}).text('Panorama'));
@@ -906,7 +907,7 @@ var DAV = new function() {
                 this._remaining = allocation.current.segments().length;
                 vignettes.clear();
                 $.each(allocation.current.segments(), function(index,segment) {
-                    $.getJSON('php/csps-json.php?json='+allocation.current.path+'/'+segment+'/info/rawdata-autoseg/',function(data) {
+                    $.getJSON('php/csps-json.php?mnt='+storage.mountpoint+'&json='+allocation.current.path+'/'+segment+'/info/rawdata-autoseg/',function(data) {
                         segmentation.json.success(index,segment,data);
                     }).fail(segmentation.json.fail);
                 });
@@ -934,7 +935,7 @@ var DAV = new function() {
 
                 if (allocation.current.master == '1403185204') {
 
-                    if (segment != '1404383663' && segment != '1404381299') {
+                    if (segment != '1404383663' && segment != '1404381299' && segment != '1423492626') {
                         this._remaining--;
                         if (this._remaining == 0)
                             this.done();
@@ -943,10 +944,12 @@ var DAV = new function() {
 
                     var hasDufour = false;
                     var hasReformateurs = false;
+                    var hasSSA = false;
 
                     if (allocation.current.val.indexOf('both') > -1) {
                         hasDufour = true;
                         hasReformateurs = true;
+                        hasSSA = true;
                     }
 
                     if (allocation.current.val.indexOf('dufour') > -1) {
@@ -957,10 +960,17 @@ var DAV = new function() {
                         hasReformateurs = true;
                     }
 
+                    if (allocation.current.val.indexOf('ssa') > -1) {
+                        hasSSA = true;
+                    }
+
                     if ((allocation.current.val.indexOf('raw') > -1 || allocation.current.val.indexOf('panorama') > -1 || allocation.current.val.indexOf('poi') > -1 || allocation.current.val.indexOf('pointcloud') > -1)
-                        && allocation.current.val.indexOf('dufour') == -1 && allocation.current.val.indexOf('reformateurs') == -1) {
+                        && allocation.current.val.indexOf('dufour') == -1
+                        && allocation.current.val.indexOf('reformateurs') == -1
+                        && allocation.current.val.indexOf('ssa') == -1) {
                         hasDufour = true;
                         hasReformateurs = true;
+                        hasSSA = true;
                     }
 
                     if (segment == '1404383663' && !hasDufour) {
@@ -971,6 +981,13 @@ var DAV = new function() {
                     }
 
                     if (segment == '1404381299' && !hasReformateurs) {
+                        this._remaining--;
+                        if (this._remaining == 0)
+                            this.done();
+                        return;
+                    }
+
+                    if (segment == '1423492626' && !hasSSA) {
                         this._remaining--;
                         if (this._remaining == 0)
                             this.done();
@@ -1637,7 +1654,7 @@ var DAV = new function() {
             freepanel.$(freepanel.window.document).trigger(e);
           }
         });
-      } 
+      }
   });
 
   /**
@@ -2384,21 +2401,36 @@ var DAV = new function() {
                     $('#pose_info .viewers').css('display','none');
                     $('#usages .usage.posepointcloud').css('display','none');
                 } else {
-                    $('#pose_info .viewers').css('display','block');
-                    $('#usages .usage.posepointcloud').css('display','block');
+                    if (segment == '1423492626') {
+                        $('#pose_info .viewers').css('display','none');
+                        $('#usages .usage.posepointcloud').css('display','none');
+                    } else {
+                        $('#pose_info .viewers').css('display','block');
+                        $('#usages .usage.posepointcloud').css('display','block');
+                    }
                 }
 
                 // download panorama
-                var test_download_panorama_link = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/result_'+(pose.sec-7200)+'_'+pose.usc+'-0-25-1.jpeg';
-                var thumb_panorama_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/small/result_'+(pose.sec-7200)+'_'+pose.usc+'-0-25-1.jpeg';
-                var download_panorama_link = 'php/download.php?file='+storage.mountpoint+'/footage/demodav/'+segment+'/result_'+(pose.sec-7200)+'_'+pose.usc+'-0-25-1.jpeg';
+
+                var utcdiff = 7200;
+                if (segment == '1423492626') {
+                    utcdiff = 0;
+                }
+
+                var test_download_panorama_link = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
+                var thumb_panorama_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/small/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
+                var download_panorama_link = 'php/download.php?file='+storage.mountpoint+'/footage/demodav/'+segment+'/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
                 $(information._dom+' .download_panorama').attr('href',download_panorama_link);
                 var view_panorama_link = document.location.origin+'/dav/freepano/example/';
-                if (segment == '1404381299')
+                if (segment == '1404381299') {
                     view_panorama_link += 'reformateurs.php';
-                else if (segment == '1404383663')
+                } else if (segment == '1404383663') {
                     view_panorama_link += 'dufour.php';
-                view_panorama_link += '?initial='+(pose.sec-7200)+'_'+pose.usc;
+                } else if (segment == '1423492626') {
+                    view_panorama_link += 'ssa.php';
+                }
+                view_panorama_link += '?initial='+(pose.sec-utcdiff)+'_'+pose.usc;
+                console.log('view_panorama_link = '+view_panorama_link);
                 $(information._dom+' .view_panorama').data('href',view_panorama_link);
 
                 // test panorama
@@ -2423,10 +2455,13 @@ var DAV = new function() {
                 $(information._dom+' .download_pointcloud').attr('href',download_pointcloud_link);
                 $('#usages .usage.posepointcloud img').attr('src',thumb_pointclound_src);
                 var view_pointcloud_link = document.location.origin+'/dav/potree/examples/';
-                if (segment == '1404381299')
+                if (segment == '1404381299') {
                     view_pointcloud_link += 'reformateurs.html';
-                else if (segment == '1404383663')
+                } else if (segment == '1404383663') {
                     view_pointcloud_link += 'dufour.html';
+                } else if (segment == '1423492626') {
+                    view_pointcloud_link += 'ssa.html';
+                }
                 $(information._dom+' .view_pointcloud').data('href',view_pointcloud_link);
 
                 // html
@@ -2973,6 +3008,11 @@ var DAV = new function() {
           var vignettes=this;
           var vignette=vignettes.list[index];
 
+          var utcdiff = 7200;
+          if (vignette.segment == '1423492626') {
+            utcdiff = 0;
+          }
+
           switch(vignette.type){
           case 'raw': // raw
 
@@ -2980,7 +3020,7 @@ var DAV = new function() {
             var html='';
 
             if (allocation.type() == 'panorama') {
-                var testpanoimg = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-7200)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
+                var testpanoimg = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
                 // test panorama
                 $.ajax({
                     url:testpanoimg,
@@ -2999,14 +3039,17 @@ var DAV = new function() {
                 html+='<div class="info">';
                 html+='<div class="what">Panorama</div></div></div>';
             } else if (allocation.type() == 'poi') {
-                var testpanoimg = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-7200)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
+                var testpanoimg = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
 
                 var view_panorama_link_listpoi = document.location.origin+'/dav/freepano/example/';
-                if (vignette.segment == '1404381299')
+                if (vignette.segment == '1404381299') {
                     view_panorama_link_listpoi += 'reformateurs.php';
-                else if (vignette.segment == '1404383663')
+                } else if (vignette.segment == '1404383663') {
                     view_panorama_link_listpoi += 'dufour.php';
-                view_panorama_link_listpoi += '?initial='+(vignette.pose.sec-7200)+'_'+vignette.pose.usc;
+                } else if (vignette.segment == '1423492626') {
+                    view_panorama_link_listpoi += 'ssa.php';
+                }
+                view_panorama_link_listpoi += '?initial='+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc;
 
                 // test poilist
                 $.ajax({
@@ -3290,7 +3333,7 @@ var DAV = new function() {
 
           panel.inventory_setSelection([name]);
           panel.panorama.poi.show(name,function(){
-            // trash POI 
+            // trash POI
             if ($(e.target).hasClass('fa-trash-o')) {
               if (confirm("Supprimer ce point d'intérêt ?")) {
                 panel.panorama.poi.list[name].instance.remove();
@@ -3420,7 +3463,7 @@ var DAV = new function() {
 
             } else {
               coords={
-                lon: panel.panorama.lon, 
+                lon: panel.panorama.lon,
                 lat: panel.panorama.lat
               }
             }

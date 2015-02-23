@@ -529,6 +529,8 @@
         <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['both','poi']);return false;">Projet SITG (Points d'intérêts)</a>
         <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['both','pointcloud']);return false;">Projet SITG (Point Clouds)</a>
         <a style="margin-top:20px;" href="#" class="quick" onclick="DAV.allocation.quicksearch(['reformateurs','raw']);return false;">Mur des Réformateurs (RAW)</a>
+        <a style="margin-top:20px;" href="#" class="quick" onclick="DAV.allocation.quicksearch(['ssa','raw']);return false;">Exemple SSA (RAW)</a>
+        <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['ssa','panorama']);return false;">Exemple SSA (Panoramas)</a>
   </div>
 
   <!--div id="search">
