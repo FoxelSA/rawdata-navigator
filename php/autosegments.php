@@ -81,6 +81,9 @@ foreach ($camera_lsdir as $macaddress) {
 
             $segment_path = $master_path.'/'.$segment;
 
+            if ((int)$segment != 1404381299 && (int)$segment != 1404383663 && (int)$segment != 1423492626)
+                continue;
+
             // not processed
             if (!file_exists($segment_path.'/info/rawdata-autoseg/segment.json'))
                 continue;
