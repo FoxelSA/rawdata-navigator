@@ -1241,9 +1241,11 @@ $(document).on('filesloaded', function(){
 
       precision: 'highp',
 
-      antialias: false,
+      antialias: true,
 
-      alpha: false
+      alpha: true,
+
+      logarithmicDepthBuffer: true
 
     },
 
@@ -1273,6 +1275,10 @@ $(document).on('filesloaded', function(){
       ]
     },
 */
+
+    pointCloud: {
+      active: true
+    },
 
     postProcessing: {
       enabled: false,

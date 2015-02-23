@@ -1,7 +1,7 @@
-/*                                                                                                                                                                                                                 
+/*
  * freepano - WebGL panorama viewer
  *
- * Copyright (c) 2014 FOXEL SA - http://foxel.ch
+ * Copyright (c) 2014,2015 FOXEL SA - http://foxel.ch
  * Please read <http://foxel.ch/license> for more information.
  *
  *
@@ -55,9 +55,20 @@ $.extend(POI_loader.prototype,{
     init: function poiLoader_init() {
     },
 
+    on_panorama_init: function poiLoader_onPanoramaInit(e) {
+      var panorama=this;
+      panorama.poiLoader=new POI_loader({panorama: panorama});
+    }, // poiLoader_onPanoramaInit
+
     on_panorama_ready: function poiLoader_onPanoramaReady(e){
       var panorama=this;
       var poiLoader=panorama.poiLoader;
+
+      if (e.poiLoader_was_here){
+        console.log('fixme');
+        return;
+      }
+      e.poiLoader_was_here=true;
 
       if (!document.location.search.match(/action=poi_edit/)) {
          if (panorama.poi) panorama.poi.list={};
@@ -74,12 +85,12 @@ $.extend(POI_loader.prototype,{
             */
             if (panorama.poi) panorama.poi.list={};
             // propagate panorama 'ready' event
-            poiLoader.panorama_prototype_callback.apply(e.target,[e]);
+            panorama.dispatch(e);
           },
           success: function(poi_list) {
             panorama.poi=$.extend(true,panorama.poi,panorama.defaults.poi,poiLoader.defaults.poi,poi_list);
             // propagate panorama 'ready' event
-            poiLoader.panorama_prototype_callback.apply(e.target,[e]);
+            panorama.dispatch(e);
             panorama.drawScene();
           }
       });
@@ -89,17 +100,7 @@ $.extend(POI_loader.prototype,{
       return false;
     },
 
-    panorama_prototype_init: Panorama.prototype.init
-
 });
 
-$.extend(true,Panorama.prototype,{
-    init: function poiLoader_panorama_prototype_init() {
-      var panorama=this;
-      panorama.poiLoader=new POI_loader({panorama: panorama});
-      panorama.poiLoader.panorama_prototype_init.call(panorama);
-    }
-});
-
-Panorama.prototype.setupCallback(POI_loader.prototype);
-
+// subscribe to panorama events
+Panorama.prototype.dispatchEventsTo(POI_loader.prototype);

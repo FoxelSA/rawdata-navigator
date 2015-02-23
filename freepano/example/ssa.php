@@ -1,4 +1,41 @@
-<!DOCTYPE html>
+<?php
+$poi_path="/data/footage/demodav/1423492626/poi/";
+
+if (isset($_POST['cmd'])) {
+  $json=$poi_path.$_GET['initial'].".json";
+  switch($_POST['cmd']) {
+  case 'poi_save':
+    file_put_contents($json,$_POST['poi_list']);
+    header('Content-Type: application/json');
+    echo '{"status": "ok"}';
+    exit(0);
+    break;
+  }
+  exit(1);
+}
+
+if (isset($_GET['initial'])) {
+  $json=$poi_path.$_GET['initial'].".json";
+}
+
+if (isset($_GET['action']) && $_GET['action']=="poi_list") {
+
+  if (isset($_GET['download'])) {
+    header('Content-Type: application/octet-stream');
+    header("Content-Transfer-Encoding: Binary");
+    header("Content-disposition: attachment; filename=\"" . basename($json) . "\"");
+  } else {
+    header('Content-Type: application/json');
+  }
+
+  if (isset($json) && file_exists($json)) {
+    print(file_get_contents($json));
+  } else {
+    echo '{}';
+  }
+  exit(0);
+}
+?><!DOCTYPE html>
 <html lang="en">
 <!--
 
@@ -51,7 +88,13 @@
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <title>Freepano Example - https://github.com/FoxelSA/freepano</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimum-scale=1,maximum-scale=1" />
+    <!--meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimum-scale=1,maximum-scale=1" /-->
+    <script type="text/javascript">
+            var poi_path='<?php print($poi_path); ?>';
+        <?php if (isset($_GET['initial'])): ?>
+            var initialImage = '<?php print ($_GET['initial']); ?>';
+        <?php endif; ?>
+    </script>
     <script type="text/javascript" src="../js/thirdparty/jquery-2.1.3.min.js"></script>
     <script type="text/javascript" src="../js/thirdparty/jquery.easing-1.3.min.js"></script>
     <script type="text/javascript" src="../js/thirdparty/jquery.mousewheel-3.1.12.min.js"></script>
@@ -66,24 +109,26 @@
     <script type="text/javascript" src="../js/thirdparty/three.js/postprocessing/MaskPass.js"></script>
     <script type="text/javascript" src="../js/thirdparty/three.js/postprocessing/ShaderPass.js"></script>
     <script type="text/javascript" src="../js/thirdparty/three.js/shaders/CopyShader.js"></script>
+    <script type="text/javascript" src="../js/thirdparty/three.js/shaders/GreenShader.js"></script>
     <script type="text/javascript" src="../js/thirdparty/three.js/shaders/EdgeShader.js"></script>
     <script type="text/javascript" src="../js/thirdparty/three.js/shaders/EdgeShader2.js"></script>
-    <script type="text/javascript" src="../js/thirdparty/three.js/shaders/GreenShader.js"></script>
     <script type="text/javascript" src="../js/thirdparty/howler.js/howler.core.js"></script>
     <script type="text/javascript" src="../js/thirdparty/howler.js/howler.effects.js"></script>
     <script type="text/javascript" src="../js/notify.js"></script>
-    <script type="text/javascript" src="../js/eventDispatcher.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.widget.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.poi.js"></script>
+    <script type="text/javascript" src="../js/jquery.freepano.poi.thumbnails.js"></script>
+    <script type="text/javascript" src="../js/jquery.freepano.poi.loader.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.arrow.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.sound.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.list.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.controls.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.pyramid.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.map.js"></script>
-    <script type="text/javascript" src="../js/jquery.freepano.example.js"></script>
-    <script type="text/javascript" src="js/main.js"></script>
+    <script type="text/javascript" src="../js/jquery.freepano.pointcloud.js"></script>
+    <script type="text/javascript" src="js/ssa.js"></script>
+
 
     <link rel="stylesheet" type="text/css" media="all" href="../js/thirdparty/jquery-toastmessage/css/jquery.toastmessage.css" />
     <link rel="stylesheet" type="text/css" media="all" href="../js/thirdparty/leaflet/leaflet.css" />
@@ -94,18 +139,18 @@
 
 <div id="pano" class="freepano"></div>
 
-<footer>
+<!--footer>
     <div class="shade"></div>
     <div class="main">
         <div class="caption">
-            <div>Freepano Example</div>
-            <div>Montpellier, Port Marianne</div>
+            <div>Projet SITG</div>
+            <div>Mur des Réformateurs</div>
         </div>
         <div class="logo">
             <a href="http://foxel.ch/" target="_blank"><img src="img/foxel.png" alt="FOXEL" width="71" height="18" /></a>
         </div>
     </div>
-</footer>
+</footer-->
 
 </body>
 </html>
