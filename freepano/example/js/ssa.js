@@ -477,15 +477,15 @@ $(document).on('filesloaded', function(){
 
             '1423492719_843700': {
             dirName: '/data/footage/demodav/1423492626/pyramid/result_1423492719_843700-0-25-1/512/3',
-            coords: { lat: 46.20001185, lon: 6.1460866 }
+            coords: { lat: 46.20981475667383, lon: 6.143023496939854 }
             },
             '1423492810_343700': {
             dirName: '/data/footage/demodav/1423492626/pyramid/result_1423492810_343700-0-25-1/512/3',
-            coords: { lat: 46.20002519, lon: 6.14607673 }
+            coords: { lat: 46.2094262117969, lon: 6.142922878463576 }
             },
             '1423492823_343700': {
             dirName: '/data/footage/demodav/1423492626/pyramid/result_1423492823_343700-0-25-1/512/3',
-            coords: { lat: 46.20004401, lon: 6.14606654 }
+            coords: { lat: 46.209519922943706, lon: 6.143039606260866 }
             }
 
         }
