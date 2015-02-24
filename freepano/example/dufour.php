@@ -5,9 +5,9 @@ if (isset($_POST['cmd'])) {
   $json=$poi_path.$_GET['initial'].".json";
   switch($_POST['cmd']) {
   case 'poi_save':
-    file_put_contents($json,$_POST['poi_list']);
+    $ret=file_put_contents($json,$_POST['poi_list']);
     header('Content-Type: application/json');
-    echo '{"status": "ok"}';
+    echo '{"status": '.($ret===FALSE?"error":"ok").'}';
     exit(0);
     break;
   }

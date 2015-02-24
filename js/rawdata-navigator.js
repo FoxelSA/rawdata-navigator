@@ -3712,7 +3712,7 @@ var DAV = new function() {
             poi.list[id]={
               coords: this.coords,
               zoom: this.zoom,
-              metadata: this.metadata,
+              metadata: this.metadata
             };
           });
 
