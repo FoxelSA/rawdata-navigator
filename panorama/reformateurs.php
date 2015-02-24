@@ -128,6 +128,7 @@ if (isset($_GET['action']) && $_GET['action']=="poi_list") {
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.pyramid.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.map.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.pointcloud.js"></script>
+    <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.pointcloud.sequence.js"></script>
     <script type="text/javascript" src="js/reformateurs.js"></script>
 
 
