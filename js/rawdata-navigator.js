@@ -3499,10 +3499,12 @@ var DAV = new function() {
                 handleTransparency: true,
 
                 onmousedown: function(e){
+                  console.log('down');
                   poicursor.mousedown(e);
                 },
 
                 onmouseup: function(e){
+                  console.log('up');
                   poicursor.mouseup(e);
                   return false;
                 }
@@ -3544,8 +3546,8 @@ var DAV = new function() {
 
           mouseup: function poiPanel_poicursor_mouseup(e){
 
-            e.preventDefault();
-            e.stopPropagation();
+            //e.preventDefault();
+           // e.stopPropagation();
 
             var poicursor=this;
             var panel=poicursor.panel;
@@ -3638,8 +3640,11 @@ var DAV = new function() {
             var name;
             var isNew;
 
+            // are we adding a new poi ?
             if (panel.currentPOI=='cursor') {
               isNew=true;
+
+              // set poi name
               panorama.poi.count=0;
               $.each(panorama.poi.list,function(name){
                 if (name!=='cursor') {
@@ -3656,9 +3661,11 @@ var DAV = new function() {
               }
 
             } else {
+              // else we are editing an existing poi
               name=panel.currentPOI;
             }
 
+            // prepare poi data to be saved
             var coords=panorama.poi.list.cursor.instance.coords;
             poi[name]={
                   coords: {
@@ -3673,31 +3680,39 @@ var DAV = new function() {
                   }
             }
 
+            // input data validation
             if (poi[name].metadata.name.trim()=="") {
               window.alert('Vous devez spécifier un identifiant.');
               $('#poipanel_edit #poi_name').focus();
               return;
             }
 
+            // set current POI
             panel.currentPOI=name;
 
-            panel.$('#pano canvas').off('mousedown.poipanel');
+            //panel.$('#pano canvas').off('mousedown.poipanel');
 
+
+            // remove poi cursor
             panorama.poi.list.cursor.instance.remove();
 
+            // add or replace poi
             if (!isNew) {
               panorama.poi.list[name].instance.remove();
             }
             panorama.poi.add(poi);
 
+            // set poi selection
             panel.inventory_setSelection([name]);
 
             panorama.drawScene();
-            panel.editSaveToServer();
+
+            // save poi json 
+            panel.editSaveToServer(isNew);
 
         }, // poiPanel_editSave
 
-        editSaveToServer: function poiPanel_editSaveToServer() {
+        editSaveToServer: function poiPanel_editSaveToServer(isNew) {
           var panel=this;
           var data=panel.panorama.poi.list[panel.currentPOI].metadata||{};
           data.name=$('#poipanel_edit #poi_name').val();
@@ -3746,11 +3761,15 @@ var DAV = new function() {
                 // generate thumbnail
                 panel.panorama.poiThumb.update(panel.currentPOI);
 
-                // just edited existing poi
+                // are we editing an existing poi ?
                 var update=$('li#'+panel.currentPOI,panel._dom).length;
 
-                // add to inventory or update entry
-                panel.addToInventory(panel.currentPOI,{update: update, prepend: true});
+                // add or update poi inventory entry
+                panel.addToInventory(panel.currentPOI,{
+                    update: update,
+                    prepend: true
+                });
+
               }
           });
 
@@ -3760,11 +3779,11 @@ var DAV = new function() {
           var panel=this;
 
           if (panel.panorama.poi.list.cursor){
-           if (panel.panorama.poi.list.cursor.instance) {
-             panel.panorama.poi.list.cursor.instance.remove();
-           } else {
-              delete(panel.panorama.poi.list.cursor);
-           }
+            if (panel.panorama.poi.list.cursor.instance) {
+              panel.panorama.poi.list.cursor.instance.remove();
+            } else {
+               delete(panel.panorama.poi.list.cursor);
+            }
           }
 
           panel.panorama.drawScene();
@@ -3773,14 +3792,17 @@ var DAV = new function() {
 
         }, // poiPanel_cancel
 
+        // add or update poi inventory entry
         addToInventory: function poiPanel_addToInventory(name,options){
           var panel=this;
           var data=panel.panorama.poi.list[name].metadata;
 
+          // update existing poi info / thumbnail
           if (options && options.update){
             var li=$('li#'+name,panel._dom);
             $('div.name',li).text(data.name);
             $('div.description',li).text(data.description);
+            $('canvas',li).replaceWith(panel.panorama.poi.list[name].thumb.canvas)
             return;
           }
 

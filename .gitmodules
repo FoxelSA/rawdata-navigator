@@ -1,0 +1,3 @@
+[submodule "lib/freepano"]
+	path = lib/freepano
+	url = git@github.com:/foxelsa/freepano
