@@ -115,6 +115,7 @@ if (isset($_GET['action']) && $_GET['action']=="poi_list") {
     <script type="text/javascript" src="../js/thirdparty/howler.js/howler.core.js"></script>
     <script type="text/javascript" src="../js/thirdparty/howler.js/howler.effects.js"></script>
     <script type="text/javascript" src="../js/notify.js"></script>
+    <script type="text/javascript" src="../js/eventDispatcher.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.widget.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.poi.js"></script>

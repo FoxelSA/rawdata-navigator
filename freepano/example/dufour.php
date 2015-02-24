@@ -1,4 +1,4 @@
-<?php                                                                                                                
+<?php
 $poi_path="/data/footage/demodav/1404383663/poi/";
 
 if (isset($_POST['cmd'])) {
@@ -23,8 +23,8 @@ if (isset($_GET['action']) && $_GET['action']=="poi_list") {
 
   if (isset($_GET['download'])) {
     header('Content-Type: application/octet-stream');
-    header("Content-Transfer-Encoding: Binary"); 
-    header("Content-disposition: attachment; filename=\"" . basename($json) . "\""); 
+    header("Content-Transfer-Encoding: Binary");
+    header("Content-disposition: attachment; filename=\"" . basename($json) . "\"");
   } else {
     header('Content-Type: application/json');
   }
@@ -116,6 +116,7 @@ if (isset($_GET['action']) && $_GET['action']=="poi_list") {
     <script type="text/javascript" src="../js/thirdparty/howler.js/howler.core.js"></script>
     <script type="text/javascript" src="../js/thirdparty/howler.js/howler.effects.js"></script>
     <script type="text/javascript" src="../js/notify.js"></script>
+    <script type="text/javascript" src="../js/eventDispatcher.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.widget.js"></script>
     <script type="text/javascript" src="../js/jquery.freepano.poi.js"></script>
