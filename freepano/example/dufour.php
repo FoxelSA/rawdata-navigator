@@ -7,7 +7,7 @@ if (isset($_POST['cmd'])) {
   case 'poi_save':
     $ret=file_put_contents($json,$_POST['poi_list']);
     header('Content-Type: application/json');
-    echo '{"status": '.($ret===FALSE?"error":"ok").'}';
+    echo '{"status": '.($ret===FALSE?'"error"':'"ok"').'}';
     exit(0);
     break;
   }
