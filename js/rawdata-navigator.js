@@ -2421,7 +2421,7 @@ var DAV = new function() {
                 var thumb_panorama_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/small/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
                 var download_panorama_link = 'php/download.php?file='+storage.mountpoint+'/footage/demodav/'+segment+'/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
                 $(information._dom+' .download_panorama').attr('href',download_panorama_link);
-                var view_panorama_link = document.location.origin+'/dav/freepano/example/';
+                var view_panorama_link = document.location.origin+'/dav/freepano/';
                 if (segment == '1404381299') {
                     view_panorama_link += 'reformateurs.php';
                 } else if (segment == '1404383663') {
@@ -3041,7 +3041,7 @@ var DAV = new function() {
             } else if (allocation.type() == 'poi') {
                 var testpanoimg = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
 
-                var view_panorama_link_listpoi = document.location.origin+'/dav/freepano/example/';
+                var view_panorama_link_listpoi = document.location.origin+'/dav/freepano/';
                 if (vignette.segment == '1404381299') {
                     view_panorama_link_listpoi += 'reformateurs.php';
                 } else if (vignette.segment == '1404383663') {

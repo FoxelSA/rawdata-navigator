@@ -55,7 +55,7 @@ $(document).ready(function(){
 
   // load image with alpha channel to use as POI cursor
   window.poicursor_texture=new THREE.ImageUtils.loadTexture(
-    '../../img/dav-cursor.png',
+    '/dav/img/dav-cursor.png',
     THREE.UVMapping,
     file_onload,
     function onloaderror() {
@@ -65,7 +65,7 @@ $(document).ready(function(){
 
   // load image with alpha channel to use as POI
   window.poi_texture=new THREE.ImageUtils.loadTexture(
-    '../../img/dav-cursor-blank.png',
+    '/dav/img/dav-cursor-blank.png',
     THREE.UVMapping,
     file_onload,
     function onloaderror() {
