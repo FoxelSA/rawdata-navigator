@@ -3724,11 +3724,11 @@ var DAV = new function() {
                 poi_list: JSON.stringify(poi)
               },
               error: function() {
-                $.notify('Error: Save failed !');
+                panel.window.$.notify('Error: Save failed !');
               },
               success: function(json) {
                 if (json.status!='ok') {
-                  $.notify('Error: Save failed !');
+                  panel.window.$.notify('Error: Save failed !');
                   return;
                 }
 
