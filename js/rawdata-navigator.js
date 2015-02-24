@@ -3482,7 +3482,7 @@ var DAV = new function() {
                 object3D: null,
 
                 mesh: new panel.window.THREE.Mesh(
-                  new panel.window.THREE.PlaneGeometry(Math.PI/4,Math.PI/4,1,1),
+                  new panel.window.THREE.PlaneGeometry(10,10,1,1),
                   new panel.window.THREE.MeshBasicMaterial({
                    map: panel.window.poicursor_texture,
                    transparent: true
