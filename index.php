@@ -134,9 +134,9 @@
                     <div class="section geo control closed"><span></span>Position</div>
                     <div class="closeable closed">
                         <table class="section geo known">
-                            <tr><td class="attr">Latitude</td><td class="lat"></td></tr>
-                            <tr><td class="attr">Longitude</td><td class="lng"></td></tr>
-                            <tr class="space"><td class="attr">Altitude</td><td class="alt"></td></tr>
+                            <tr><td class="attr">Latitude</td><td><span class="pre">WGS84</span><span class="lat"></span></td></tr>
+                            <tr><td class="attr">Longitude</td><td><span class="pre">WGS84</span><span class="lng"></span></td></tr>
+                            <tr class="space"><td class="attr">Altitude</td><td><span class="pre">MSL</span><span class="alt"></span></td></tr>
                             <tr class="space"><td class="attr">Still</td><td class="still"></td></tr>
                             <tr><td class="attr">Robustness</td><td class="robustness"></td></tr>
                         </table>

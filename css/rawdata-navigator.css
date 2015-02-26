@@ -468,6 +468,11 @@ a, a:link, a:visited, a:hover, a:active {
                     width:85px;
                 }
 
+            #info .data td span.pre {
+                display:inline-block;
+                width:50px;
+            }
+
     #info .viewer {
         position:relative;
         height:250px;
