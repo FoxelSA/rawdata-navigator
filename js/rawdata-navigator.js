@@ -3296,6 +3296,7 @@ var DAV = new function() {
               panel.$=panel.window.$;
               panel.panorama=panel.$('#pano').data('pano');
               panel.panorama.dispatchEventsTo(panel);
+              panel.panorama.dispatchEventsTo(panel.poicursor);
               panel.window.POI_thumb.prototype.dispatchEventsTo(panel);
 //              panel.window.POI_list.prototype.dispatchEventsTo(panel);
               panel.window.POI.prototype.dispatchEventsTo(panel);
@@ -3413,6 +3414,9 @@ var DAV = new function() {
 
         on_poi_select: function poiPanel_on_poi_select(e) {
           var poi=this;
+          if (poi.name=='cursor') {
+              return false;
+          }
           poi.selected=false; // so that inventory_setSelection update it
           poiPanel.inventory_setSelection([poi.name]);
           // scroll to selected element
@@ -3473,6 +3477,7 @@ var DAV = new function() {
             panel.panorama.poi.add({
 
               cursor: {
+                panel: panel,
 
                 // we want the cursor above POIs
                 radius: panel.panorama.sphere.radius-2.5,
@@ -3517,30 +3522,34 @@ var DAV = new function() {
 
           }, // poiPanel_poicursor_init
 
+          on_panorama_mousemove: function poiPanel_poiCursor_on_panorama_mousemove(e) {
+           
+            if (!panel.poicursor.leftButtonDown) {
+                return;
+            }
+
+            panel.panorama.getMouseCoords(e);
+            var mc=panel.panorama.mouseCoords;
+
+            panel.panorama.poi.list.cursor.instance.setCoords(mc);
+
+            panel.panorama.drawScene();
+
+            return false;
+                
+          }, // poiPanel_poicursor_on_panorama_mousemove
+
           mousedown: function poiPanel_poicursor_mousedown(e) {
 
             var poicursor=this;
             var panel=poicursor.panel;
 
-            panel.$(panel.panorama.renderer.context.canvas).on('mousemove.poicursor',function(e){
-
-              e.stopPropagation();
-              e.preventDefault();
-
-              panel.panorama.getMouseCoords(e);
-              var mc=panel.panorama.mouseCoords;
-
-              panel.panorama.poi.list.cursor.instance.setCoords(mc);
-
-              panel.panorama.drawScene();
-
-              return false;
-            })
+            panel.$(panel.panorama.renderer.domElement)
             .css('cursor','none')
-            .on('mouseup.poicursor',function(e){
-              poicursor.mouseup(e);
-              return false;
-            });
+//            .on('mouseup.poicursor',function(e){
+//              poicursor.mouseup(e);
+   //           return false;
+ //           });
 
           }, // poiPanel_poicursor_mousedown
 
