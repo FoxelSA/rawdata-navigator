@@ -458,6 +458,12 @@
   </div>
 
   <div class="content2" >
+     <div class="">
+        <a id="measure" title="Tracer" class="fa fa-pencil-square fa-fw"></a>
+     </div>
+     <div >
+        <a id="trash_measure" title="Effacer" class="fa fa-minus-square fa-fw"></a>
+     </div>
     <iframe frameborder="no" scrolling="no" seamless="seamless"></iframe>
   </div>
 </div>

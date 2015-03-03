@@ -2,38 +2,91 @@
 $poi_path="/data/footage/demodav/1404381299/poi/";
 
 if (isset($_POST['cmd'])) {
-  $json=$poi_path.$_GET['initial'].".json";
+
   switch($_POST['cmd']) {
+
+  // save poi list
   case 'poi_save':
-    $ret=file_put_contents($json,$_POST['poi_list']);
+
+    // output file name
+    $outfile=$poi_path.$_GET['initial'].".json";
+
+    // write json to file
+    $ret=file_put_contents($outfile,$_POST['json']);
+
+    // set return status
     header('Content-Type: application/json');
     echo '{"status": '.($ret===FALSE?'"error"':'"ok"').'}';
+
     exit(0);
-    break;
+
+  // save particle sequences
+  case 'seq_save':
+    
+    // output file name
+    $outfile=$poi_path.$_GET['initial']."_seq.json";
+
+    // write json to file
+    $ret=file_put_contents($outfile,$_POST['json']);
+
+    // set return status
+    header('Content-Type: application/json');
+    echo '{"status": '.($ret===FALSE?'"error"':'"ok"').'}';
+
+    exit(0);
   }
+
+  // unknown command
   exit(1);
 }
 
-if (isset($_GET['initial'])) {
-  $json=$poi_path.$_GET['initial'].".json";
-}
+// timestamp and action specified ?
+if (isset($_GET['initial']) && isset($_GET['action'])) {
+  
+  switch($_GET['action']) {
 
-if (isset($_GET['action']) && $_GET['action']=="poi_list") {
+  /* POI list requested */
+  case "poi_list":
 
-  if (isset($_GET['download'])) {
-    header('Content-Type: application/octet-stream');
-    header("Content-Transfer-Encoding: Binary"); 
-    header("Content-disposition: attachment; filename=\"" . basename($json) . "\""); 
-  } else {
-    header('Content-Type: application/json');
+    $json=$poi_path.$_GET['initial'].".json";
+
+    if (isset($_GET['download'])) {
+      header('Content-Type: application/octet-stream');
+      header("Content-Transfer-Encoding: Binary"); 
+      header("Content-disposition: attachment; filename=\"" . basename($json) . "\""); 
+    } else {
+      header('Content-Type: application/json');
+    }
+
+    if (isset($json) && file_exists($json)) {
+      print(file_get_contents($json));
+    } else {
+      echo '{}';
+    }
+    exit(0);
+
+  /* point lists requested */
+  case "seq_list":
+
+    $json=$poi_path.$_GET['initial']."_seq.json";
+
+    if (isset($_GET['download'])) {
+      header('Content-Type: application/octet-stream');
+      header("Content-Transfer-Encoding: Binary"); 
+      header("Content-disposition: attachment; filename=\"" . basename($json) . "\""); 
+    } else {
+      header('Content-Type: application/json');
+    }
+
+    if (isset($json) && file_exists($json)) {
+      print(file_get_contents($json));
+    } else {
+      echo '{}';
+    }
+    exit(0);
+
+
   }
-
-  if (isset($json) && file_exists($json)) {
-    print(file_get_contents($json));
-  } else {
-    echo '{}';
-  }
-  exit(0);
 }
 ?><!DOCTYPE html>
 <html lang="en">
@@ -88,7 +141,7 @@ if (isset($_GET['action']) && $_GET['action']=="poi_list") {
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <title>Freepano Example - https://github.com/FoxelSA/freepano</title>
-    <!--meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimum-scale=1,maximum-scale=1" /-->
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimum-scale=1,maximum-scale=1,user-scalable=0">
     <script type="text/javascript">
             var poi_path='<?php print($poi_path); ?>';
         <?php if (isset($_GET['initial'])): ?>

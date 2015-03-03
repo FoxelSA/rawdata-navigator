@@ -1208,4 +1208,25 @@ ul.poi li .buttons {
   padding-top: 8px;
 }
 
+#poipanel .content2 #measure {
+  position: absolute;
+  z-index: 999999;
+  text-shadow: 4px 4px 16px rgba(0,0,0,0.5);
+  right: -1em;
+  font-size: 6.4em;
+  top: 0.75em;
+}
 
+#poipanel .content2 #trash_measure {
+  position: absolute;
+  z-index: 999999;
+  text-shadow: 4px 4px 16px rgba(0,0,0,0.5);
+  right: -1em;
+  font-size: 6.4em;
+  top: 1.75em;
+
+}
+
+#poipanel .content2 #trash_measure a {
+  color: black;
+}
