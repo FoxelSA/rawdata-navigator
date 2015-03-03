@@ -3288,7 +3288,7 @@ var DAV = new function() {
           var iframe=panel.iframe=$('iframe',panel._dom);
 
           if (iframe.attr('src')!=$(elem).data('href')) {
-            overlay.show('Loading POI editor...');            
+            overlay.show('Loading POI editor...');
             panel.inventory_clear();
             iframe.attr('src',$(elem).data('href')).off('load').on('load',function(){
               // POI EDITOR onload (see above for panorama viewer)
@@ -3429,7 +3429,7 @@ var DAV = new function() {
         }, // poiPanel_on_panorama_ready
 
         on_poi_dispose: function poiPanel_on_poi_dispose(e) {
-           var poi=this;                                                                                            
+           var poi=this;
            $('#poipanel_inventory ul li#'+poi.name,poiPanel._domElement).remove();
         }, // poiPanel_on_poi_dispose
 
@@ -3529,7 +3529,7 @@ var DAV = new function() {
           }, // poiPanel_poicursor_init
 
           on_panorama_mousemove: function poiPanel_poiCursor_on_panorama_mousemove(e) {
-           
+
             var panel=poiPanel;
 
             if (!poiPanel.poicursor.dragging) {
@@ -3544,7 +3544,7 @@ var DAV = new function() {
             panel.panorama.drawScene();
 
             return false;
-                
+
           }, // poiPanel_poicursor_on_panorama_mousemove
 
           mousedown: function poiPanel_poicursor_mousedown(e) {
@@ -3727,7 +3727,7 @@ var DAV = new function() {
 
             panorama.drawScene();
 
-            // save poi json 
+            // save poi json
             panel.editSaveToServer(isNew);
 
         }, // poiPanel_editSave
@@ -3880,14 +3880,14 @@ var DAV = new function() {
               if (pointCloud.cursor && pointCloud.cursor.sprite) {
                 pointCloud.cursor.sprite.visible=true;
               }
-    
+
             }, // poiPanel_pcl_sequence_record
-            
+
             // stop recording the particle sequence
-            stop: function poiPanel_pcl_sequence_stop() {
+            stop: function poiPanel_pcl_sequence_stop(options) {
 
               var pointCloud=poiPanel.panorama.pointCloud.instance;
-              
+
               // remove non-validated segment
               var seq=pointCloud.sequence[pointCloud.sequence.length-1];
               var count=seq.particleIndex_list.length;
@@ -3896,7 +3896,7 @@ var DAV = new function() {
                   seq.pop(last);
                   poiPanel.panorama.drawScene();
               }
-             
+
               // exit sequence editing mode
               poiPanel.mode.edit_sequence=false;
               pointCloud.enableParticleEvents=false;
@@ -3905,9 +3905,16 @@ var DAV = new function() {
               pointCloud.sequence[pointCloud.sequence.length-1].mode.wheredowegofromhere=false;
               pointCloud.cursor.sprite.visible=false;
 
-              poiPanel.pcl_sequence.save();
+              if (options && options.abort) {
+                 pointCloud.sequence[pointCloud.sequence.length-1].dispose();
+                 pointCloud.sequence[pointCloud.sequence.length-1]=new pointCloud.Sequence({
+                   pointCloud: pointCloud
+                 });
+                 poiPanel.drawScene();
+              } else {
+                 poiPanel.pcl_sequence.save();
+              }
 
-    
             }, // poiPanel_pcl_sequence_stop
 
             // Add current sequence to list, send list to server,
@@ -3915,16 +3922,18 @@ var DAV = new function() {
             save: function poiPanel_pcl_sequence_save() {
                 var pcl_sequence=this;
                 var pointCloud=poiPanel.panorama.pointCloud.instance;
-             
+
                 // add current sequence to list
                 pcl_sequence.list.push(pointCloud.sequence);
 
                 var list=[];
 
                 $.each(pcl_sequence.list,function(){
-                    list.push(this.particleIndex_list);
+                    if (this.particleIndex_list.length) {
+                      list.push(this.particleIndex_list);
+                    }
                 });
-                
+
                 // send list to server
                 $.ajax({
                     url: poiPanel.panorama_link,
@@ -3943,8 +3952,8 @@ var DAV = new function() {
 
                     // got a valid server reply
                     success: function(json) {
-              
-                      // php script returned an error ? 
+
+                      // php script returned an error ?
                       if (json.status!='ok') {
                         poiPanel.window.$.notify('Error: Could not save segments !');
                         return;
@@ -3965,25 +3974,52 @@ var DAV = new function() {
 
             } // poiPanel_pcl_sequence_clearAll
         },
-       
+
         _panel_init: Panel.prototype.init,
         init: function poiPanel_init() {
           var panel=this;
           panel._panel_init();
 
+          // click on start/stop sequence editor button
           $('#measure',panel._dom).off('click').on('click',function(){
               if (!panel.mode.edit_sequence) {
+                  // enter sequence edit mode
                   panel.pcl_sequence.record();
               } else {
-                  panel.pcl_sequence.stop();
+                  // exit sequence edit mode and save
+                  panel.pcl_sequence.stop({abort:false});
               }
           });
-        
+
+          // click on trash all button
+          $('#trash_measure',panel.dom).off('click').on('click',function(){
+
+              // abort sequence editing if enabled
+              if (panel.mode.edit_sequence) {
+                  panel.pcl_sequence.stop({abort:true});
+              }
+
+              // initialize an empty sequence list
+              panel.panorama.pointCloud.instance.sequence=[new panel.panorama.pointCloud.instance.Sequence({
+                pointCloud: panel.panorama.pointCloud.instance
+              })];
+
+              // save empty sequence list
+              panel.pcl_sequence.save();
+
+              panel.panorama.drawScene();
+
+          });
+
+          // handle keydown events over poiPanel
           $(document).on('keydown',function(e){
+
             if (panel.visible && panel.istoplevel()){
+
               // forward key event to freepano when inventory is visible and add button has not been pressed
               if ($('#poipanel_inventory',panel._dom).is(':visible') && !$('#addpoi',panel._dom).hasClass('cancel')) {
-                // unless the key is assigned to inventory navigation
+
+                // unless the key is assigned to inventory navigation or sequence editing
                 switch(e.keyCode){
                 case 32: // space
                   var next=$('ul.poi li.selected:last',panel._dom).next();
@@ -3994,20 +4030,23 @@ var DAV = new function() {
                   $('#poipanel_inventory .list',panel._dom).mCustomScrollbar("scrollTo",'#'+next.attr('id'));
                   return;
 
+                case 13: // enter
                 case 27: // escape
                   // stop recording particle sequence
                   if (panel.mode.edit_sequence) {
-                    panel.pcl_sequence.stop();
+                     panel.pcl_sequence.stop({abort:(e.keyCode==27)});
                   }
                   return;
                 }
+
+                // forward key event to panorama viewer
                 panel.$(panel.window.document).trigger(e);
-              
+
               } else {
                 // POI edit dialog is open or "add" button has been pressed, watch for escape keydown
                 switch(e.keyCode) {
                 case 27: // escape
-                   // cancel poi edition
+                   // cancel poi edition on escape
                   if ($('#addpoi',panel._dom).hasClass('cancel') || $('#poipanel_edit',panel._dom).is(':visible')) {
                     panel.editCancel();
                   }
@@ -4016,6 +4055,7 @@ var DAV = new function() {
               }
             }
           });
+
         } // poiPanel_init
     });
 
