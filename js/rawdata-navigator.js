@@ -3620,20 +3620,31 @@ var DAV = new function() {
         }, // poiPanel_mouseoverlay
         */
 
+        /**
+        * PoiPanel.edit
+        *
+        * Open POI details edit panel
+        *
+        */
         edit: function poiPanel_edit(name){
           var panel=this;
           panel.currentPOI=name;
 
+          // abort particle sequence editing
           if (panel.mode.edit_sequence) {
               panel.pcl_sequence.stop({abort:true});
           }
 
-          if (name!='cursor') {
+          // editing an existing POI ?
+          if (name!='cursor') {         
+            // if not create a poi named 'cursor' as cursor
             panel.poicursor.init(panel);
           }
 
+          // hide inventory
           $('div.action:first, #poipanel_inventory',panel._dom).hide(0);
 
+          // setup button event listeners
           $('#poipanel_edit a').off('click.poipanel');
           $('#poipanel_edit a.cancel').on('click.poipanel',function(e){
             panel.editCancel();
@@ -3642,21 +3653,53 @@ var DAV = new function() {
             panel.editSave();
           });
 
+          // initialize input fields
           var data=panel.panorama.poi.list[name].metadata||{};
           $('#poipanel_edit #poi_name').val(data.name||'');
           $('#poipanel_edit #poi_date').val(data.date||new Date().toString());
           $('#poipanel_edit #poi_description').val(data.description||'');
+
+          // display edit dialog
           $('#poipanel_edit',panel._dom).show(0);
 
         }, // poiPanel_edit
 
+        /**
+        * PoiPanel.editClose
+        *
+        * Close POI details edit panel
+        *
+        */
         editClose: function poiPanel_editClose() {
           var panel=this;
+
+          // hide edit panel
           $('#poipanel_edit',panel._dom).hide(0);
+
+          // reset add button text
           $('#addpoi',panel._dom).text('Ajouter').removeClass('cancel');
+
+          // show inventory
           $('div.action:first, #poipanel_inventory',panel._dom).show(0);
+
         }, // poiPanel_editClose
 
+        /**
+        * poiPanel.editSave()
+        *
+        * Create a new poi identifier if not editing an existing one
+        * Gather data to be saved from poi edit panel
+        * Validate poi edit panel data
+        * Set current poi
+        * Remove poi cursor
+        * Update poi list
+        * Set selection
+        * Send data to server
+        *
+        * Comments are not run
+        * This list may be erroneous or out of sync
+        *
+        */
         editSave: function poiPanel_editSave() {
 
             var panel=this;
@@ -3738,18 +3781,37 @@ var DAV = new function() {
 
         }, // poiPanel_editSave
 
+        /**
+        * PoiPanel.editSaveToServer
+        *
+        * on success:
+        * update mesh list for hover detection
+        * close edit panel
+        * update poicount for info panel
+        * add or update poi thumbnail and inventory 
+        *
+        * @todo: restore poi cursor on failure
+        *
+        */
         editSaveToServer: function poiPanel_editSaveToServer(isNew) {
           var panel=this;
+
+          // current POI data to be saved (can set default values here)
           var data=panel.panorama.poi.list[panel.currentPOI].metadata||{};
           data.name=$('#poipanel_edit #poi_name').val();
           data.date=$('#poipanel_edit #poi_date').val();
           data.description=$('#poipanel_edit #poi_description').val();
+
+          // update current poi data
           panel.panorama.poi.list[panel.currentPOI].metadata=data;
           panel.panorama.drawScene();
 
+          // build poi list to be saved
           var poi={list:{}};
           $.each(panel.panorama.poi.list,function(id){
+            // dont save poi cursor as a poi
             if (id=='cursor') return;
+
             poi.list[id]={
               coords: this.coords,
               zoom: this.zoom,
@@ -3757,6 +3819,7 @@ var DAV = new function() {
             };
           });
 
+          // send poi list to server
           $.ajax({
               url: panel.panorama_link,
               method: 'POST',
@@ -3764,27 +3827,32 @@ var DAV = new function() {
                 cmd: 'poi_save',
                 json: JSON.stringify(poi)
               },
+
+              // network or server error
               error: function() {
                 panel.window.$.notify('Error: Save failed !');
               },
+
+              // server replied
               success: function(json) {
                 if (json.status!='ok') {
                   panel.window.$.notify('Error: Save failed !');
                   return;
                 }
 
+                // rebuild mesh list (for hover detection)
                 try {
                   panel.panorama.poi.mesh_list_update();
                 } catch(e){}
 
+                // close
                 panel.editClose();
 
-
-                // update poicount
+                // update poicount for information panel
                 information.poicount=panel.panorama.poi.count;
                 information.updatepoicount();
 
-                // generate thumbnail
+                // generate or update poi thumbnail
                 panel.panorama.poiThumb.update(panel.currentPOI);
 
                 // are we editing an existing poi ?
@@ -3801,9 +3869,18 @@ var DAV = new function() {
 
         }, // poiPanel_editSaveToServer
 
+        /**
+        * poiPanel.editCancel
+        *
+        * Cancel poi edition
+        *
+        * Remove poi cursor and close poi edit panel
+        *
+        */
         editCancel: function poiPanel_editCancel() {
           var panel=this;
 
+          // remove poi cursor
           if (panel.panorama.poi.list.cursor){
             if (panel.panorama.poi.list.cursor.instance) {
               panel.panorama.poi.list.cursor.instance.remove();
@@ -3817,20 +3894,33 @@ var DAV = new function() {
 
         }, // poiPanel_cancel
 
-        // add or update poi inventory entry
+        /**
+        * poiPanel.addToInventory
+        * 
+        * Add or update poi inventory entry
+        * @param name   the poi id
+        * @param options  {prepend: boolean}
+        *
+        */
         addToInventory: function poiPanel_addToInventory(name,options){
           var panel=this;
           var data=panel.panorama.poi.list[name].metadata;
 
-          // update existing poi info / thumbnail
+          // update existing poi inventory list entry ?
           if (options && options.update){
+
+            // update poi name and description for existing inventory list entry 
             var li=$('li#'+name,panel._dom);
             $('div.name',li).text(data.name);
             $('div.description',li).text(data.description);
+
+            // update thumbnail canvas for existing inventory list entry
             $('canvas',li).replaceWith(panel.panorama.poi.list[name].thumb.canvas)
+ 
             return;
           }
 
+          // forge a new poi inventory list entry
           var li='<li id="'+name+'">';
           li+='<div class="thumb">';
           li+='<canvas class="poithumb" />';
@@ -3844,11 +3934,15 @@ var DAV = new function() {
           li+='<a class="fa fa-pencil-square-o fa-fw button"></a>';
           li+='</div>';
           li+='</li>';
+
+          // prepend or append to list
           if (options && options.prepend){
             $('ul.poi',panel._dom).prepend(li);
           } else {
             $('ul.poi',panel._dom).append(li);
           }
+
+          // set directory entry details
           var li=$('li#'+name,panel._dom);
           $('div.name',li).text(data.name);
           $('div.description',li).text(data.description);
@@ -3856,15 +3950,28 @@ var DAV = new function() {
 
         }, // poiPanel_addToInventory
 
+         /**
+         * poiPanel.resize()
+         * 
+         * update poi panel html components on resize event
+         *
+         */
         _panel_resize: Panel.prototype.resize,
         resize: function poiPanel_resize(e){
           var panel=this;
+
+          // run base panel resize handler
           panel._panel_resize(e);
+
+          // update iframe dimensions
           panel.iframe.height($('.content2',panel._dom).height());
           panel.iframe.width($(window).width()-panel.iframe.offset().left);
+
+          // update inventory list and custom scrollbar container dimensions
           $('#poipanel_inventory .list',panel._dom)
             .height($(panel._dom).height()-$('#poipanel_inventory .list',panel._dom).offset().top-32)
             .mCustomScrollbar('update');
+            
         }, // poiPanel_resize
 
         /**
