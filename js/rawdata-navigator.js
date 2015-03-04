@@ -3289,7 +3289,7 @@ var DAV = new function() {
             $('.content2 a',panel._dom).addClass('disabled');
             
             panel.editClose();
-            
+
         },
 
         open: function poiPanel_open(elem) {
@@ -3446,6 +3446,8 @@ var DAV = new function() {
         }, // poiPanel_on_poi_select
 
         on_panorama_ready: function poiPanel_on_panorama_ready() {
+           // update button states
+           $('.content2 a',panel._dom).removeClass('disabled');
 
         }, // poiPanel_on_panorama_ready
 
@@ -3696,7 +3698,7 @@ var DAV = new function() {
           $('#poipanel_edit',panel._dom).hide(0);
 
           // reset add button text
-          $('#addpoi',panel._dom).text('Ajouter').removeClass('cancel');
+          $('#addpoi',panel._dom).text('Ajouter').removeClass('cancel').addClass('disabled');
 
           // show inventory
           $('div.action:first, #poipanel_inventory',panel._dom).show(0);
@@ -4182,7 +4184,7 @@ var DAV = new function() {
           // click on start/stop sequence editor button
           $('#measure',panel._dom).off('click').on('click',function(e){
 
-              if ($(e.target).hasType('disabled')) {
+              if ($(e.target).hasClass('disabled')) {
                   return;
               }
 
@@ -4198,7 +4200,7 @@ var DAV = new function() {
           // click on trash all button
           $('#trash_measure',panel.dom).off('click').on('click',function(e){
 
-              if ($(e.target).hasType('disabled')) {
+              if ($(e.target).hasClass('disabled')) {
                   return;
               }
 
