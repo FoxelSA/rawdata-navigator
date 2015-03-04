@@ -3273,6 +3273,25 @@ var DAV = new function() {
         _url: 'php/poi.php',
         mode: {},
 
+        /** 
+        * poiPanel.reset()
+        *
+        * reset poiPanel components
+        *
+        */
+        reset: function poipanel_reset() {
+            var panel=this;
+
+            // clear poi inventory
+            panel.inventory_clear();
+
+            // reset button states
+            $('.content2 a',panel._dom).addClass('disabled');
+            
+            panel.editClose();
+            
+        },
+
         open: function poiPanel_open(elem) {
 
           var panel=this;
@@ -3289,7 +3308,7 @@ var DAV = new function() {
 
           if (iframe.attr('src')!=$(elem).data('href')) {
             overlay.show('Loading POI editor...');
-            panel.inventory_clear();
+            panel.reset();
             iframe.attr('src',$(elem).data('href')).off('load').on('load',function(){
               // POI EDITOR onload (see above for panorama viewer)
               overlay.hide();
@@ -3971,7 +3990,7 @@ var DAV = new function() {
           $('#poipanel_inventory .list',panel._dom)
             .height($(panel._dom).height()-$('#poipanel_inventory .list',panel._dom).offset().top-32)
             .mCustomScrollbar('update');
-            
+
         }, // poiPanel_resize
 
         /**
@@ -3982,13 +4001,16 @@ var DAV = new function() {
             // start recording a new particle sequence
             record: function poiPanel_pcl_sequence_record() {
 
+              var pointCloud=poiPanel.panorama.pointCloud.instance;
+              if (!pointCloud) {
+                  return;
+              }
+
               // close poi editor if open
               //@todo: disable buttons triggering mutually exclusive functions instead
               if ($('#addpoi',poiPanel._dom).hasClass('cancel')) {
                   poiPanel.editCancel();
               }
-
-              var pointCloud=poiPanel.panorama.pointCloud.instance;
 
               // enter sequence editing mode
               poiPanel.mode.edit_sequence=true;
@@ -4006,6 +4028,9 @@ var DAV = new function() {
             stop: function poiPanel_pcl_sequence_stop(options) {
 
               var pointCloud=poiPanel.panorama.pointCloud.instance;
+              if (!pointCloud) {
+                  return;
+              }
 
               // remove non-validated segment
               var seq=pointCloud.sequence[pointCloud.sequence.length-1];
@@ -4022,7 +4047,9 @@ var DAV = new function() {
               pointCloud.showParticleCursor=false;
               pointCloud.sequence[pointCloud.sequence.length-1].mode.add=false;
               pointCloud.sequence[pointCloud.sequence.length-1].mode.wheredowegofromhere=false;
-              pointCloud.cursor.sprite.visible=false;
+              if (pointCloud.cursor && pointCloud.cursor.sprite) {
+                pointCloud.cursor.sprite.visible=false;
+              }
 
               // aborting ?
               if (options && options.abort) {
@@ -4033,7 +4060,7 @@ var DAV = new function() {
                    pointCloud: pointCloud
                  });
 
-                 poiPanel.drawScene();
+                 poiPanel.panorama.drawScene();
 
               } else {
                  // save and upload
@@ -4125,7 +4152,25 @@ var DAV = new function() {
                   poiPanel.pcl_sequence.stop({abort:false});
               }
 
-            } // poiPanel_pcl_sequence_on_pointcloud_particleclick
+            }, // poiPanel_pcl_sequence_on_pointcloud_particleclick
+            
+            // update pointcloud related poi panel button state
+            updateButtons: function pcl_sequence_updateButtons() {
+                var pointCloud=poiPanel.panorama.pointCloud.instance;
+                if (!pointCloud.json || !pointCloud.json.points || !pointCloud.json.points.length) {
+                    $('.content2 a',poiPanel._domElement).addClass('disabled');
+                } else {
+                    $('.content2 a',poiPanel._domElement).removeClass('disabled');
+                }
+            },
+
+            on_pointcloud_ready: function pcl_sequence_on_pointcloud_ready() {
+                poiPanel.pcl_sequence.updateButtons();
+            }, // poiPanel_pcl_sequence_on_pointcloud_ready
+
+            on_pointcloud_loaderror: function pcl_sequence_on_pointcloud_loaderror() {
+                poiPanel.pcl_sequence.updateButtons();
+            } // pcl_sequence_on_pointcloud_loaderror
 
         },
 
@@ -4135,7 +4180,12 @@ var DAV = new function() {
           panel._panel_init();
 
           // click on start/stop sequence editor button
-          $('#measure',panel._dom).off('click').on('click',function(){
+          $('#measure',panel._dom).off('click').on('click',function(e){
+
+              if ($(e.target).hasType('disabled')) {
+                  return;
+              }
+
               if (!panel.mode.edit_sequence) {
                   // enter sequence edit mode
                   panel.pcl_sequence.record();
@@ -4146,7 +4196,11 @@ var DAV = new function() {
           });
 
           // click on trash all button
-          $('#trash_measure',panel.dom).off('click').on('click',function(){
+          $('#trash_measure',panel.dom).off('click').on('click',function(e){
+
+              if ($(e.target).hasType('disabled')) {
+                  return;
+              }
 
               // abort sequence editing if enabled
               if (panel.mode.edit_sequence) {

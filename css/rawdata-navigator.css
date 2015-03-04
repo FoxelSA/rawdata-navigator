@@ -113,6 +113,11 @@ a, a:link, a:visited, a:hover, a:active {
   transform: scale(0.8);
 }
 
+a.fa.disabled, a.fa.disabled:hover, a.fa.disabled:active {
+  color: rgba(255,255,255,0.4);
+  transform: none;
+}
+
 #vignettes a.fa:active {
   color: black;
 }
