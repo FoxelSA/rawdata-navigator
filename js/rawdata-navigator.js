@@ -3541,6 +3541,13 @@ var DAV = new function() {
                   console.log('up');
                   poicursor.mouseup(e);
                   return false;
+                },
+ 
+                onupdate: function(e) {
+                   var poi=this;
+                   // update cursor scale according to Zoom
+                   var scale=1/panel.panorama.getZoom();
+                   poi.object3D.scale.set(scale,scale,scale);
                 }
 
               } // cursor
