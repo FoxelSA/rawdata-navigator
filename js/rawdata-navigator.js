@@ -3273,7 +3273,7 @@ var DAV = new function() {
         _url: 'php/poi.php',
         mode: {},
 
-        /** 
+        /**
         * poiPanel.reset()
         *
         * reset poiPanel components
@@ -3287,7 +3287,7 @@ var DAV = new function() {
 
             // reset button states
             $('.content2 a',panel._dom).addClass('disabled');
-            
+
             panel.editClose();
 
         },
@@ -3487,6 +3487,8 @@ var DAV = new function() {
 
             var poicursor=this;
             poicursor.panel=panel;
+            poicursor.dragging=false;
+
             var coords;
 
             // editing an existing poi ?
@@ -3513,15 +3515,19 @@ var DAV = new function() {
 
                 coords: coords,
 
-                object3D: null,
+                object3D: function(){
+                  var material=new panel.window.THREE.SpriteMaterial({
+                    map: panel.window.poicursor_texture,
+                    transparent: true,
+                    depthTest: false,
+                    depthWrite: false
+                  });
 
-                mesh: new panel.window.THREE.Mesh(
-                  new panel.window.THREE.PlaneGeometry(10,10,1,1),
-                  new panel.window.THREE.MeshBasicMaterial({
-                   map: panel.window.poicursor_texture,
-                   transparent: true
-                  })
-                ),
+                  var sprite=new panel.window.THREE.Sprite(material);
+                  var object3D=new panel.window.THREE.Object3D();
+                  object3D.add(sprite);
+                  return object3D;
+                },
 
                 color: {
                   normal: '#ffffff',
@@ -3529,7 +3535,7 @@ var DAV = new function() {
                   active: '#ffffff'
                 },
 
-
+                // no mouse events for transparent pixels
                 handleTransparency: true,
 
                 onmousedown: function(e){
@@ -3542,12 +3548,20 @@ var DAV = new function() {
                   poicursor.mouseup(e);
                   return false;
                 },
- 
+
+                // update poi cursor scale and position
                 onupdate: function(e) {
                    var poi=this;
+                   var panorama=poi.panorama;
+
+                   var v=poi.object3D.position.clone();
+                   v.applyMatrix4(panorama.camera.instance.matrixWorldInverse);
+
                    // update cursor scale according to Zoom
-                   var scale=1/panel.panorama.getZoom();
+                   var scale=(10/panel.panorama.getZoom())*v.z/panorama.sphere.radius;
                    poi.object3D.scale.set(scale,scale,scale);
+
+
                 }
 
               } // cursor
@@ -3562,7 +3576,7 @@ var DAV = new function() {
 
             var panel=poiPanel;
 
-            if (!poiPanel.poicursor.dragging) {
+            if (!panel.panorama.poi.list.cursor || !poiPanel.poicursor.dragging) {
                 return;
             }
 
@@ -3664,7 +3678,7 @@ var DAV = new function() {
           }
 
           // editing an existing POI ?
-          if (name!='cursor') {         
+          if (name!='cursor') {
             // if not create a poi named 'cursor' as cursor
             panel.poicursor.init(panel);
           }
@@ -3816,7 +3830,7 @@ var DAV = new function() {
         * update mesh list for hover detection
         * close edit panel
         * update poicount for info panel
-        * add or update poi thumbnail and inventory 
+        * add or update poi thumbnail and inventory
         *
         * @todo: restore poi cursor on failure
         *
@@ -3910,9 +3924,11 @@ var DAV = new function() {
 
           // remove poi cursor
           if (panel.panorama.poi.list.cursor){
+            // remove widget instance
             if (panel.panorama.poi.list.cursor.instance) {
               panel.panorama.poi.list.cursor.instance.remove();
             }
+            // remove poi from list
             delete(panel.panorama.poi.list.cursor);
           }
 
@@ -3924,7 +3940,7 @@ var DAV = new function() {
 
         /**
         * poiPanel.addToInventory
-        * 
+        *
         * Add or update poi inventory entry
         * @param name   the poi id
         * @param options  {prepend: boolean}
@@ -3934,17 +3950,17 @@ var DAV = new function() {
           var panel=this;
           var data=panel.panorama.poi.list[name].metadata;
 
-          // update existing poi inventory list entry ?
+          // are we updating an existing poi inventory list entry ?
           if (options && options.update){
 
-            // update poi name and description for existing inventory list entry 
+            // update poi name and description for existing inventory list entry
             var li=$('li#'+name,panel._dom);
             $('div.name',li).text(data.name);
             $('div.description',li).text(data.description);
 
             // update thumbnail canvas for existing inventory list entry
             $('canvas',li).replaceWith(panel.panorama.poi.list[name].thumb.canvas)
- 
+
             return;
           }
 
@@ -3963,14 +3979,14 @@ var DAV = new function() {
           li+='</div>';
           li+='</li>';
 
-          // prepend or append to list
+          // prepend or append to inventory list
           if (options && options.prepend){
             $('ul.poi',panel._dom).prepend(li);
           } else {
             $('ul.poi',panel._dom).append(li);
           }
 
-          // set directory entry details
+          // set inventory entry details
           var li=$('li#'+name,panel._dom);
           $('div.name',li).text(data.name);
           $('div.description',li).text(data.description);
@@ -3980,7 +3996,7 @@ var DAV = new function() {
 
          /**
          * poiPanel.resize()
-         * 
+         *
          * update poi panel html components on resize event
          *
          */
@@ -4135,7 +4151,7 @@ var DAV = new function() {
             on_pointcloud_particleclick: function poiPanel_pcl_sequence_on_pointcloud_particleclick(e) {
 
               var pointCloud=this;
-      
+
               if (!pointCloud.sequence  || !pointCloud.sequence.length) {
                  return;
               }
@@ -4162,7 +4178,7 @@ var DAV = new function() {
               }
 
             }, // poiPanel_pcl_sequence_on_pointcloud_particleclick
-            
+
             // update pointcloud related poi panel button state
             updateButtons: function pcl_sequence_updateButtons() {
                 var pointCloud=poiPanel.panorama.pointCloud.instance;
