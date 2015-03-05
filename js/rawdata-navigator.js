@@ -4112,6 +4112,11 @@ var DAV = new function() {
                   poiPanel.panorama.drawScene();
               }
 
+              // change cursor color
+              pointCloud.cursor.sprite.material.map=pointCloud.cursorMap.normal;
+              pointCloud.cursor.sprite.material.needsUpdate=true;
+              poiPanel.panorama.drawScene();
+
               if (options.continue) {
 
                  // restart editing after next save
@@ -4203,7 +4208,9 @@ var DAV = new function() {
                         pointCloud: pointCloud
                       }));
 
-                      pcl_sequence.dispatch('save');
+                      if (pcl_sequence.onsave) {
+                          pcl_sequence.onsave();
+                      }
 
                     } // success
 
@@ -4225,7 +4232,14 @@ var DAV = new function() {
 
               var seq=pointCloud.sequence[pointCloud.sequence.length-1];
 
-              if (seq.length<2) {
+              if (seq.particleIndex_list.length==1) {
+                // change cursor color
+                pointCloud.cursor.sprite.material.map=pointCloud.cursorMap.recording;
+                pointCloud.cursor.sprite.material.needsUpdate=true;
+                poiPanel.panorama.drawScene();
+              }
+
+              if (seq.particleIndex_list.length<2) {
                   return;
               }
 

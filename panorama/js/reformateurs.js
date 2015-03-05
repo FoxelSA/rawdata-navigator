@@ -1229,6 +1229,12 @@ $(document).on('filesloaded', function(){
 
     pointCloud: {
       active: true,
+
+      cursorMap: {
+        normal: THREE.ImageUtils.loadTexture('img/dot_hover_normal.png'),
+        recording: THREE.ImageUtils.loadTexture('img/dot_hover_recording.png')
+      },
+
       // point cloud dot material
       dotMaterial: new THREE.PointCloudMaterial({
           map: THREE.ImageUtils.loadTexture('img/dot.png'),
