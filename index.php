@@ -535,6 +535,8 @@
         <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['both','pointcloud']);return false;">Projet SITG (Point Clouds)</a>
         <a style="margin-top:20px;" href="#" class="quick" onclick="DAV.allocation.quicksearch(['reformateurs','raw']);return false;">Mur des Réformateurs (RAW)</a>
         <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['reformateurs','panorama']);return false;">Mur des Réformateurs (Panoramas)</a>
+        <a style="margin-top:20px;" href="#" class="quick" onclick="DAV.allocation.quicksearch(['boelle','raw']);return false;">Rue de la Tour-de-Boël (RAW)</a>
+        <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['boelle','panorama']);return false;">Rue de la Tour-de-Boël (Panoramas)</a>
         <a style="margin-top:20px;" href="#" class="quick" onclick="DAV.allocation.quicksearch(['ssa','panorama']);return false;">Exemple SSA (Panoramas)</a>
   </div>
 
