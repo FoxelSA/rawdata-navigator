@@ -3,7 +3,7 @@
 /**
  * rawdata-navigator - Human-understandable raw data navigator
  *
- * Copyright (c) 2014 FOXEL SA - http://foxel.ch
+ * Copyright (c) 2014-2015 FOXEL SA - http://foxel.ch
  * Please read <http://foxel.ch/license> for more information.
  *
  *
@@ -535,8 +535,8 @@
         <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['both','poi']);return false;">Projet SITG (Points d'intérêts)</a>
         <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['both','pointcloud']);return false;">Projet SITG (Point Clouds)</a>
         <a style="margin-top:20px;" href="#" class="quick" onclick="DAV.allocation.quicksearch(['reformateurs','raw']);return false;">Mur des Réformateurs (RAW)</a>
-        <a style="margin-top:20px;" href="#" class="quick" onclick="DAV.allocation.quicksearch(['ssa','raw']);return false;">Exemple SSA (RAW)</a>
-        <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['ssa','panorama']);return false;">Exemple SSA (Panoramas)</a>
+        <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['reformateurs','panorama']);return false;">Mur des Réformateurs (Panoramas)</a>
+        <a style="margin-top:20px;" href="#" class="quick" onclick="DAV.allocation.quicksearch(['ssa','panorama']);return false;">Exemple SSA (Panoramas)</a>
   </div>
 
   <!--div id="search">
