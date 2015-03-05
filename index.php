@@ -537,7 +537,7 @@
         <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['reformateurs','panorama']);return false;">Mur des Réformateurs (Panoramas)</a>
         <a style="margin-top:20px;" href="#" class="quick" onclick="DAV.allocation.quicksearch(['boelle','raw']);return false;">Rue de la Tour-de-Boël (RAW)</a>
         <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['boelle','panorama']);return false;">Rue de la Tour-de-Boël (Panoramas)</a>
-        <a style="margin-top:20px;" href="#" class="quick" onclick="DAV.allocation.quicksearch(['ssa','panorama']);return false;">Exemple SSA (Panoramas)</a>
+        <!--<a style="margin-top:20px;" href="#" class="quick" onclick="DAV.allocation.quicksearch(['ssa','panorama']);return false;">Exemple SSA (Panoramas)</a>-->
   </div>
 
   <!--div id="search">

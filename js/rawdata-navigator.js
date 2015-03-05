@@ -951,7 +951,7 @@ var DAV = new function() {
                     if (allocation.current.val.indexOf('both') > -1) {
                         hasDufour = true;
                         hasReformateurs = true;
-                        hasSSA = false;
+                        //hasSSA = false;
                         hasBoelle = true;
                     }
 
@@ -964,7 +964,7 @@ var DAV = new function() {
                     }
 
                     if (allocation.current.val.indexOf('ssa') > -1) {
-                        hasSSA = true;
+                        //hasSSA = true;
                     }
 
                     if (allocation.current.val.indexOf('boelle') > -1) {
@@ -978,7 +978,7 @@ var DAV = new function() {
                         && allocation.current.val.indexOf('boelle') == -1) {
                         hasDufour = true;
                         hasReformateurs = true;
-                        hasSSA = true;
+                        //hasSSA = true;
                         hasBoelle = true;
                     }
 
