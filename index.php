@@ -617,7 +617,7 @@
             </div>
         </div>
         <div class="usage posepoi">
-          <div class="title pointer">Points d'intérêt <span class="poicount" /></div>
+          <div class="title pointer">Mesures et POIs <span class="poicount" /></div>
             <div class="closeable">
                 <div class="actions">
                   <a class="edit_poi" onclick="DAV.poiPanel.open(this);return false;"><div class="action">Editer les POIs...</div></a>
@@ -627,7 +627,7 @@
             </div>
         </div>
         <div class="usage posepointcloud">
-            <div class="title pointer">Point Cloud</div>
+            <div class="title pointer">Mensurations 3D métriques</div>
             <div class="closeable">
               <div><a class="view_pointcloud" onclick="DAV.viewPotree(this);return false;"><img width="430" /></a></div>
                 <div class="actions">
