@@ -118,6 +118,11 @@ a.fa.disabled, a.fa.disabled:hover, a.fa.disabled:active {
   transform: none;
 }
 
+.recording, a.fa.recording:hover {
+  color: #ecb100;
+}
+
+
 #vignettes a.fa:active {
   color: black;
 }
@@ -1217,18 +1222,18 @@ ul.poi li .buttons {
   position: absolute;
   z-index: 999999;
   text-shadow: 4px 4px 16px rgba(0,0,0,0.5);
-  right: -1em;
-  font-size: 6.4em;
-  top: 0.75em;
+  right: -1.3em;
+  font-size: 5em;
+  top: 1.2em;
 }
 
 #poipanel .content2 #trash_measure {
   position: absolute;
   z-index: 999999;
   text-shadow: 4px 4px 16px rgba(0,0,0,0.5);
-  right: -1em;
-  font-size: 6.4em;
-  top: 1.75em;
+  right: -1.3em;
+  font-size: 5em;
+  top: 2.4em;
 
 }
 

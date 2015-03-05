@@ -4037,6 +4037,9 @@ var DAV = new function() {
                   poiPanel.editCancel();
               }
 
+              // set button color
+              $('#measure',poiPanel._dom).addClass('recording');
+
               // enter sequence editing mode
               poiPanel.mode.edit_sequence=true;
               pointCloud.enableParticleEvents=true;
@@ -4066,6 +4069,21 @@ var DAV = new function() {
                   poiPanel.panorama.drawScene();
               }
 
+              if (options.continue) {
+
+                 // save and upload
+                 poiPanel.pcl_sequence.save();
+
+                 // activate sequence editing mode
+                 pointCloud.sequence[pointCloud.sequence.length-1].mode.add=true;
+                 pointCloud.sequence[pointCloud.sequence.length-1].mode.wheredowegofromhere=true;
+              
+                 return;
+              }
+
+              // set button color
+              $('#measure',poiPanel._dom).removeClass('recording');
+
               // exit sequence editing mode
               poiPanel.mode.edit_sequence=false;
               pointCloud.enableParticleEvents=false;
@@ -4091,7 +4109,7 @@ var DAV = new function() {
                  // save and upload
                  poiPanel.pcl_sequence.save();
               }
-
+              
             }, // poiPanel_pcl_sequence_stop
 
             // Build list of sequences, send list to server,
@@ -4174,7 +4192,10 @@ var DAV = new function() {
 
               // exit sequence editing mode if clicking twice on the same particle
               if (seq.doubleClick && seq.doubleClick.bool) {
-                  poiPanel.pcl_sequence.stop({abort:false});
+                  poiPanel.pcl_sequence.stop({
+                      abort:false,
+                      continue: true
+                  });
               }
 
             }, // poiPanel_pcl_sequence_on_pointcloud_particleclick
@@ -4217,6 +4238,7 @@ var DAV = new function() {
               } else {
                   // exit sequence edit mode and save
                   panel.pcl_sequence.stop({abort:false});
+                  panel.panorama.drawScene();
               }
           });
 
