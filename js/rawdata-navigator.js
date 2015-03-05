@@ -1226,6 +1226,12 @@ var DAV = new function() {
       return $(this._dom).hasClass('primary');
     }, // panel_isprimary
 
+    /**
+    * Panel.toggle()
+    *
+    * Toggle panel visibility
+    *
+    */
     toggle: function panel_toggle(){
 
       var panel=this;
@@ -1406,6 +1412,20 @@ var DAV = new function() {
 
       setTimeout(panel.updateTitle,0);
 
+      // show map/vignettes buttons
+      var topp=toppanel();
+      if (topp) {
+        if ($(topp._dom).hasClass('primary')) {
+          $('.views',leftbar._dom).css({
+            visibility: 'visible'
+          });
+        }
+      } else {
+         $('.views',leftbar._dom).css({
+            visibility: 'hidden'
+         });
+      }
+
       $(panel._dom).trigger('hidden');
 
     }, // panel_hide
@@ -1560,9 +1580,11 @@ var DAV = new function() {
           var panel=this;
           if (information.visible) {
             information.close();
+/* dont close primary panel
             setTimeout(function(){
              panel.hide();
             },1000);
+*/
             return false;
           } else {
             panel.hide();
@@ -1654,7 +1676,14 @@ var DAV = new function() {
             freepanel.$(freepanel.window.document).trigger(e);
           }
         });
+      },
+      closebutton_click: function freepanel_closebutton_click(e){
+          var panel=this;
+          $('.views',leftbar._dom).css({
+                visibility: 'visible'
+          });
       }
+
   });
 
   /**
@@ -2564,6 +2593,7 @@ var DAV = new function() {
             setTimeout(function() {
 
               infopanel.hide();
+              information.visible=false;
               /*
               setTimeout(function(){
                 $('#info_button').fadeIn();
@@ -3317,10 +3347,14 @@ var DAV = new function() {
               panel.panorama=panel.$('#pano').data('pano');
               panel.panorama.dispatchEventsTo(panel);
               panel.panorama.dispatchEventsTo(panel.poicursor);
+              panel.window.POI.prototype.dispatchEventsTo(panel);
               panel.window.PointCloud.prototype.dispatchEventsTo(panel.pcl_sequence);
+              panel.window.setupEventDispatcher(panel.pcl_sequence);
               panel.window.POI_thumb.prototype.dispatchEventsTo(panel);
 //              panel.window.POI_list.prototype.dispatchEventsTo(panel);
               panel.window.POI.prototype.dispatchEventsTo(panel);
+              panel.window.POI.prototype.defaults.selectable=true;
+
               panel.toggle();
               setTimeout(function(){panel.resize()},1000);
             });
@@ -3331,6 +3365,11 @@ var DAV = new function() {
           }
 
         }, // poiPanel_open
+
+        on_poi_click: function poiPanel_on_poi_click(e) {
+            console.log(e);
+
+        },
 
         inventory_clear: function poiPanel_inventory_clear() {
           var panel=this;
@@ -3350,9 +3389,9 @@ var DAV = new function() {
 
         }, // poiPanel_inventory_clear
 
-        inventory_click: function poiPanel_inventory_click(e) {
+        inventory_click: function poiPanel_inventory_click(e,li) {
           var panel=this;
-          var li=$(e.target).closest('li');
+          if (!li) li=$(e.target).closest('li');
           var name=li.attr('id');
 
           panel.inventory_setSelection([name]);
@@ -3458,7 +3497,7 @@ var DAV = new function() {
 
         on_poi_thumb_ready: function poiPanel_on_poi_thumb_ready(e) {
           var panel=this;
-          if (!$('#p0',panel._dom).length) { // fixme: on_poi_list_ready is called twice -- should be fixed already
+          if (!$('#p0',panel._dom).length) {
             poiPanel.inventory_update();
           } else {
             console.log('fixme')
@@ -3535,6 +3574,8 @@ var DAV = new function() {
                   active: '#ffffff'
                 },
 
+                selectable: false,
+
                 // no mouse events for transparent pixels
                 handleTransparency: true,
 
@@ -3560,7 +3601,6 @@ var DAV = new function() {
                    // update cursor scale according to Zoom
                    var scale=(10/panel.panorama.getZoom())*v.z/panorama.sphere.radius;
                    poi.object3D.scale.set(scale,scale,scale);
-
 
                 }
 
@@ -4020,6 +4060,9 @@ var DAV = new function() {
 
         /**
          * poiPanel.pcl_sequence
+         *
+         * namespace for pointcloud particle sequence related stuff
+         *
          */
         pcl_sequence: {
 
@@ -4071,13 +4114,17 @@ var DAV = new function() {
 
               if (options.continue) {
 
+                 // restart editing after next save
+                 poiPanel.pcl_sequence.onsave=function() {
+                    // activate sequence editing mode
+                    pointCloud.sequence[pointCloud.sequence.length-1].mode.add=true;
+                    pointCloud.sequence[pointCloud.sequence.length-1].mode.wheredowegofromhere=true;
+                    poiPanel.pcl_sequence.onsave=null;
+                 }
+
                  // save and upload
                  poiPanel.pcl_sequence.save();
 
-                 // activate sequence editing mode
-                 pointCloud.sequence[pointCloud.sequence.length-1].mode.add=true;
-                 pointCloud.sequence[pointCloud.sequence.length-1].mode.wheredowegofromhere=true;
-              
                  return;
               }
 
@@ -4109,7 +4156,7 @@ var DAV = new function() {
                  // save and upload
                  poiPanel.pcl_sequence.save();
               }
-              
+
             }, // poiPanel_pcl_sequence_stop
 
             // Build list of sequences, send list to server,
@@ -4155,6 +4202,8 @@ var DAV = new function() {
                       pointCloud.sequence.push(new pointCloud.Sequence({
                         pointCloud: pointCloud
                       }));
+
+                      pcl_sequence.dispatch('save');
 
                     } // success
 
@@ -4316,7 +4365,6 @@ var DAV = new function() {
     });
 
 }; // DAV
-
 
 window.nopreview = function nopreview(img) {
   img.onerror=null;
