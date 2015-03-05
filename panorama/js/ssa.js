@@ -1,7 +1,7 @@
 /*
  * freepano - WebGL panorama viewer
  *
- * Copyright (c) 2014 FOXEL SA - http://foxel.ch
+ * Copyright (c) 2014-2015 FOXEL SA - http://foxel.ch
  * Please read <http://foxel.ch/license> for more information.
  *
  *
@@ -55,7 +55,7 @@ $(document).ready(function(){
 
   // load image with alpha channel to use as POI cursor
   window.poicursor_texture=new THREE.ImageUtils.loadTexture(
-    '../../img/dav-cursor.png',
+    '/dav/img/dav-cursor.png',
     THREE.UVMapping,
     file_onload,
     function onloaderror() {
@@ -65,7 +65,7 @@ $(document).ready(function(){
 
   // load image with alpha channel to use as POI
   window.poi_texture=new THREE.ImageUtils.loadTexture(
-    '../../img/dav-cursor-blank.png',
+    '/dav/img/dav-cursor-blank.png',
     THREE.UVMapping,
     file_onload,
     function onloaderror() {
@@ -156,42 +156,20 @@ $(document).on('filesloaded', function(){
         current: 1.0,
 
         // maximal zoom value
-        max: 10
+        max: 15
 
       }
 
     }, // camera
-/*
+
     // panorama.sphere: sphere object defaults
     // normally you dont need to modify this
 
     sphere: {
-
-      radius: 15,
-
-      widthSegments: 36,
-
-      heightSegments: 18,
-
-      // panorama.sphere.texture: sphere texture options
-      // When using 'panorama.list' to configure several panoramas,
-      // 'panorama.list.defaults' will extend or override values below
-
-      texture: {
-
-        // tiles directory relative url
-        dirName: 'panoramas/result_1403179805_224762-0-25-1/',
-
-        // tile filename prefix
-        baseName: 'result_1403179805_224762-0-25-1',
-
-        // full panorama dimension, in tiles
-        columns: 16,
-        rows: 8
-
-      } // texture
-
+      dynamicTileLoading: false
+//      dynamicTileDisposal: false
     }, // sphere
+
 /*
    // panorama.sound: sounds bound to panorama
    // When using 'panorama.list' below to configure several panoramas,
@@ -281,7 +259,7 @@ $(document).on('filesloaded', function(){
               object3D.add(poi.icon());
 
               // poi title
-              poi.title=text2canvas(poi.metadata.name);
+              poi.title=poi.text2canvas(poi.metadata.name);
               console.log(poi.title);
               var map=new THREE.Texture(poi.title);
               map.needsUpdate=true;
@@ -290,8 +268,8 @@ $(document).on('filesloaded', function(){
                 new THREE.MeshBasicMaterial({
                  map: map,
                  transparent: true,
-                 depthWrite: false,
-                 depthTest: false,
+                 depthWrite: true,
+                 depthTest: true,
                  opacity: 0.8
                 })
               );
@@ -533,35 +511,32 @@ $(document).on('filesloaded', function(){
 
     },
 
-
-/* incompatible with panorama.list below yet
-    pyramid: {
-      dirName: 'panoramas/result_1403179805_224762-0-25-1/512',
-      baseName: 'result_1403179805_224762-0-25-1',
-      levels: 4,
-      preload: true
-      sphere: [
-        {
-          radius: 1
-        },
-        {
-          radius: 2
-        },
-        {
-          radius: 4
-        },
-        {
-          radius: 8
-        },
-        {
-          radius: 16
-        },
-      ]
-    },
-*/
-
     pointCloud: {
-      active: true
+      active: true,
+
+      cursorMap: {
+        normal: THREE.ImageUtils.loadTexture('img/dot_hover_normal.png'),
+        recording: THREE.ImageUtils.loadTexture('img/dot_hover_recording.png')
+      },
+
+      // point cloud dot material
+      dotMaterial: new THREE.PointCloudMaterial({
+          map: THREE.ImageUtils.loadTexture('img/dot.png'),
+          size: 0.15,
+          color: 'yellow',
+          sizeAttenuation: true,
+          transparent: true,
+          opacity: 0.8,
+          alphaTest: 0.1,
+          depthTest: false,
+          depthWrite: false,
+          visible: false
+      }), // pointCloud.defaults.dotMaterial
+
+      enableParticleEvents: false,
+
+      showParticleCursor: false
+
     },
 
     postProcessing: {
@@ -633,7 +608,7 @@ $(document).on('filesloaded', function(){
 
 });
 
-window.text2canvas=function text2canvas(text,options) {
+POI.prototype.text2canvas=function poi_text2canvas(text,options) {
   if (!options) options={};
   var canvas=document.createElement('canvas');
   var ctx=canvas.getContext('2d');
@@ -682,5 +657,3 @@ window.next_power_of_two=function next_power_of_2(x) {
    x = x | (x >> 8);
    return x + 1;
 }
-
-
