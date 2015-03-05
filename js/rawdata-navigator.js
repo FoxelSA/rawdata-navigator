@@ -1,7 +1,7 @@
 /*
  * rawdata-navigator - Human-understandable raw data navigator
  *
- * Copyright (c) 2014 FOXEL SA - http://foxel.ch
+ * Copyright (c) 2014-2015 FOXEL SA - http://foxel.ch
  * Please read <http://foxel.ch/license> for more information.
  *
  *
@@ -556,6 +556,7 @@ var DAV = new function() {
             group2.append($('<option>',{'value':'dufour'}).text('Statue Dufour'));
             group2.append($('<option>',{'value':'both'}).text('Street View'));
             group2.append($('<option>',{'value':'ssa'}).text('SSA'));
+            group2.append($('<option>',{'value':'boelle'}).text('Rue de la Tour-de-Boël'));
 
             group3.append($('<option>',{'value':'raw'}).text('RAW'));
             group3.append($('<option>',{'value':'panorama'}).text('Panorama'));
@@ -935,7 +936,7 @@ var DAV = new function() {
 
                 if (allocation.current.master == '1403185204') {
 
-                    if (segment != '1404383663' && segment != '1404381299' && segment != '1423492626') {
+                    if (segment != '1404383663' && segment != '1404381299' && segment != '1423492626' && segment != '1416400954') {
                         this._remaining--;
                         if (this._remaining == 0)
                             this.done();
@@ -945,6 +946,7 @@ var DAV = new function() {
                     var hasDufour = false;
                     var hasReformateurs = false;
                     var hasSSA = false;
+                    var hasBoelle = false;
 
                     if (allocation.current.val.indexOf('both') > -1) {
                         hasDufour = true;
@@ -964,13 +966,19 @@ var DAV = new function() {
                         hasSSA = true;
                     }
 
+                    if (allocation.current.val.indexOf('boelle') > -1) {
+                        hasBoelle = true;
+                    }
+
                     if ((allocation.current.val.indexOf('raw') > -1 || allocation.current.val.indexOf('panorama') > -1 || allocation.current.val.indexOf('poi') > -1 || allocation.current.val.indexOf('pointcloud') > -1)
                         && allocation.current.val.indexOf('dufour') == -1
                         && allocation.current.val.indexOf('reformateurs') == -1
-                        && allocation.current.val.indexOf('ssa') == -1) {
+                        && allocation.current.val.indexOf('ssa') == -1
+                        && allocation.current.val.indexOf('boelle') == -1) {
                         hasDufour = true;
                         hasReformateurs = true;
                         hasSSA = true;
+                        hasBoelle = true;
                     }
 
                     if (segment == '1404383663' && !hasDufour) {
@@ -988,6 +996,13 @@ var DAV = new function() {
                     }
 
                     if (segment == '1423492626' && !hasSSA) {
+                        this._remaining--;
+                        if (this._remaining == 0)
+                            this.done();
+                        return;
+                    }
+
+                    if (segment == '1416400954' && !hasBoelle) {
                         this._remaining--;
                         if (this._remaining == 0)
                             this.done();
@@ -2457,7 +2472,10 @@ var DAV = new function() {
                     view_panorama_link += 'dufour.php';
                 } else if (segment == '1423492626') {
                     view_panorama_link += 'ssa.php';
+                } else if (segment == '1416400954') {
+                    view_panorama_link += 'boelle.php';
                 }
+
                 view_panorama_link += '?initial='+(pose.sec-utcdiff)+'_'+pose.usc;
                 console.log('view_panorama_link = '+view_panorama_link);
                 $(information._dom+' .view_panorama').data('href',view_panorama_link);
@@ -2490,7 +2508,10 @@ var DAV = new function() {
                     view_pointcloud_link += 'dufour.html';
                 } else if (segment == '1423492626') {
                     view_pointcloud_link += 'ssa.html';
+                } else if (segment == '1416400954') {
+                    view_pointcloud_link += 'boelle.html';
                 }
+
                 $(information._dom+' .view_pointcloud').data('href',view_pointcloud_link);
 
                 // html
@@ -3078,7 +3099,10 @@ var DAV = new function() {
                     view_panorama_link_listpoi += 'dufour.php';
                 } else if (vignette.segment == '1423492626') {
                     view_panorama_link_listpoi += 'ssa.php';
+                } else if (vignette.segment == '1416400954') {
+                    view_panorama_link_listpoi += 'boelle.php';
                 }
+
                 view_panorama_link_listpoi += '?initial='+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc;
 
                 // test poilist
