@@ -750,8 +750,8 @@ var RawDataNavigator = new function() {
                     else
                         validated++;
 
-                    // add on cluster
-                    if (displaymarker)
+                    // add on cluster, filtered by status control
+                    if (displaymarker && map.controls.status.show(pose.raw))
                         cluster.addLayer(map.helpers.cluster.marker(segment,pose,latlng,info,index));
 
                     // add on poses
@@ -812,8 +812,48 @@ var RawDataNavigator = new function() {
                 timeline.update();
                 map.segments.show();
                 overlay.hide();
-            }
+            },
 
+            /**
+             * segmentation.json.rebuild()
+             */
+            rebuild: function() {
+
+                // rebuild each segments
+                $.each(segmentation.items(), function(segment,obj) {
+
+                    // get feature group
+                    var group = segmentation.layer(segment);
+
+                    // remove cluster layer
+                    $.each(group.getLayers(), function(ilayer,layer) {
+                        if (layer instanceof L.MarkerClusterGroup)
+                            group.removeLayer(layer);
+                    });
+
+                    // get info
+                    var info = segmentation.info(segment);
+
+                    // cluster group
+                    var cluster = map.helpers.cluster.group(info);
+
+                    // pose markers
+                    $.each(segmentation.poses(segment),function(index,pose) {
+
+                        var displaymarker = !info.gps || (info.gps && pose.position.known);
+
+                        // add on cluster, filtered by status control
+                        if (displaymarker && map.controls.status.show(pose.raw))
+                            cluster.addLayer(map.helpers.cluster.marker(segment,pose,pose.position.latlng,info,index));
+
+                    });
+
+                    // set cluster
+                    group.addLayer(cluster);
+
+                });
+
+            }
         }
 
     };
@@ -847,7 +887,10 @@ var RawDataNavigator = new function() {
             });
 
             // scale
-            L.control.scale({position:'bottomright'}).addTo(this._component);
+            map.controls.scale();
+
+            // pose statuses
+            map.controls.status.add();
 
             // tiles
             this.tiles.init();
@@ -877,6 +920,170 @@ var RawDataNavigator = new function() {
         clear: function() {
             this.segments.clear();
             this.tiles.reset();
+        },
+
+        /**
+         * map.controls{}
+         */
+        controls: {
+
+            /**
+             * map.controls.layers()
+             */
+            layers: function() {
+                return L.control.layers({},{}).addTo(map._component);
+            },
+
+            /**
+             * map.controls.scale()
+             */
+            scale: function() {
+                return L.control.scale({position:'bottomright'}).addTo(map._component);
+            },
+
+            /**
+             * map.controls.zoom()
+             */
+            zoom: function() {
+                return L.control.zoom({position:'topright'}).addTo(map._component);
+            },
+
+            /**
+             * map.controls.status{}
+             */
+            status: {
+
+                _control: null,
+                _state: {
+                    valid: false,
+                    miss: false,
+                    trash: false,
+                    corrupt: false
+                },
+
+                /**
+                 * map.controls.status.get()
+                 */
+                get: function() {
+                    return this._control;
+                },
+
+                /**
+                 * map.controls.status.show()
+                 */
+                show: function(type) {
+                    return this._state[type];
+                },
+
+                /**
+                 * map.controls.status.state()
+                 */
+                state: function() {
+                    return this._state;
+                },
+
+                /**
+                 * map.controls.status.add()
+                 */
+                add: function() {
+
+                    // extend L.Control
+                    var CustomControlStatus = L.Control.extend({
+
+                        options: {
+                            position: 'topright'
+                        },
+
+                        // initialize() [L.Control override]
+                        initialize: function(options) {
+                            L.setOptions(this,options);
+                        },
+
+                        // onAdd() [L.Control override]
+                        onAdd: function() {
+
+                            // container
+                            var container = L.DomUtil.create('div','leaflet-control-layers');
+
+                            // list
+                            var list = $('<div>',{'class':'leaflet-control-layers-base'})
+                                            .append(this._item('valid','validated',true))
+                                            .append(this._item('miss','missing',false))
+                                            .append(this._item('trash','trashed',false))
+                                            .append(this._item('corrupt','corrupted',false)
+                            );
+
+                            // add icon to container
+                            $(container).append($('<a>',{'class':'leaflet-control-layers-toggle status',href:'#',title:'Status'}));
+
+                            // add list in form to container
+                            $(container)
+                                .append($('<form>',{'class':'leaflet-control-layers-list'})
+                                    .append(list)
+                            );
+
+                            // container events
+                            $(container).on('dblclick',function(e) {
+                                e.stopPropagation();
+                            });
+                            $(container).on('mouseenter',function() {
+                                L.DomUtil.addClass(container,'leaflet-control-layers-expanded');
+                            });
+                            $(container).on('mouseleave',function() {
+                                L.DomUtil.removeClass(container,'leaflet-control-layers-expanded');
+                            });
+
+                            // item checkbox events
+                            list.find(':checkbox').on('change',function() {
+
+                                // set state of every checkbox
+                                $.each(list.find(':checkbox'), function(index,checkbox) {
+                                    map.controls.status._state[$(checkbox).val()] = $(checkbox).prop('checked');
+                                });
+
+                                // rebuild segmentation layers
+                                segmentation.json.rebuild();
+
+                            });
+
+                            return container;
+
+                        },
+
+                        // _item()
+                        _item: function(type,name,checked) {
+
+                            map.controls.status._state[type] = checked;
+
+                            var input = $('<input>', {
+                                'class': 'leaflet-control-layers-selector',
+                                type: 'checkbox',
+                                name: 'leaflet-pose-status[]',
+                                value: type
+                            });
+
+                            if (checked)
+                                input.attr('checked','checked');
+
+                            return $('<label>')
+                                .append(input)
+                                .append($('<span>').append(' Show <strong>'+name+'</strong> poses'));
+                        }
+
+                    });
+
+                    // instanciate
+                    this._control = new CustomControlStatus();
+
+                    // add control to map
+                    map._component.addControl(this._control);
+
+                    return this._control;
+
+                }
+
+            }
+
         },
 
         /**
@@ -944,10 +1151,10 @@ var RawDataNavigator = new function() {
             init: function() {
 
                 // layers
-                this.control = L.control.layers({},{}).addTo(map._component);
+                this.control = map.controls.layers();
 
                 // zoom
-                L.control.zoom({position:'topright'}).addTo(map._component);
+                map.controls.zoom();
 
                 // tiles
                 this.maps();

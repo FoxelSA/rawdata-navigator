@@ -114,6 +114,14 @@ a, a:link, a:visited, a:hover, a:active {
         border-radius:0;
     }
 
+    .leaflet-control-layers-toggle.status {
+        background-image: url(../img/status.png);
+    }
+
+        .leaflet-retina .leaflet-control-layers-toggle {
+            background-image: url(../img/status-2x.png);
+        }
+
     .marker-cluster {
         color:#222;
         background-color:transparent !important;
@@ -123,10 +131,12 @@ a, a:link, a:visited, a:hover, a:active {
             font-weight:700 !important;
         }
 
+        /*
         .marker-cluster-large span,
         .marker-cluster-medium span {
             visibility:hidden;
         }
+        */
 
     .seg-f00 div,
     .vis.timeline .item.timeline-f00 {
