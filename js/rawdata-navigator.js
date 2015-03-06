@@ -182,7 +182,7 @@ var RawDataNavigator = new function() {
         /**
          * timeline.add()
          */
-        add: function(segment,info,poses,validated,trashed,corrupted) {
+        add: function(segment,info,poses,stats) {
             this._items.push({
                 id: segment,
                 content: '<div id="timeline_'+segment+'"></div><strong>'+segment+'</strong>',
@@ -191,9 +191,10 @@ var RawDataNavigator = new function() {
                 className: 'timeline'+info.color.replace('#','-'),
                 segmentation: {
                     length: poses.length,
-                    validated: validated,
-                    trashed: trashed,
-                    corrupted: corrupted,
+                    validated: stats.valid,
+                    trashed: stats.trash,
+                    corrupted: stats.corrupt,
+                    missed: stats.miss,
                     gps: info.gps,
                     split: info.split,
                     preview: info.preview,
@@ -232,7 +233,7 @@ var RawDataNavigator = new function() {
                 // mouse enter
                 timeline.box(item.id).on('mouseenter',function(e) {
                     $('#statistics div').html(item.segmentation.length+' poses'
-                        + ' ['+item.segmentation.validated+' valid, '+item.segmentation.trashed+' trashed, '+item.segmentation.corrupted+' corrupted]'
+                        + ' ['+item.segmentation.validated+' valid, '+item.segmentation.missed+' missing, '+item.segmentation.trashed+' trashed, '+item.segmentation.corrupted+' corrupted]'
                         + ' <span>GPS :&nbsp; '+(item.segmentation.gps?'Yes':'No')+'</span>'
                         + ' <span>Splitted :&nbsp; '+(item.segmentation.split?'Yes':'No')+'</span>'
                         + ' <span>Preview :&nbsp; '+(item.segmentation.preview?'Yes ('+item.segmentation.debayer+')':'No')+'</span>');
@@ -712,6 +713,7 @@ var RawDataNavigator = new function() {
                 var validated = 0;
                 var trashed = 0;
                 var corrupted = 0;
+                var missed = 0;
 
                 // gui
                 overlay.show('Building layers, please wait...');
@@ -743,6 +745,8 @@ var RawDataNavigator = new function() {
                         trashed++;
                     else if (pose.raw=='corrupt')
                         corrupted++;
+                    else if (pose.raw=='miss')
+                        missed++;
                     else
                         validated++;
 
@@ -784,7 +788,12 @@ var RawDataNavigator = new function() {
                 layer.addLayer(cluster);
 
                 // add on timeline
-                timeline.add(segment,info,data.pose,validated,trashed,corrupted);
+                timeline.add(segment,info,data.pose,{
+                    valid: validated,
+                    trash: trashed,
+                    corrupt: corrupted,
+                    miss: missed
+                });
 
                 // segmentation
                 segmentation.add(segment,{info:info,layer:layer,poses:poses,vframes:vframes});

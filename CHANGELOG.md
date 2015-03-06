@@ -2,6 +2,11 @@
 ## Changelog
 
 
+### 1.3.1 (March 6, 2015)
+
+- `ADDED` Pose missing flag in case there is not associated image or MOV file to it.
+
+
 ### 1.3.0 (February 19, 2015)
 
 - `FIXED` Overview map size is invalidated following the API.

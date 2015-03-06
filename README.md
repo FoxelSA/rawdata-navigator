@@ -1,7 +1,11 @@
 
 ## rawdata-navigator<br />Human-understandable raw data navigator
 
-Geographical, temporal and human-understandable visualization of raw data.
+rawdata-navigator is a web-based human-understandable interface dedicated to navigate
+through raw datasets. It draws downloaded segments on a map and a timeline, allowing
+to display information (geo-position, status, date and preview) for every pose of the
+segments. Segments can also be viewed as timelapse videos, where every frame is binded
+to its pose information.
 
 
 ### Documentation
@@ -13,6 +17,9 @@ Documentation can be consulted on the [wiki](https://github.com/FoxelSA/rawdata-
 
 Copyright (c) 2014-2015 FOXEL SA - [http://foxel.ch](http://foxel.ch)<br />
 This program is part of the FOXEL project <[http://foxel.ch](http://foxel.ch)>.
+
+This program includes works distributed under the terms of the GNU General
+Public License and/or a compatible license and other copyright notices.
 
 Please read the [COPYRIGHT.md](COPYRIGHT.md) file for more information.
 

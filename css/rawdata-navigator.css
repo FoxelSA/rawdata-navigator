@@ -190,7 +190,8 @@ a, a:link, a:visited, a:hover, a:active {
         }
 
             .marker-pnt.type-trash span,
-            .marker-pnt.type-corrupt span {
+            .marker-pnt.type-corrupt span,
+            .marker-pnt.type-miss span {
                 color:#000;
             }
 
@@ -208,6 +209,10 @@ a, a:link, a:visited, a:hover, a:active {
 
             .marker-pnt.type-corrupt span:before {
                 content:"\f071";
+            }
+
+            .marker-pnt.type-miss span:before {
+                content:"\f188";
             }
 
 #overlay {
