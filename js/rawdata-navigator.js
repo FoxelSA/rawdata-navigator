@@ -4322,6 +4322,7 @@ var DAV = new function() {
                 pointCloud.cursor.sprite.material.map=pointCloud.cursorMap.recording;
                 pointCloud.cursor.sprite.material.needsUpdate=true;
                 pointCloud.panorama.drawScene();
+                poiPanel.updateButtons();
               }
 
               // add a joint if no double click detected
@@ -4415,6 +4416,10 @@ var DAV = new function() {
                 poiPanel.updateButtons();
             }, // poiPanel_pcl_sequence_on_pointcloud_ready
 
+            on_pointcloud_sequenceload: function pcl_sequence_on_pointcloud_sequenceload() {
+                poiPanel.updateButtons();
+            }, // poiPanel_pcl_sequence_on_pointcloud_sequenceload
+
             on_pointcloud_loaderror: function pcl_sequence_on_pointcloud_loaderror() {
                 poiPanel.updateButtons();
             } // pcl_sequence_on_pointcloud_loaderror
@@ -4438,10 +4443,10 @@ var DAV = new function() {
             } else {
                 $('.content2 a#measure',poiPanel._domElement).removeClass('disabled');
 
-                if (pointCloud.sequence.length>1 || (
+                if (pointCloud.sequence && (pointCloud.sequence.length>1 || (
                         pointCloud.sequence.length &&
-                        pointCloud.sequence[pointCloud.sequence.length-1].length
-                )) {
+                        pointCloud.sequence[pointCloud.sequence.length-1].particleIndex_list.length
+                ))) {
                    $('.content2 a#trash_measure',poiPanel._domElement).removeClass('disabled');
 
                 } else {
@@ -4503,6 +4508,7 @@ var DAV = new function() {
 
               // trash all joints
               panel.panorama.joint.dispatch('dispose');
+              panel.panorama.joint.idSeq=[];
 
               panel.updateButtons();
 
