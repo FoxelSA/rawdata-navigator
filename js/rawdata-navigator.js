@@ -3316,7 +3316,9 @@ var DAV = new function() {
             panel.inventory_clear();
 
             // reset button states
-            $('.content2 a',panel._dom).addClass('disabled');
+            $('.content2 a',panel._dom)
+            .addClass('disabled')
+            .removeClass('recording');
 
             panel.editClose();
 
@@ -3325,35 +3327,92 @@ var DAV = new function() {
         open: function poiPanel_open(elem) {
 
           var panel=this;
-          $('#addpoi',panel._dom).off('click').on('click',function(){
+
+          // (re)set "add poi" / "cancel" button click handler
+          $('#addpoi',panel._dom)
+          .off('click')
+          .on('click',function addpoi_onclick(){
+
             if ($(this).text()=="Ajouter") {
               $(this).text('Annuler').addClass('cancel');
               panel.addPOI();
+
             } else {
               panel.editCancel();
             }
-          });
+
+          }); // addpoi_onclick
 
           var iframe=panel.iframe=$('iframe',panel._dom);
 
+          // url iframe changed ?
           if (iframe.attr('src')!=$(elem).data('href')) {
             overlay.show('Loading POI editor...');
+
+            // (re)-initialize panel content
             panel.reset();
-            iframe.attr('src',$(elem).data('href')).off('load').on('load',function(){
+
+            // (re)-set iframe url and 'load' event handler
+            iframe.attr('src',$(elem).data('href'))
+            .off('load')
+            .on('load',function poieditor_onload(){
               // POI EDITOR onload (see above for panorama viewer)
               overlay.hide();
+
+              // define some shortcuts
               panel.window=iframe[0].contentWindow;
               panel.$=panel.window.$;
               panel.panorama=panel.$('#pano').data('pano');
+
+              // subscribe to required iframe event dispatchers
               panel.panorama.dispatchEventsTo(panel);
               panel.panorama.dispatchEventsTo(panel.poicursor);
               panel.window.POI.prototype.dispatchEventsTo(panel);
               panel.window.PointCloud.prototype.dispatchEventsTo(panel.pcl_sequence);
-              panel.window.setupEventDispatcher(panel.pcl_sequence);
+              panel.window.PointCloud.prototype.Sequence.prototype.dispatchEventsTo(panel.pcl_sequence);
               panel.window.POI_thumb.prototype.dispatchEventsTo(panel);
-//              panel.window.POI_list.prototype.dispatchEventsTo(panel);
               panel.window.POI.prototype.dispatchEventsTo(panel);
+
+              // make POI selectable
               panel.window.POI.prototype.defaults.selectable=true;
+
+              // init line joint widget type
+              panel.window.WidgetFactory('Joint');
+              $.extend(true,panel.window.Joint.prototype,{
+
+                overlay: true,
+
+                handleTransparency: true,
+
+                handleMouseEvents: false,
+
+                defaults: {
+                  object3D: function() {
+                      return new panel.window.THREE.Sprite(new panel.window.THREE.SpriteMaterial({
+                          map: panel.panorama.joint.map,
+                          depthTest: false,
+                          depthWrite: false,
+                          transparent: true
+
+                      }));
+                  },
+                  color: {
+                    normal: 'white',
+                    selected: 'white',
+                    hover: 'white',
+                    active: 'white'
+                  }
+                }
+
+              }); // extend Joint prototype
+
+              $.extend(true,panel.window.Joint_list.prototype,{
+
+                idSeq: [], // joint id sequence for joint.pop()
+
+                map: panel.window.THREE.ImageUtils.loadTexture('img/dot.png')
+
+              }); // extend Joint list prototype
 
               panel.toggle();
               setTimeout(function(){panel.resize()},1000);
@@ -3486,7 +3545,7 @@ var DAV = new function() {
 
         on_panorama_ready: function poiPanel_on_panorama_ready() {
            // update button states
-           $('.content2 a',panel._dom).removeClass('disabled');
+           $('.content2 a',poiPanel._dom).removeClass('disabled');
 
         }, // poiPanel_on_panorama_ready
 
@@ -3616,7 +3675,7 @@ var DAV = new function() {
 
             var panel=poiPanel;
 
-            if (!panel.panorama.poi.list.cursor || !poiPanel.poicursor.dragging) {
+            if (!panel.panorama.poi || !panel.panorama.poi.list.cursor || !panel.poicursor.dragging) {
                 return;
             }
 
@@ -4230,23 +4289,26 @@ var DAV = new function() {
                  return;
               }
 
+              // get last sequence
               var seq=pointCloud.sequence[pointCloud.sequence.length-1];
 
+              if (!seq) {
+                return;
+              }
+
+              // display 'recording' cursor on first point added
               if (seq.particleIndex_list.length==1) {
-                // change cursor color
                 pointCloud.cursor.sprite.material.map=pointCloud.cursorMap.recording;
                 pointCloud.cursor.sprite.material.needsUpdate=true;
-                poiPanel.panorama.drawScene();
+                pointCloud.panorama.drawScene();
+              }
+
+              // add a joint if no double click detected
+              if (!seq.doubleClick || !seq.doubleClick.bool) {
               }
 
               if (seq.particleIndex_list.length<2) {
                   return;
-              }
-
-              var panorama=pointCloud.panorama;
-
-              if (!seq) {
-                return;
               }
 
               if (!seq.mode.add) {
@@ -4262,6 +4324,61 @@ var DAV = new function() {
               }
 
             }, // poiPanel_pcl_sequence_on_pointcloud_particleclick
+
+            // add a line joint on particle sequence add
+            on_particlesequence_add: function poiPanel_pcl_sequence_on_particlesequence_add(e,index){
+              if (index==undefined) {
+                  return;
+              }
+              var sequence=this;
+              poiPanel.pcl_sequence.addJoint(sequence,index);
+            }, // poiPanel_pcl_sequence_on_particlesequence_add
+
+            // pop a line joint on particlesequence pop
+            on_particlesequence_pop: function poiPanel_pcl_sequence_on_particlesequence_pop(e,index) {
+                var sequence=this;
+                poiPanel.pcl_sequence.popJoint(sequence,index);
+            }, // poiPanel_pcl_sequence_on_particlesequence_pop
+
+            // add a line joint
+            addJoint: function poiPanel_pcl_sequence_addJoint(seq,index) {
+                  var joint=seq.pointCloud.panorama.joint;
+                  var lastParticleIndex=seq.particleIndex_list[seq.particleIndex_list.length-1];
+                  var coords=seq.pointCloud.getParticleSphericalCoords(lastParticleIndex);
+
+                  var list={};
+
+                  if (!joint.nextIndex) {
+                      joint.nextIndex=0;
+                  }
+
+                  // set joint id
+                  var id='j'+joint.nextIndex++;
+                  joint.idSeq.push(id);
+
+                  // set joint details
+                  list[id]={
+                      coords: {
+                          lon: coords.lon,
+                          lat: coords.lat
+                      },
+                      size: 1,
+                      particleIndex: lastParticleIndex
+                  }
+
+                  joint.add(list);
+
+            }, // poiPanel_pcl_sequence_addJoint
+
+            popJoint: function poiPanel_pcl_sequence_popJoint(seq,index) {
+                  var joint=seq.pointCloud.panorama.joint;
+                  if (!joint.idSeq.length) {
+                      return;
+                  }
+                  var id=joint.idSeq.pop();
+                  joint.list[id].instance.remove();
+
+            }, // poiPanel_pcl_sequence_popJoint
 
             // update pointcloud related poi panel button state
             updateButtons: function pcl_sequence_updateButtons() {
@@ -4287,6 +4404,8 @@ var DAV = new function() {
         init: function poiPanel_init() {
           var panel=this;
           panel._panel_init();
+
+          panel.mode={};
 
           // click on start/stop sequence editor button
           $('#measure',panel._dom).off('click').on('click',function(e){
@@ -4324,6 +4443,9 @@ var DAV = new function() {
 
               // save empty sequence list
               panel.pcl_sequence.save();
+
+              // trash all joints
+              panel.panorama.joint.dispatch('dispose');
 
               panel.panorama.drawScene();
 
