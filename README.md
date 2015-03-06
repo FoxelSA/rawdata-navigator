@@ -1,9 +1,9 @@
 
 ## rawdata-navigator<br />Human-understandable raw data navigator
 
-rawdata-navigator is a web-based human-understandable interface dedicated to navigate
+_rawdata-navigator_ is a web-based human-understandable interface dedicated to navigate
 through raw datasets. It draws downloaded segments on a map and a timeline, allowing
-to display information (geo-position, status, date and preview) for every pose of the
+to display information (geoposition, orientation, status, date and preview) for every pose of the
 segments. Segments can also be viewed as timelapse videos, where every frame is binded
 to its pose information.
 
