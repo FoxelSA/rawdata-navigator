@@ -3336,18 +3336,18 @@ var DAV = new function() {
         */
         reset: function poipanel_reset() {
             var panel=this;
-
-            // clear poi inventory
             panel.inventory_clear();
-
-            // reset button states
-            $('.content2 a',panel._dom)
-            .addClass('disabled')
-            .removeClass('recording');
-
             panel.editClose();
-
+            panel.updateButtons();
         },
+
+        exitSequenceEditingMode: function poiPanel_exitSequenceEditingMode() {
+            var panel=this;
+            if (panel.mode.edit_sequence) {
+              panel.pcl_sequence.stop({abort:false});
+              panel.panorama.drawScene();
+            }
+        }, // exitSequenceEditingMode
 
         open: function poiPanel_open(elem) {
 
@@ -3359,6 +3359,9 @@ var DAV = new function() {
           .on('click',function addpoi_onclick(){
 
             if ($(this).text()=="Ajouter") {
+
+              panel.exitSequenceEditingMode();
+
               $(this).text('Annuler').addClass('cancel');
               panel.addPOI();
 
@@ -3565,7 +3568,7 @@ var DAV = new function() {
           poi.selected=false; // so that inventory_setSelection update it
           poiPanel.inventory_setSelection([poi.name]);
           // scroll to selected element
-          $('#poipanel_inventory .list',poiPanel._dom).mCustomScrollbar("scrollTo",'#'+poi.thumb.poiname);
+          $('#poipanel_inventory .list',poiPanel._dom).mCustomScrollbar("scrollTo",'#'+poi.name);
         }, // poiPanel_on_poi_select
 
         on_panorama_ready: function poiPanel_on_panorama_ready() {
@@ -4164,15 +4167,17 @@ var DAV = new function() {
                   poiPanel.editCancel();
               }
 
-              // set button color
-              $('#measure',poiPanel._dom).addClass('recording');
-
               // enter sequence editing mode
               poiPanel.mode.edit_sequence=true;
               pointCloud.enableParticleEvents=true;
               pointCloud.showParticleCursor=true;
               pointCloud.sequence[pointCloud.sequence.length-1].mode.add=true;
               pointCloud.sequence[pointCloud.sequence.length-1].mode.wheredowegofromhere=true;
+              pointCloud.sequence[pointCloud.sequence.length-1].lastclicked=undefined;
+              pointCloud.sequence[pointCloud.sequence.length-1].lastmouse=undefined;
+
+              poiPanel.updateButtons();
+
               if (pointCloud.cursor && pointCloud.cursor.sprite) {
                 pointCloud.cursor.sprite.visible=true;
               }
@@ -4191,14 +4196,16 @@ var DAV = new function() {
               var seq=pointCloud.sequence[pointCloud.sequence.length-1];
               var count=seq.particleIndex_list.length;
               var last=seq.particleIndex_list[count-1];
-              if (count>1 && last!=seq.lastclicked) {
+              if ((count>1 && last!=seq.lastclicked) || (count==1)) {
                   seq.pop(last);
-                  poiPanel.panorama.drawScene();
               }
 
               // change cursor color
-              pointCloud.cursor.sprite.material.map=pointCloud.cursorMap.normal;
-              pointCloud.cursor.sprite.material.needsUpdate=true;
+              if (pointCloud.cursor && pointCloud.cursor.sprite) {
+                 pointCloud.cursor.sprite.material.map=pointCloud.cursorMap.normal;
+                 pointCloud.cursor.sprite.material.needsUpdate=true;
+              }
+
               poiPanel.panorama.drawScene();
 
               if (options.continue) {
@@ -4217,13 +4224,11 @@ var DAV = new function() {
                  return;
               }
 
-              // set button color
-              $('#measure',poiPanel._dom).removeClass('recording');
-
               // exit sequence editing mode
               poiPanel.mode.edit_sequence=false;
               pointCloud.enableParticleEvents=false;
               pointCloud.showParticleCursor=false;
+
               pointCloud.sequence[pointCloud.sequence.length-1].mode.add=false;
               pointCloud.sequence[pointCloud.sequence.length-1].mode.wheredowegofromhere=false;
               if (pointCloud.cursor && pointCloud.cursor.sprite) {
@@ -4239,11 +4244,13 @@ var DAV = new function() {
                    pointCloud: pointCloud
                  });
 
+                 poiPanel.updateButtons();
                  poiPanel.panorama.drawScene();
 
               } else {
                  // save and upload
                  poiPanel.pcl_sequence.save();
+                 poiPanel.updateButtons();
               }
 
             }, // poiPanel_pcl_sequence_stop
@@ -4287,10 +4294,12 @@ var DAV = new function() {
                         return;
                       }
 
-                      // initialize a new empty sequence
-                      pointCloud.sequence.push(new pointCloud.Sequence({
-                        pointCloud: pointCloud
-                      }));
+                      // initialize a new empty sequence, if needed.
+                      if (pointCloud.sequence[pointCloud.sequence.length-1].particleIndex_list.length) {
+                        pointCloud.sequence.push(new pointCloud.Sequence({
+                          pointCloud: pointCloud
+                        }));
+                      }
 
                       if (pcl_sequence.onsave) {
                           pcl_sequence.onsave();
@@ -4356,6 +4365,7 @@ var DAV = new function() {
                   return;
               }
               var sequence=this;
+              sequence.pointCloud.cursor.sprite.visible=false;
               poiPanel.pcl_sequence.addJoint(sequence,index);
             }, // poiPanel_pcl_sequence_on_particlesequence_add
 
@@ -4363,6 +4373,8 @@ var DAV = new function() {
             on_particlesequence_pop: function poiPanel_pcl_sequence_on_particlesequence_pop(e,index) {
                 var sequence=this;
                 poiPanel.pcl_sequence.popJoint(sequence,index);
+                poiPanel.updateButtons();
+
             }, // poiPanel_pcl_sequence_on_particlesequence_pop
 
             // add a line joint
@@ -4405,25 +4417,51 @@ var DAV = new function() {
 
             }, // poiPanel_pcl_sequence_popJoint
 
-            // update pointcloud related poi panel button state
-            updateButtons: function pcl_sequence_updateButtons() {
-                var pointCloud=poiPanel.panorama.pointCloud.instance;
-                if (!pointCloud.json || !pointCloud.json.points || !pointCloud.json.points.length) {
-                    $('.content2 a',poiPanel._domElement).addClass('disabled');
-                } else {
-                    $('.content2 a',poiPanel._domElement).removeClass('disabled');
-                }
-            },
-
             on_pointcloud_ready: function pcl_sequence_on_pointcloud_ready() {
-                poiPanel.pcl_sequence.updateButtons();
+                poiPanel.updateButtons();
             }, // poiPanel_pcl_sequence_on_pointcloud_ready
 
             on_pointcloud_loaderror: function pcl_sequence_on_pointcloud_loaderror() {
-                poiPanel.pcl_sequence.updateButtons();
+                poiPanel.updateButtons();
             } // pcl_sequence_on_pointcloud_loaderror
 
-        },
+        }, // pcl_sequence
+
+        // update poi panel buttons
+        updateButtons: function poiPanel_updateButtons() {
+            var poiPanel=this;
+
+            if (!poiPanel.panorama || !poiPanel.panorama.pointCloud || !poiPanel.panorama.pointCloud.instance) {
+                return;
+            }
+
+            var pointCloud=poiPanel.panorama.pointCloud.instance;
+
+            // pcl_sequence buttons
+            if (!pointCloud.json || !pointCloud.json.points || !pointCloud.json.points.length) {
+                $('.content2 a',poiPanel._domElement).addClass('disabled');
+
+            } else {
+                $('.content2 a#measure',poiPanel._domElement).removeClass('disabled');
+
+                if (pointCloud.sequence.length>1 || (
+                        pointCloud.sequence.length &&
+                        pointCloud.sequence[pointCloud.sequence.length-1].length
+                )) {
+                   $('.content2 a#trash_measure',poiPanel._domElement).removeClass('disabled');
+
+                } else {
+                   $('.content2 a#trash_measure',poiPanel._domElement).addClass('disabled');
+                }
+            }
+
+            if (poiPanel.mode.edit_sequence) {
+              $('#measure',poiPanel._dom).addClass('recording');
+            } else {
+              $('#measure',poiPanel._dom).removeClass('recording');
+            }
+
+        }, // poiPanel_updateButtons
 
         _panel_init: Panel.prototype.init,
         init: function poiPanel_init() {
@@ -4471,6 +4509,8 @@ var DAV = new function() {
 
               // trash all joints
               panel.panorama.joint.dispatch('dispose');
+
+              panel.updateButtons();
 
               panel.panorama.drawScene();
 
