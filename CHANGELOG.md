@@ -2,6 +2,12 @@
 ## Changelog
 
 
+### 1.3.2 (March 6, 2015)
+
+- `ADDED` Poses can be filtered by their status.
+- `FIXED` Right-clicking on the timeline was breaking the widget.
+
+
 ### 1.3.1 (March 6, 2015)
 
 - `ADDED` Pose missing flag in case there is not associated image or MOV file to it.
