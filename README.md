@@ -18,9 +18,7 @@ Documentation can be consulted on the [wiki](https://github.com/FoxelSA/rawdata-
 Copyright (c) 2014-2015 FOXEL SA - [http://foxel.ch](http://foxel.ch)<br />
 This program is part of the FOXEL project <[http://foxel.ch](http://foxel.ch)>.
 
-This program includes works distributed under the terms of the GNU General
-Public License and/or a compatible license and other copyright notices.
-
+This program includes works distributed under other copyright notices.<br />
 Please read the [COPYRIGHT.md](COPYRIGHT.md) file for more information.
 
 
@@ -35,3 +33,6 @@ of the
 
 You must read <[http://foxel.ch/license](http://foxel.ch/license)> for more
 information about our Licensing terms and our Usage and Attribution guidelines.
+
+This program includes works distributed under the terms of another license(s).<br />
+Please read the [COPYRIGHT.md](COPYRIGHT.md) file for more information.
