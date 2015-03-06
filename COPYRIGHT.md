@@ -33,8 +33,7 @@ information about our Licensing terms and our Usage and Attribution guidelines.
 
 ## Included Software and Libraries
 
-This program includes works distributed under the terms of the GNU General
-Public License and/or a compatible license and other copyright notices.
+This program includes works distributed under the terms of another license(s) and other copyright notice(s).
 
 
 *   __Leaflet 0.7.3__<br />
