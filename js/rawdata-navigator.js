@@ -3364,7 +3364,7 @@ var DAV = new function() {
           var panel=this;
 
           panel.updateButtons();
-          
+
           // (re)set "add poi" / "cancel" button click handler
           $('#addpoi',panel._dom)
           .off('click')
@@ -3772,36 +3772,6 @@ var DAV = new function() {
 
         }, // poiPanel_poicursor
 
-        /*
-        mouseoverlay: {
-
-          show: function poiPanel_mouseoverlay_show() {
-
-            var div=this.div=$('#mouseoverlay');
-            if (!div.length) {
-              div=$('<div id="mouseoverlay" />').appendTo('body');
-            }
-
-            div.css({
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                height: '100%',
-                width: '100%',
-                zIndex: 1000000,
-                display: 'block',
-                cursor: 'none'
-            });
-
-          }, // poiPanel_mouseoverlay_show
-
-          hide: function poiPanel_mouseoverlay_hide() {
-            this.div.hide(0);
-          }
-
-        }, // poiPanel_mouseoverlay
-        */
-
         /**
         * PoiPanel.edit
         *
@@ -4062,6 +4032,10 @@ var DAV = new function() {
         editCancel: function poiPanel_editCancel() {
           var panel=this;
 
+          if (!panel.panorama) {
+              return;
+          }
+
           // remove poi cursor
           if (panel.panorama.poi.list.cursor){
             // remove widget instance
@@ -4265,8 +4239,8 @@ var DAV = new function() {
 
             }, // poiPanel_pcl_sequence_stop
 
-            // Build list of sequences, send list to server,
-            // on success, init a new sequence
+            // Build list of sequences, send list to server, on success init a new sequence.
+            // On ajax completion, run callback with 'success' or 'error' as parameter
             save: function poiPanel_pcl_sequence_save(callback) {
                 var pcl_sequence=this;
                 var pointCloud=poiPanel.panorama.pointCloud.instance;
@@ -4386,7 +4360,7 @@ var DAV = new function() {
 
               // ad joint
               poiPanel.pcl_sequence.addJoint(sequence,index);
-            
+
             }, // poiPanel_pcl_sequence_on_particlesequence_add
 
             // pop a line joint on particlesequence pop
