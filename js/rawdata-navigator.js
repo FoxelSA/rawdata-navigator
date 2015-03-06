@@ -309,15 +309,13 @@ var RawDataNavigator = new function() {
          */
         rightclick: function(segment) {
 
-            // remove overlays
-            map.segments.clear();
-
-            // show segment
-            map.segments.selection([segment]);
+            this.select([segment]);
 
             // show information on videoframe
-            var vframe = segmentation.vframe(segment,0);
-            information.show(segment,_.isUndefined(vframe)?0:vframe);
+            setTimeout(function() {
+                var vframe = segmentation.vframe(segment,0);
+                information.show(segment,_.isUndefined(vframe)?0:vframe);
+            },500);
 
         },
 
