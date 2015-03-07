@@ -3448,8 +3448,6 @@ var DAV = new function() {
 
               $.extend(true,panel.window.Joint_list.prototype,{
 
-                idSeq: [], // joint id sequence for joint.pop()
-
                 map: panel.window.THREE.ImageUtils.loadTexture('img/dot.png')
 
               }); // extend Joint list prototype
@@ -4179,12 +4177,26 @@ var DAV = new function() {
                   return;
               }
 
-              // remove non-validated segment
+              /* remove non-validated segment */
               var seq=pointCloud.sequence[pointCloud.sequence.length-1];
-              var count=seq.particleIndex_list.length;
-              var last=seq.particleIndex_list[count-1];
-              if ((count>1 && last!=seq.lastclicked) || (count==1)) {
-                  seq.pop(last);
+              var count=seq.particle_list.length;
+              var lastParticle=seq.particle_list[count-1];
+              if ((count>1 && lastParticle.index!=seq.lastclicked) || (count==1)) {
+                  if (count>2) {
+                    // remove last particle
+                    seq.pop(lastParticle);
+                  } else {
+                    /* remove all particles (count < 2 or second is not validated) */
+                    while(count--) {
+                      seq.pop(seq.particleIndex_list[count]);
+                    }
+                    // discard current sequence
+                    pointCloud.sequence[pointCloud.sequence.length-1].dispose();
+                    // intialize an empty one
+                    pointCloud.sequence[pointCloud.sequence.length-1]=new pointCloud.Sequence({
+                      pointCloud: pointCloud
+                    });
+                  }
               }
 
               // change cursor color
@@ -4248,8 +4260,8 @@ var DAV = new function() {
                 var list=[];
 
                 $.each(pointCloud.sequence,function(){
-                    if (this.particleIndex_list.length) {
-                      list.push(this.particleIndex_list);
+                    if (this.particle_list.length) {
+                      list.push(this.particle_list);
                     }
                 });
 
@@ -4282,7 +4294,7 @@ var DAV = new function() {
                       }
 
                       // initialize a new empty sequence, if needed.
-                      if (pointCloud.sequence[pointCloud.sequence.length-1].particleIndex_list.length) {
+                      if (pointCloud.sequence[pointCloud.sequence.length-1].particle_list.length) {
                         pointCloud.sequence.push(new pointCloud.Sequence({
                           pointCloud: pointCloud
                         }));
@@ -4318,7 +4330,7 @@ var DAV = new function() {
               }
 
               // display 'recording' cursor on first point added
-              if (seq.particleIndex_list.length==1) {
+              if (seq.particle_list.length==1) {
                 pointCloud.cursor.sprite.material.map=pointCloud.cursorMap.recording;
                 pointCloud.cursor.sprite.material.needsUpdate=true;
                 pointCloud.panorama.drawScene();
@@ -4329,7 +4341,7 @@ var DAV = new function() {
               if (!seq.doubleClick || !seq.doubleClick.bool) {
               }
 
-              if (seq.particleIndex_list.length<2) {
+              if (seq.particle_list.length<2) {
                   return;
               }
 
@@ -4348,8 +4360,8 @@ var DAV = new function() {
             }, // poiPanel_pcl_sequence_on_pointcloud_particleclick
 
             // add a line joint on particle sequence add
-            on_particlesequence_add: function poiPanel_pcl_sequence_on_particlesequence_add(e,index){
-              if (index==undefined) {
+            on_particlesequence_add: function poiPanel_pcl_sequence_on_particlesequence_add(e,particle){
+              if (particle==undefined) {
                   return;
               }
               var sequence=this;
@@ -4360,57 +4372,60 @@ var DAV = new function() {
               }
 
               // ad joint
-              poiPanel.pcl_sequence.addJoint(sequence,index);
+              poiPanel.pcl_sequence.addJoint(sequence,particle);
 
             }, // poiPanel_pcl_sequence_on_particlesequence_add
 
-            // pop a line joint on particlesequence pop
-            on_particlesequence_pop: function poiPanel_pcl_sequence_on_particlesequence_pop(e,index) {
+            // dispose of line joint on particlesequence pop
+            on_particlesequence_pop: function poiPanel_pcl_sequence_on_particlesequence_pop(e,particle) {
                 var sequence=this;
-                poiPanel.pcl_sequence.popJoint(sequence,index);
+                poiPanel.pcl_sequence.joint_dispose(sequence,particle);
                 poiPanel.updateButtons();
 
             }, // poiPanel_pcl_sequence_on_particlesequence_pop
 
-            // add a line joint
-            addJoint: function poiPanel_pcl_sequence_addJoint(seq,index) {
+            // add a line joint, assume particle is the last seq.particle_list item
+            addJoint: function poiPanel_pcl_sequence_addJoint(seq,particle) {
                   var joint=seq.pointCloud.panorama.joint;
-                  var lastParticleIndex=seq.particleIndex_list[seq.particleIndex_list.length-1];
-                  var coords=seq.pointCloud.getParticleSphericalCoords(lastParticleIndex);
-
-                  var list={};
+                  var coords=seq.pointCloud.getParticleSphericalCoords(particle.index);
 
                   if (!joint.nextIndex) {
                       joint.nextIndex=0;
                   }
 
-                  // set joint id
-                  var id='j'+joint.nextIndex++;
-                  joint.idSeq.push(id);
+                  // set particle joint id
+                  particle.jointId='j'+joint.nextIndex++;
 
                   // set joint details
-                  list[id]={
+                  var joint_list={};
+                  joint_list[particle.jointId]={
                       coords: {
                           lon: coords.lon,
                           lat: coords.lat
                       },
                       size: 1,
-                      particleIndex: lastParticleIndex
+                      particleSequence: {
+                        instance: seq,
+                        index: seq.particle_list.length-1 // assume particle is the last list item
+                      }
                   }
 
-                  joint.add(list);
+                  // instantiate joint
+                  joint.add(joint_list);
 
             }, // poiPanel_pcl_sequence_addJoint
 
-            popJoint: function poiPanel_pcl_sequence_popJoint(seq,index) {
-                  var joint=seq.pointCloud.panorama.joint;
-                  if (!joint.idSeq.length) {
-                      return;
-                  }
-                  var id=joint.idSeq.pop();
-                  joint.list[id].instance.remove();
+            joint_dispose: function poiPanel_pcl_sequence_joint_dispose(seq,particle) {
 
-            }, // poiPanel_pcl_sequence_popJoint
+              if (!particle.jointId) {
+                return;
+              }
+
+              // remove joint
+              seq.pointCloud.panorama.joint.list[particle.jointId].instance.remove();
+              particle.jointId=null;
+
+            }, // poiPanel_pcl_sequence_joint_dispose
 
             on_pointcloud_ready: function pcl_sequence_on_pointcloud_ready() {
                 poiPanel.updateButtons();
@@ -4445,7 +4460,7 @@ var DAV = new function() {
 
                 if (pointCloud.sequence && (pointCloud.sequence.length>1 || (
                         pointCloud.sequence.length &&
-                        pointCloud.sequence[pointCloud.sequence.length-1].particleIndex_list.length
+                        pointCloud.sequence[pointCloud.sequence.length-1].particle_list.length
                 ))) {
                    $('.content2 a#trash_measure',poiPanel._domElement).removeClass('disabled');
 
@@ -4498,6 +4513,9 @@ var DAV = new function() {
                   panel.pcl_sequence.stop({abort:true});
               }
 
+              // trash all joints
+              panel.panorama.joint.dispatch('dispose');
+
               // initialize an empty sequence list
               panel.panorama.pointCloud.instance.sequence=[new panel.panorama.pointCloud.instance.Sequence({
                 pointCloud: panel.panorama.pointCloud.instance
@@ -4505,10 +4523,6 @@ var DAV = new function() {
 
               // save empty sequence list
               panel.pcl_sequence.save();
-
-              // trash all joints
-              panel.panorama.joint.dispatch('dispose');
-              panel.panorama.joint.idSeq=[];
 
               panel.updateButtons();
 
