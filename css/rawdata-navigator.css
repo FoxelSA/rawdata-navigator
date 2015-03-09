@@ -468,6 +468,34 @@ a.fa.disabled, a.fa.disabled:hover, a.fa.disabled:active {
   transition: 0.04s all ease-in-out;
 }
 
+#poipanel_pointcloud a.view_pointcloud {
+    cursor:pointer;
+}
+
+#poipanel_pointcloud {
+    margin-top:40px;
+}
+
+#poipanel_pointcloud .usage {
+    width:450px;
+    color:#fff;
+    background-color:#111;
+    padding-bottom:10px;
+}
+
+    #poipanel_pointcloud .usage img {
+        position:relative;
+        left:10px;
+    }
+
+    #poipanel_pointcloud .title {
+        padding:10px;
+        font-weight:bold;
+        font-size:13px !important;
+        top:0 !important;
+        margin-bottom:0 !important;
+    }
+
 #poipanel a.button {
   font-size: 1.4em;
   padding-left: 1em;

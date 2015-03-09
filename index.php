@@ -456,7 +456,12 @@
     </div>
 
     <div id="poipanel_pointcloud">
-        <div><a class="view_pointcloud" onclick="DAV.viewPotree(this);return false;"><img width="430" /></a></div>
+        <div class="usage posepointcloud">
+            <div class="title pointer">Mensurations 3D métriques</div>
+            <div class="closeable">
+              <div><a class="view_pointcloud" onclick="DAV.viewPotree(this);return false;"><img width="430" /></a></div>
+            </div>
+        </div>
     </div>
 
   </div>
