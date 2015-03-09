@@ -4202,7 +4202,7 @@ var DAV = new function() {
             stop: function poiPanel_pcl_sequence_stop(options) {
 
               var pointCloud=poiPanel.panorama.pointCloud.instance;
-              if (!pointCloud || !pointCloud.sequence || !pointCloud.sequence[pointCloud.sequence.length-1].length) {
+              if (!pointCloud || !pointCloud.sequence) {
                   return;
               }
 
@@ -4237,10 +4237,11 @@ var DAV = new function() {
               poiPanel.panorama.drawScene();
 
               if (options.continue) {
-
+console.log('save1')
                  // save and upload
                  poiPanel.pcl_sequence.save(function(){
                     // restart editing after save
+                    console.log('aftersave')
                     pointCloud.sequence[pointCloud.sequence.length-1].mode.add=true;
                     pointCloud.sequence[pointCloud.sequence.length-1].mode.wheredowegofromhere=true;
                  });
@@ -4272,6 +4273,7 @@ var DAV = new function() {
                  poiPanel.panorama.drawScene();
 
               } else {
+                  console.log('save2')
                  // save and upload
                  poiPanel.pcl_sequence.save(function(){
                      poiPanel.updateButtons();
@@ -4288,6 +4290,7 @@ var DAV = new function() {
 
                 // build list of sequences to save
                 var seq_list=[];
+                console.log('ajax')
                 $.each(pointCloud.sequence,function(){
                     if (this.particle_list.length) {
                       var index_list=[];
@@ -4319,7 +4322,7 @@ var DAV = new function() {
 
                     // got a valid server reply
                     success: function(json) {
-
+console.log('success')
                       // php script returned an error ?
                       if (json.status!='ok') {
                         poiPanel.window.$.notify('Error: Could not save segments !');
