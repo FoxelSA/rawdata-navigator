@@ -3820,6 +3820,7 @@ var DAV = new function() {
 
           // hide inventory
           $('div.action:first, #poipanel_inventory',panel._dom).hide(0);
+          $('#poipanel_pointcloud').hide(0);
 
           // setup button event listeners
           $('#poipanel_edit a').off('click.poipanel');
@@ -3858,6 +3859,7 @@ var DAV = new function() {
 
           // show inventory
           $('div.action:first, #poipanel_inventory',panel._dom).show(0);
+          $('#poipanel_pointcloud').show(0);
 
         }, // poiPanel_editClose
 
@@ -4152,7 +4154,7 @@ var DAV = new function() {
 
           // update inventory list and custom scrollbar container dimensions
           $('#poipanel_inventory .list',panel._dom)
-            .height($(panel._dom).height()-$('#poipanel_inventory .list',panel._dom).offset().top-272)
+            .height($(panel._dom).height()-$('#poipanel_inventory .list',panel._dom).offset().top-340)
             .mCustomScrollbar('update');
 
         }, // poiPanel_resize
