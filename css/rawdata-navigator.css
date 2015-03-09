@@ -1,7 +1,7 @@
 /*
  * rawdata-navigator - Human-understandable raw data navigator
  *
- * Copyright (c) 2014 FOXEL SA - http://foxel.ch
+ * Copyright (c) 2014-2015 FOXEL SA - http://foxel.ch
  * Please read <http://foxel.ch/license> for more information.
  *
  *
@@ -469,7 +469,7 @@ a.fa.disabled, a.fa.disabled:hover, a.fa.disabled:active {
 }
 
 #poipanel a.button {
-  font-size: 2em;
+  font-size: 1.4em;
   padding-left: 1em;
   padding-right: 1em;
   border-radius: 7px;
@@ -1066,7 +1066,6 @@ a.reload {
 
 #poipanel_edit {
   display: none;
-
 }
 
 #poipanel_edit label {
@@ -1089,9 +1088,8 @@ a.reload {
 #poipanel .title {
   position: relative;
   font-size: 2em;
-  top: 1.2em;
-  margin-bottom: 2em;
-  margin-left: 0.5em;
+  top: 1.8em;
+  margin-bottom: 2.9em;
 }
 
 #poipanel_edit textarea, #poipanel_edit label {
@@ -1099,7 +1097,8 @@ a.reload {
 }
 
 #poipanel_edit textarea, #poipanel_edit input {
-  margin-bottom: 10px;
+  margin-bottom:20px;
+  border:solid 1px #666;
 }
 
 #poipanel_edit input {
@@ -1180,7 +1179,7 @@ ul.poi li:hover {
 }
 
 ul.poi. li .buttons a:active {
-    color: #ecb100;       
+    color: #ecb100;
     transform: scale(0.98);
 }
 
@@ -1239,4 +1238,9 @@ ul.poi li .buttons {
 
 #poipanel .content2 #trash_measure a {
   color: black;
+}
+
+#poipanel .content {
+    width:465px;
+    padding-left:25px;
 }

@@ -2458,7 +2458,7 @@ var DAV = new function() {
                 // download panorama
 
                 var utcdiff = 7200;
-                if (segment == '1423492626') {
+                if (segment == '1423492626' || segment == '1416400954') {
                     utcdiff = 0;
                 }
 
@@ -3061,7 +3061,7 @@ var DAV = new function() {
           var vignette=vignettes.list[index];
 
           var utcdiff = 7200;
-          if (vignette.segment == '1423492626') {
+          if (vignette.segment == '1423492626' || vignette.segment == '1416400954') {
             utcdiff = 0;
           }
 
