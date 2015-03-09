@@ -2466,19 +2466,19 @@ var DAV = new function() {
                 var thumb_panorama_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/small/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
                 var download_panorama_link = 'php/download.php?file='+storage.mountpoint+'/footage/demodav/'+segment+'/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
                 $(information._dom+' .download_panorama').attr('href',download_panorama_link);
-                var view_panorama_link = document.location.origin+'/dav/panorama/';
+                var view_panorama_link = document.location.origin+'/dav/panorama/panorama.php?pano=';
                 if (segment == '1404381299') {
-                    view_panorama_link += 'reformateurs.php';
+                    view_panorama_link += 'mur-des-reformateurs';
                 } else if (segment == '1404383663') {
-                    view_panorama_link += 'dufour.php';
+                    view_panorama_link += 'place-de-neuve';
                 } else if (segment == '1423492626') {
-                    view_panorama_link += 'ssa.php';
+                    view_panorama_link += 'ssa';
                 } else if (segment == '1416400954') {
-                    view_panorama_link += 'panorama.php?pano=tour-de-boel';
+                    view_panorama_link += 'tour-de-boel';
                 }
 
                 view_panorama_link += '&initial='+(pose.sec-utcdiff)+'_'+pose.usc;
-                console.log('view_panorama_link = '+view_panorama_link);
+                //console.log('view_panorama_link = '+view_panorama_link);
                 $(information._dom+' .view_panorama').data('href',view_panorama_link);
 
                 // test panorama
@@ -3095,15 +3095,15 @@ var DAV = new function() {
             } else if (allocation.type() == 'poi') {
                 var testpanoimg = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
 
-                var view_panorama_link_listpoi = document.location.origin+'/dav/panorama/';
+                var view_panorama_link_listpoi = document.location.origin+'/dav/panorama/panorama.php?pano=';
                 if (vignette.segment == '1404381299') {
-                    view_panorama_link_listpoi += 'reformateurs.php';
+                    view_panorama_link_listpoi += 'mur-des-reformateurs';
                 } else if (vignette.segment == '1404383663') {
-                    view_panorama_link_listpoi += 'dufour.php';
+                    view_panorama_link_listpoi += 'place-de-neuve';
                 } else if (vignette.segment == '1423492626') {
-                    view_panorama_link_listpoi += 'ssa.php';
+                    view_panorama_link_listpoi += 'ssa';
                 } else if (vignette.segment == '1416400954') {
-                    view_panorama_link_listpoi += 'panorama.php?pano=tour-de-boel';
+                    view_panorama_link_listpoi += 'tour-de-boel';
                 }
 
                 view_panorama_link_listpoi += '&initial='+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc;
@@ -3311,7 +3311,7 @@ var DAV = new function() {
      * pointcloud viewer
      */
     this.viewPotree = function(item) {
-        console.log("viewPotree is clicked");
+        //console.log("viewPotree is clicked");
         var panel=window._panels['pointcloudpanel'];
         if ($('iframe',panel._dom).attr('src')!=$(item).data('href')) {
           $('iframe',panel._dom).attr('src',$(item).data('href')).off('load').on('load',function(){panel.toggle()});
@@ -3348,7 +3348,7 @@ var DAV = new function() {
         setPointCloudImage: function poipanel_setPointCloudImage() {
 
             var segment = $('#usages .usage.posepoi .edit_poi').attr('rel');
-            console.log("segment is "+segment);
+            //console.log("segment is "+segment);
 
             // download pointcloud
             var thumb_pointclound_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.jpg';
@@ -3363,7 +3363,7 @@ var DAV = new function() {
             } else if (segment == '1416400954') {
                 view_pointcloud_link += 'boelle.html';
             }
-            console.log("set pointcloud view link = "+view_pointcloud_link);
+            //console.log("set pointcloud view link = "+view_pointcloud_link);
             $('#poipanel_pointcloud .view_pointcloud').data('href',view_pointcloud_link);
 
         },
