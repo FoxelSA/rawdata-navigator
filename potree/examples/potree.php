@@ -6,6 +6,12 @@
 </head>
 <body style="margin: 0; padding: 0">
 
+<?php
+
+$pano = $_GET['pano'];
+
+?>
+
     <style type="text/css">
 
     #renderArea{
@@ -118,6 +124,7 @@ void main() {
     </div>
 
 
+
     <div id="renderArea"></div>
 
     <script>
@@ -144,7 +151,7 @@ void main() {
 
 
 
-        var pointcloudPath = "../resources/pointclouds/reformateurs/cloud.js";
+        var pointcloudPath = "../resources/pointclouds/<?php echo $pano; ?>/cloud.js";
 
         var elRenderArea = document.getElementById("renderArea");
 
