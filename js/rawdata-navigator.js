@@ -3311,6 +3311,7 @@ var DAV = new function() {
      * pointcloud viewer
      */
     this.viewPotree = function(item) {
+        console.log("viewPotree is clicked");
         var panel=window._panels['pointcloudpanel'];
         if ($('iframe',panel._dom).attr('src')!=$(item).data('href')) {
           $('iframe',panel._dom).attr('src',$(item).data('href')).off('load').on('load',function(){panel.toggle()});
@@ -3362,6 +3363,7 @@ var DAV = new function() {
             } else if (segment == '1416400954') {
                 view_pointcloud_link += 'boelle.html';
             }
+            console.log("set pointcloud view link = "+view_pointcloud_link);
             $('#poipanel_pointcloud .view_pointcloud').data('href',view_pointcloud_link);
 
         },

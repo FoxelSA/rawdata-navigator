@@ -456,7 +456,7 @@
     </div>
 
     <div id="poipanel_pointcloud">
-        <div><a class="view_pointcloud" onclick="alert('click');DAV.viewPotree(this);return false;"><img width="430" /></a></div>
+        <div><a class="view_pointcloud" onclick="DAV.viewPotree(this);return false;"><img width="430" /></a></div>
     </div>
 
   </div>
