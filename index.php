@@ -473,6 +473,9 @@
      <div >
         <a id="trash_measure" title="Effacer" class="disabled fa fa-minus-square fa-fw"></a>
      </div>
+     <div >
+       <a id="toggle_pointcloud" title="Points" class="disabled fa fa-eye fa-fw"></a>
+     </div>
     <iframe frameborder="no" scrolling="no" seamless="seamless"></iframe>
   </div>
 </div>
