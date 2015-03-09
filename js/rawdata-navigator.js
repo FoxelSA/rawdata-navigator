@@ -3339,6 +3339,28 @@ var DAV = new function() {
             panel.inventory_clear();
             panel.editCancel();
             panel.updateButtons();
+            panel.setPointCloudImage();
+        },
+
+        setPointCloudImage: poipanel_setPointCloudImage() {
+
+            var segment = '1416400954';
+
+            // download pointcloud
+            var thumb_pointclound_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.jpg';
+            $('#poipanel_pointcloud img').attr('src',thumb_pointclound_src);
+            var view_pointcloud_link = document.location.origin+'/dav/potree/examples/';
+            if (segment == '1404381299') {
+                view_pointcloud_link += 'reformateurs.html';
+            } else if (segment == '1404383663') {
+                view_pointcloud_link += 'dufour.html';
+            } else if (segment == '1423492626') {
+                view_pointcloud_link += 'ssa.html';
+            } else if (segment == '1416400954') {
+                view_pointcloud_link += 'boelle.html';
+            }
+            $('#poipanel_pointcloud .view_pointcloud').data('href',view_pointcloud_link);
+
         },
 
         exitSequenceEditingMode: function poiPanel_exitSequenceEditingMode() {
