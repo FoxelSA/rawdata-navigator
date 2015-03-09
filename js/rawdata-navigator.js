@@ -4202,7 +4202,7 @@ var DAV = new function() {
             stop: function poiPanel_pcl_sequence_stop(options) {
 
               var pointCloud=poiPanel.panorama.pointCloud.instance;
-              if (!pointCloud) {
+              if (!pointCloud || !pointCloud.sequence) {
                   return;
               }
 
@@ -4237,10 +4237,11 @@ var DAV = new function() {
               poiPanel.panorama.drawScene();
 
               if (options.continue) {
-
+console.log('save1')
                  // save and upload
                  poiPanel.pcl_sequence.save(function(){
                     // restart editing after save
+                    console.log('aftersave')
                     pointCloud.sequence[pointCloud.sequence.length-1].mode.add=true;
                     pointCloud.sequence[pointCloud.sequence.length-1].mode.wheredowegofromhere=true;
                  });
@@ -4272,6 +4273,7 @@ var DAV = new function() {
                  poiPanel.panorama.drawScene();
 
               } else {
+                  console.log('save2')
                  // save and upload
                  poiPanel.pcl_sequence.save(function(){
                      poiPanel.updateButtons();
@@ -4288,6 +4290,7 @@ var DAV = new function() {
 
                 // build list of sequences to save
                 var seq_list=[];
+                console.log('ajax')
                 $.each(pointCloud.sequence,function(){
                     if (this.particle_list.length) {
                       var index_list=[];
@@ -4319,11 +4322,10 @@ var DAV = new function() {
 
                     // got a valid server reply
                     success: function(json) {
-
+console.log('success')
                       // php script returned an error ?
                       if (json.status!='ok') {
                         poiPanel.window.$.notify('Error: Could not save segments !');
-                        return;
                       }
 
                       // initialize a new empty sequence, if needed.
@@ -4334,7 +4336,7 @@ var DAV = new function() {
                       }
 
                       if (callback) {
-                        callback('success');
+                        callback(status=='ok'?'success':'error');
                       }
 
                     } // success
@@ -4416,6 +4418,14 @@ var DAV = new function() {
                 poiPanel.updateButtons();
 
             }, // poiPanel_pcl_sequence_on_particlesequence_pop
+
+            on_particlesequence_dispose: function poiPanel_pcl_sequence_on_particlesequence_dispose(e) {
+                var sequence=this;
+                $.each(sequence.particle_list,function(particle){
+                    poiPanel.pcl_sequence.joint.dispose(sequence,particle);
+                });
+                poiPanel.updateButtons();
+            },
 
             // add a line joint, assume particle is the last seq.particle_list item
             addJoint: function poiPanel_pcl_sequence_addJoint(seq,particle) {
