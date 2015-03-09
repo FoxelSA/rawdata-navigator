@@ -118,7 +118,7 @@ a.fa.disabled, a.fa.disabled:hover, a.fa.disabled:active {
   transform: none;
 }
 
-.recording, a.fa.recording:hover {
+.active, a.fa.active:hover {
   color: #ecb100;
 }
 
@@ -1261,6 +1261,16 @@ ul.poi li .buttons {
   right: -1.3em;
   font-size: 5em;
   top: 2.4em;
+
+}
+
+#poipanel .content2 #toggle_pointcloud {
+  position: absolute;
+  z-index: 999999;
+  text-shadow: 4px 4px 16px rgba(0,0,0,0.5);
+  right: -1.4em;
+  font-size: 4.5em;
+  top: 4.0em;
 
 }
 
