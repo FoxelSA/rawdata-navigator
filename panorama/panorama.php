@@ -2,7 +2,17 @@
 
 $pano = $_GET['pano'];
 
-$poi_path="/data/footage/demodav/".$pano."/poi/";
+$panots = '';
+if ($pano == 'mur-des-reformateurs')
+    $panots = '1404381299';
+elseif ($pano == 'place-de-neuve')
+    $panots = '1404383663';
+elseif ($pano == 'tour-de-boel')
+    $panots = '1416400954';
+elseif ($pano == 'ssa')
+    $panots = '1423492626';
+
+$poi_path="/data/footage/demodav/".$panots."/poi/";
 
 if (isset($_POST['cmd'])) {
 
