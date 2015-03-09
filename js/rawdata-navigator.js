@@ -3802,6 +3802,8 @@ var DAV = new function() {
         *
         * Open POI details edit panel
         *
+        * @param name   name of existing poi, or 'cursor' on new poi
+        *
         */
         edit: function poiPanel_edit(name){
           var panel=this;
@@ -3937,9 +3939,6 @@ var DAV = new function() {
 
             // set current POI
             panel.currentPOI=name;
-
-            //panel.$('#pano canvas').off('mousedown.poipanel');
-
 
             // remove poi cursor
             panorama.poi.list.cursor.instance.remove();
@@ -4188,7 +4187,7 @@ var DAV = new function() {
               pointCloud.sequence[pointCloud.sequence.length-1].mode.add=true;
               pointCloud.sequence[pointCloud.sequence.length-1].mode.wheredowegofromhere=true;
               pointCloud.sequence[pointCloud.sequence.length-1].lastclicked=undefined;
-              pointCloud.sequence[pointCloud.sequence.length-1].lastmouse=undefined;
+              pointCloud.sequence[pointCloud.sequence.length-1].lastmouseout=undefined;
 
               poiPanel.updateButtons();
 
@@ -4239,11 +4238,15 @@ var DAV = new function() {
               if (options.continue) {
 console.log('save1')
                  // save and upload
-                 poiPanel.pcl_sequence.save(function(){
+                 poiPanel.pcl_sequence.save(function(){                    
+                    // update sequence list
+                    poiPanel.pcl_sequence.updateList();
+                    
                     // restart editing after save
                     console.log('aftersave')
                     pointCloud.sequence[pointCloud.sequence.length-1].mode.add=true;
                     pointCloud.sequence[pointCloud.sequence.length-1].mode.wheredowegofromhere=true;
+                 
                  });
 
                  return;
@@ -4262,23 +4265,25 @@ console.log('save1')
 
               // aborting ?
               if (options && options.abort) {
-                 // discard current sequence
-                 pointCloud.sequence[pointCloud.sequence.length-1].dispose();
+                 // discard current sequence (joints)
+                 pointCloud.sequence[pointCloud.sequence.length-1].dispatch('dispose');
                  // intialize an empty one
                  pointCloud.sequence[pointCloud.sequence.length-1]=new pointCloud.Sequence({
                    pointCloud: pointCloud
                  });
 
                  poiPanel.updateButtons();
-                 poiPanel.panorama.drawScene();
 
               } else {
-                  console.log('save2')
+                 // measure button clicked
+                 console.log('save2')
                  // save and upload
                  poiPanel.pcl_sequence.save(function(){
                      poiPanel.updateButtons();
                  });
               }
+             
+              poiPanel.panorama.drawScene();
 
             }, // poiPanel_pcl_sequence_stop
 
@@ -4335,6 +4340,9 @@ console.log('success')
                         }));
                       }
 
+                      // update displayed list of sequences
+                      poiPanel.pcl_sequence.updateList();
+
                       if (callback) {
                         callback(status=='ok'?'success':'error');
                       }
@@ -4344,6 +4352,56 @@ console.log('success')
                 }); // ajax
 
             },  // poiPanel_pcl_sequence_save
+
+            // update displayed list of sequences
+            updateList: function poiPanel_pcl_sequence_updateList() {
+                
+                var html=this.info='';
+               
+               return; // disable until tomorrow (WIP)..
+               
+                // get the number of sequences
+                var count=poiPanel.panorama.pointCloud.instance.sequence.length;
+
+                // loop over sequences
+                $.each(poiPanel.panorama.pointCloud.instance.sequence,function(index){
+                    
+                    // skip last sequence (empty or in edit mode)
+                    if (index+1==count) {
+                        return false;
+                    }
+
+                    // list sequence
+                    html+=
+                        '<div class="seq" id="seq'+index+'">'
+                       +'Sequence '+(index+1)
+                       +'</div>';
+                });
+
+                // do nothing if particleinfo is hidden
+                var div=poiPanel.$('#particleInfo');
+                if (!div.length) return;
+                
+                // update or append pcl_sequence_info div to particleinfo div 
+                var div2=$('#pcl_sequence_info',div);
+                if (div2.length) {
+                    // update list
+                    div2.html(html);
+
+                } else {
+                  // append list
+                  div.append('<div id="pcl_sequence_info">'+this.info+'</div>');
+
+                }
+
+            }, // poiPanel_pcl_sequence_updateList
+
+            on_pointcloud_updateparticleinfo: function poiPanel_pcl_sequence_on_pointcloud_updateparticleinfo(e) {
+        
+                // append pcl_sequence.info to particle info
+                e.html+='<div id="pcl_sequence_info">'+poiPanel.pcl_sequence.info+'</div>';
+        
+            }, // poiPanel_pcl_sequence_on_pointcloud_updateparticleinfo
 
             clearAll: function poiPanel_pcl_sequence_clearAll() {
 
@@ -4360,6 +4418,7 @@ console.log('success')
               // get last sequence
               var seq=pointCloud.sequence[pointCloud.sequence.length-1];
 
+              // return if no sequence defined
               if (!seq) {
                 return;
               }
@@ -4376,10 +4435,12 @@ console.log('success')
               if (!seq.doubleClick || !seq.doubleClick.bool) {
               }
 
+              // return if less than 2 particles
               if (seq.particle_list.length<2) {
                   return;
               }
 
+              // return if sequence is not in edit mode
               if (!seq.mode.add) {
                 return;
               }
@@ -4419,13 +4480,14 @@ console.log('success')
 
             }, // poiPanel_pcl_sequence_on_particlesequence_pop
 
+            // get rid of joints on particlesequence dispose event            
             on_particlesequence_dispose: function poiPanel_pcl_sequence_on_particlesequence_dispose(e) {
-                var sequence=this;
-                $.each(sequence.particle_list,function(particle){
-                    poiPanel.pcl_sequence.joint.dispose(sequence,particle);
+                var sequence=this
+                $.each(sequence.particle_list,function(){
+                    var particle=this;
+                    poiPanel.panorama.joint.list[particle.jointId].instance.remove();
                 });
-                poiPanel.updateButtons();
-            },
+            }, // poiPanel_pcl_sequence_on_particlesequence_dispose
 
             // add a line joint, assume particle is the last seq.particle_list item
             addJoint: function poiPanel_pcl_sequence_addJoint(seq,particle) {
@@ -4484,7 +4546,16 @@ console.log('success')
 
         }, // pcl_sequence
 
-        // update poi panel buttons
+        /**
+        * poiPanel.updateButtons()
+        *
+        * Update poi panel buttons according whatever apply..
+        * actually only point cloud related buttons,
+        *
+        * @TODO: centralize other buttons mode handling here ie:
+        * leftbar when poiPanel active, and and poiPanel leftpanel 
+        *
+        */
         updateButtons: function poiPanel_updateButtons() {
             var poiPanel=this;
 
@@ -4498,11 +4569,16 @@ console.log('success')
 
             // pcl_sequence buttons
             if (!pointCloud.json || !pointCloud.json.points || !pointCloud.json.points.length) {
+
+                // no pointcloud, disable all pointcloud related buttons
                 $('.content2 a',poiPanel._domElement).addClass('disabled');
 
             } else {
-                $('.content2 a#measure',poiPanel._domElement).removeClass('disabled');
 
+                // pointcloud defined, enable measure and toggle pointcloud buttons
+                $('.content2 a#measure, .content2 a#toggle_pointcloud',poiPanel._domElement).removeClass('disabled');
+
+                // disable sequence trash button if nothing to be trashed
                 if (pointCloud.sequence && (pointCloud.sequence.length>1 || (
                         pointCloud.sequence.length &&
                         pointCloud.sequence[pointCloud.sequence.length-1].particle_list.length
@@ -4514,10 +4590,20 @@ console.log('success')
                 }
             }
 
+            // set measure button active state 
             if (poiPanel.mode.edit_sequence) {
-              $('#measure',poiPanel._dom).addClass('recording');
+              $('#measure',poiPanel._dom).addClass('active');
+
             } else {
-              $('#measure',poiPanel._dom).removeClass('recording');
+              $('#measure',poiPanel._dom).removeClass('active');
+            }
+
+            // set toggle pointcloud button active state 
+            if (pointCloud.instance && pointCloud.instance.dotMaterial.visible) {
+                $(this).addClass('active');
+
+            } else {
+                $(this).removeClass('active');
             }
 
         }, // poiPanel_updateButtons
@@ -4573,6 +4659,23 @@ console.log('success')
 
               panel.panorama.drawScene();
 
+          });
+
+          // click on pointcloud toggle button
+          $('#toggle_pointcloud',panel.dom).off('click').on('click',function(e){
+
+            // inverse pointcloud 'visible'' flag
+            poiPanel.panorama.pointCloud.instance.dotMaterial.visible=!poiPanel.panorama.pointCloud.instance.dotMaterial.visible;
+            
+            // update 'toggle_pointcloud' button 
+            if (poiPanel.panorama.pointCloud.instance.dotMaterial.visible) {
+                $(this).addClass('active');
+            } else {
+                $(this).removeClass('active');
+            }
+
+            poiPanel.panorama.drawScene();
+          
           });
 
           // handle keydown events over poiPanel
