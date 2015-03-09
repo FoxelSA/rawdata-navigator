@@ -4188,7 +4188,7 @@ var DAV = new function() {
                   } else {
                     /* remove all particles (count < 2 or second is not validated) */
                     while(count--) {
-                      seq.pop(seq.particleIndex_list[count]);
+                      seq.pop(seq.particle_list[count]);
                     }
                     // discard current sequence
                     pointCloud.sequence[pointCloud.sequence.length-1].dispose();
@@ -4251,17 +4251,21 @@ var DAV = new function() {
 
             }, // poiPanel_pcl_sequence_stop
 
-            // Build list of sequences, send list to server, on success init a new sequence.
+            // Build list of sequences to save, send list to server, on success init a new sequence.
             // On ajax completion, run callback with 'success' or 'error' as parameter
             save: function poiPanel_pcl_sequence_save(callback) {
                 var pcl_sequence=this;
                 var pointCloud=poiPanel.panorama.pointCloud.instance;
 
-                var list=[];
-
+                // build list of sequences to save
+                var seq_list=[];
                 $.each(pointCloud.sequence,function(){
                     if (this.particle_list.length) {
-                      list.push(this.particle_list);
+                      var index_list=[];
+                      $.each(this.particle_list,function(){
+                          index_list.push(this.index);
+                      });
+                      seq_list.push(index_list)
                     }
                 });
 
@@ -4272,7 +4276,7 @@ var DAV = new function() {
                     data: {
                       cmd: 'seq_save',
                       json: JSON.stringify({
-                          list: list
+                          list: seq_list
                        })
                     },
 
@@ -4444,6 +4448,8 @@ var DAV = new function() {
         // update poi panel buttons
         updateButtons: function poiPanel_updateButtons() {
             var poiPanel=this;
+
+            /* point cloud related buttons */
 
             if (!poiPanel.panorama || !poiPanel.panorama.pointCloud || !poiPanel.panorama.pointCloud.instance) {
                 return;
