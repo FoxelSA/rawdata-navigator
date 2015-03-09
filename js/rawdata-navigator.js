@@ -2474,10 +2474,10 @@ var DAV = new function() {
                 } else if (segment == '1423492626') {
                     view_panorama_link += 'ssa.php';
                 } else if (segment == '1416400954') {
-                    view_panorama_link += 'boelle.php';
+                    view_panorama_link += 'panorama.php?pano=tour-de-boel';
                 }
 
-                view_panorama_link += '?initial='+(pose.sec-utcdiff)+'_'+pose.usc;
+                view_panorama_link += '&initial='+(pose.sec-utcdiff)+'_'+pose.usc;
                 console.log('view_panorama_link = '+view_panorama_link);
                 $(information._dom+' .view_panorama').data('href',view_panorama_link);
 
@@ -3103,10 +3103,10 @@ var DAV = new function() {
                 } else if (vignette.segment == '1423492626') {
                     view_panorama_link_listpoi += 'ssa.php';
                 } else if (vignette.segment == '1416400954') {
-                    view_panorama_link_listpoi += 'boelle.php';
+                    view_panorama_link_listpoi += 'panorama.php?pano=tour-de-boel';
                 }
 
-                view_panorama_link_listpoi += '?initial='+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc;
+                view_panorama_link_listpoi += '&initial='+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc;
 
                 // test poilist
                 $.ajax({
