@@ -2493,7 +2493,7 @@ var DAV = new function() {
                         $('#usages .usage.posepanorama img').attr('src',thumb_panorama_src);
                         $('#usages .usage.posepanorama').css('display','block');
 
-                        information.show_poiPanel(view_panorama_link);
+                        information.show_poiPanel(view_panorama_link,segment);
                     }
                 });
 
@@ -2563,10 +2563,12 @@ var DAV = new function() {
         /**
          * information.show_poiPanel
          * */
-        show_poiPanel: function information_showPoiPanel(view_panorama_link) {
+        show_poiPanel: function information_showPoiPanel(view_panorama_link,segment) {
           $('#usages .usage.posepoi .list').empty();
           $('#usages .usage.posepoi').css('display','block');
           $('#usages .usage.posepoi .edit_poi').data('href',view_panorama_link+'&action=poi_edit');
+          $('#usages .usage.posepoi .edit_poi').attr('rel',''+segment);
+
           $.ajax({
               url: view_panorama_link+'&action=poi_list',
               error: function() {
@@ -3342,9 +3344,10 @@ var DAV = new function() {
             panel.setPointCloudImage();
         },
 
-        setPointCloudImage: poipanel_setPointCloudImage() {
+        setPointCloudImage: function poipanel_setPointCloudImage() {
 
-            var segment = '1416400954';
+            var segment = $('#usages .usage.posepoi .edit_poi').attr('rel');
+            console.log("segment is "+segment);
 
             // download pointcloud
             var thumb_pointclound_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.jpg';
@@ -4147,7 +4150,7 @@ var DAV = new function() {
 
           // update inventory list and custom scrollbar container dimensions
           $('#poipanel_inventory .list',panel._dom)
-            .height($(panel._dom).height()-$('#poipanel_inventory .list',panel._dom).offset().top-32)
+            .height($(panel._dom).height()-$('#poipanel_inventory .list',panel._dom).offset().top-272)
             .mCustomScrollbar('update');
 
         }, // poiPanel_resize
