@@ -4357,9 +4357,7 @@ console.log('success')
             updateList: function poiPanel_pcl_sequence_updateList() {
                 
                 var html=this.info='';
-               
-               return; // disable until tomorrow (WIP)..
-               
+                              
                 // get the number of sequences
                 var count=poiPanel.panorama.pointCloud.instance.sequence.length;
 
@@ -4375,11 +4373,12 @@ console.log('success')
                     html+=
                         '<div class="seq" id="seq'+index+'">'
                        +'Sequence '+(index+1)
+                       +'<a class="colorpicker fa fa-square fa-fw"></a>'
                        +'</div>';
                 });
 
                 // do nothing if particleinfo is hidden
-                var div=poiPanel.$('#particleInfo');
+                var div=poiPanel.$('#info');
                 if (!div.length) return;
                 
                 // update or append pcl_sequence_info div to particleinfo div 
@@ -4396,12 +4395,20 @@ console.log('success')
 
             }, // poiPanel_pcl_sequence_updateList
 
-            on_pointcloud_updateparticleinfo: function poiPanel_pcl_sequence_on_pointcloud_updateparticleinfo(e) {
+            // initialize #sequences div in pointcloud info div
+            on_pointcloud_updateinfo: function poiPanel_pcl_sequence_on_pointcloud_updateinfo(e) {
+return;
+                // create sequences div if not existing 
+                var div=$('#sequences',e.div);
+                if (!div.length) {
+                    div=$('<div id="sequences"></div>').appendTo(e.div).css({
+                    });
+                    if (poi)                    
+                    // append pcl_sequence.info to div
+                    div.html('<div id="pcl_sequence_list">'+poiPanel.pcl_sequence.info+'</div>');
+                }
         
-                // append pcl_sequence.info to particle info
-                e.html+='<div id="pcl_sequence_info">'+poiPanel.pcl_sequence.info+'</div>';
-        
-            }, // poiPanel_pcl_sequence_on_pointcloud_updateparticleinfo
+            }, // poiPanel_pcl_sequence_on_pointcloud_updateinfo
 
             clearAll: function poiPanel_pcl_sequence_clearAll() {
 
