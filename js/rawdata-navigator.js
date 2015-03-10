@@ -4607,10 +4607,10 @@ return;
 
             // set toggle pointcloud button active state 
             if (pointCloud.instance && pointCloud.instance.dotMaterial.visible) {
-                $(this).addClass('active');
+                $('#toggle_pointcloud').addClass('active');
 
             } else {
-                $(this).removeClass('active');
+                $('#toggle_pointcloud').removeClass('active');
             }
 
         }, // poiPanel_updateButtons
