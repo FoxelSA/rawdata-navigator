@@ -2023,13 +2023,14 @@ $(document).on('filesloaded', function(){
 
       // point cloud dot material
       dotMaterial: new THREE.PointCloudMaterial({
-          map: THREE.ImageUtils.loadTexture('img/dot.png'),
-          size: 0.15,
+    //      map: THREE.ImageUtils.loadTexture('img/dot.png'),
+    //      size: 0.15,
+          size: 1,
           color: 'yellow',
-          sizeAttenuation: true,
-          transparent: true,
-          opacity: 0.8,
-          alphaTest: 0.1,
+          sizeAttenuation: false,
+  //        transparent: true,
+  //        opacity: 0.3,
+  //        alphaTest: 0.1,
           depthTest: false,
           depthWrite: false,
           visible: false
