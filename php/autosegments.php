@@ -81,7 +81,7 @@ foreach ($camera_lsdir as $macaddress) {
 
             $segment_path = $master_path.'/'.$segment;
 
-            if ((int)$segment != 1404381299 && (int)$segment != 1404383663 && (int)$segment != 1423492626 && (int)$segment != 1416400954)
+            if ((int)$segment != 1404381299 && (int)$segment != 1404383663 && (int)$segment != 1423492626 && (int)$segment != 1412953590)
                 continue;
 
             // not processed

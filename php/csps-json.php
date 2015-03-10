@@ -3,7 +3,7 @@
 /**
  * rawdata-navigator - Human-understandable raw data navigator
  *
- * Copyright (c) 2014 FOXEL SA - http://foxel.ch
+ * Copyright (c) 2014-2015 FOXEL SA - http://foxel.ch
  * Please read <http://foxel.ch/license> for more information.
  *
  *
@@ -49,7 +49,7 @@ header('Content-Type: application/json');
 header('Cache-Control: no-cache, must-revalidate');
 
 // back to old format
-if ((int)($json[$len-4]) == 1423492626) {
+if ((int)($json[$len-4]) == 1423492626 || (int)($json[$len-4]) == 1412953590) {
 
     $data = json_decode(file_get_contents($_GET['json'].'/segment.json'));
 
