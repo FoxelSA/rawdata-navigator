@@ -936,7 +936,7 @@ var DAV = new function() {
 
                 if (allocation.current.master == '1403185204') {
 
-                    if (segment != '1404383663' && segment != '1404381299' && segment != '1423492626' && segment != '1416400954') {
+                    if (segment != '1404383663' && segment != '1404381299' && segment != '1423492626' && segment != '1412953590') {
                         this._remaining--;
                         if (this._remaining == 0)
                             this.done();
@@ -1003,7 +1003,7 @@ var DAV = new function() {
                         return;
                     }
 
-                    if (segment == '1416400954' && !hasBoelle) {
+                    if (segment == '1412953590' && !hasBoelle) {
                         this._remaining--;
                         if (this._remaining == 0)
                             this.done();
@@ -2458,7 +2458,7 @@ var DAV = new function() {
                 // download panorama
 
                 var utcdiff = 7200;
-                if (segment == '1423492626' || segment == '1416400954') {
+                if (segment == '1423492626' || segment == '1412953590') {
                     utcdiff = 0;
                 }
 
@@ -2473,7 +2473,7 @@ var DAV = new function() {
                     view_panorama_link += 'place-de-neuve';
                 } else if (segment == '1423492626') {
                     view_panorama_link += 'ssa';
-                } else if (segment == '1416400954') {
+                } else if (segment == '1412953590') {
                     view_panorama_link += 'tour-de-boel';
                 }
 
@@ -2509,7 +2509,7 @@ var DAV = new function() {
                     view_pointcloud_link += 'place-de-neuve';
                 } else if (segment == '1423492626') {
                     view_pointcloud_link += 'ssa';
-                } else if (segment == '1416400954') {
+                } else if (segment == '1412953590') {
                     view_pointcloud_link += 'tour-de-boel';
                 }
 
@@ -3063,7 +3063,7 @@ var DAV = new function() {
           var vignette=vignettes.list[index];
 
           var utcdiff = 7200;
-          if (vignette.segment == '1423492626' || vignette.segment == '1416400954') {
+          if (vignette.segment == '1423492626' || vignette.segment == '1412953590') {
             utcdiff = 0;
           }
 
@@ -3102,7 +3102,7 @@ var DAV = new function() {
                     view_panorama_link_listpoi += 'place-de-neuve';
                 } else if (vignette.segment == '1423492626') {
                     view_panorama_link_listpoi += 'ssa';
-                } else if (vignette.segment == '1416400954') {
+                } else if (vignette.segment == '1412953590') {
                     view_panorama_link_listpoi += 'tour-de-boel';
                 }
 
@@ -3360,7 +3360,7 @@ var DAV = new function() {
                 view_pointcloud_link += 'place-de-neuve';
             } else if (segment == '1423492626') {
                 view_pointcloud_link += 'ssa';
-            } else if (segment == '1416400954') {
+            } else if (segment == '1412953590') {
                 view_pointcloud_link += 'tour-de-boel';
             }
             //console.log("set pointcloud view link = "+view_pointcloud_link);
@@ -4238,15 +4238,15 @@ var DAV = new function() {
               if (options.continue) {
 console.log('save1')
                  // save and upload
-                 poiPanel.pcl_sequence.save(function(){                    
+                 poiPanel.pcl_sequence.save(function(){
                     // update sequence list
                     poiPanel.pcl_sequence.updateList();
-                    
+
                     // restart editing after save
                     console.log('aftersave')
                     pointCloud.sequence[pointCloud.sequence.length-1].mode.add=true;
                     pointCloud.sequence[pointCloud.sequence.length-1].mode.wheredowegofromhere=true;
-                 
+
                  });
 
                  return;
@@ -4282,7 +4282,7 @@ console.log('save1')
                      poiPanel.updateButtons();
                  });
               }
-             
+
               poiPanel.panorama.drawScene();
 
             }, // poiPanel_pcl_sequence_stop
@@ -4355,15 +4355,15 @@ console.log('success')
 
             // update displayed list of sequences
             updateList: function poiPanel_pcl_sequence_updateList() {
-                
+
                 var html=this.info='';
-                              
+
                 // get the number of sequences
                 var count=poiPanel.panorama.pointCloud.instance.sequence.length;
 
                 // loop over sequences
                 $.each(poiPanel.panorama.pointCloud.instance.sequence,function(index){
-                    
+
                     // skip last sequence (empty or in edit mode)
                     if (index+1==count) {
                         return false;
@@ -4380,8 +4380,8 @@ console.log('success')
                 // do nothing if particleinfo is hidden
                 var div=poiPanel.$('#info');
                 if (!div.length) return;
-                
-                // update or append pcl_sequence_info div to particleinfo div 
+
+                // update or append pcl_sequence_info div to particleinfo div
                 var div2=$('#pcl_sequence_info',div);
                 if (div2.length) {
                     // update list
@@ -4398,16 +4398,16 @@ console.log('success')
             // initialize #sequences div in pointcloud info div
             on_pointcloud_updateinfo: function poiPanel_pcl_sequence_on_pointcloud_updateinfo(e) {
 return;
-                // create sequences div if not existing 
+                // create sequences div if not existing
                 var div=$('#sequences',e.div);
                 if (!div.length) {
                     div=$('<div id="sequences"></div>').appendTo(e.div).css({
                     });
-                    if (poi)                    
+                    if (poi)
                     // append pcl_sequence.info to div
                     div.html('<div id="pcl_sequence_list">'+poiPanel.pcl_sequence.info+'</div>');
                 }
-        
+
             }, // poiPanel_pcl_sequence_on_pointcloud_updateinfo
 
             clearAll: function poiPanel_pcl_sequence_clearAll() {
@@ -4487,7 +4487,7 @@ return;
 
             }, // poiPanel_pcl_sequence_on_particlesequence_pop
 
-            // get rid of joints on particlesequence dispose event            
+            // get rid of joints on particlesequence dispose event
             on_particlesequence_dispose: function poiPanel_pcl_sequence_on_particlesequence_dispose(e) {
                 var sequence=this
                 $.each(sequence.particle_list,function(){
@@ -4560,7 +4560,7 @@ return;
         * actually only point cloud related buttons,
         *
         * @TODO: centralize other buttons mode handling here ie:
-        * leftbar when poiPanel active, and and poiPanel leftpanel 
+        * leftbar when poiPanel active, and and poiPanel leftpanel
         *
         */
         updateButtons: function poiPanel_updateButtons() {
@@ -4597,7 +4597,7 @@ return;
                 }
             }
 
-            // set measure button active state 
+            // set measure button active state
             if (poiPanel.mode.edit_sequence) {
               $('#measure',poiPanel._dom).addClass('active');
 
@@ -4605,7 +4605,7 @@ return;
               $('#measure',poiPanel._dom).removeClass('active');
             }
 
-            // set toggle pointcloud button active state 
+            // set toggle pointcloud button active state
             if (pointCloud.instance && pointCloud.instance.dotMaterial.visible) {
                 $('#toggle_pointcloud').addClass('active');
 
@@ -4673,8 +4673,8 @@ return;
 
             // inverse pointcloud 'visible'' flag
             poiPanel.panorama.pointCloud.instance.dotMaterial.visible=!poiPanel.panorama.pointCloud.instance.dotMaterial.visible;
-            
-            // update 'toggle_pointcloud' button 
+
+            // update 'toggle_pointcloud' button
             if (poiPanel.panorama.pointCloud.instance.dotMaterial.visible) {
                 $(this).addClass('active');
             } else {
@@ -4682,7 +4682,7 @@ return;
             }
 
             poiPanel.panorama.drawScene();
-          
+
           });
 
           // handle keydown events over poiPanel

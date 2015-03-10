@@ -8,7 +8,7 @@ if ($pano == 'mur-des-reformateurs')
 elseif ($pano == 'place-de-neuve')
     $panots = '1404383663';
 elseif ($pano == 'tour-de-boel')
-    $panots = '1416400954';
+    $panots = '1412953590';
 elseif ($pano == 'ssa')
     $panots = '1423492626';
 
