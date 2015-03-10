@@ -4319,7 +4319,7 @@ console.log('save1')
 
                     // network or server error
                     error: function() {
-                      poiPanel.window.$.notify('Error: Could not save segments !');
+                      poiPanel.$.notify('Error: Could not save segments !');
                       if (callback) {
                           callback('error');
                       }
@@ -4330,7 +4330,7 @@ console.log('save1')
 console.log('success')
                       // php script returned an error ?
                       if (json.status!='ok') {
-                        poiPanel.window.$.notify('Error: Could not save segments !');
+                        poiPanel.$.notify('Error: Could not save segments !');
                       }
 
                       // initialize a new empty sequence, if needed.
