@@ -197,9 +197,11 @@ if (isset($_GET['initial']) && isset($_GET['action'])) {
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.pointcloud.sequence.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.pointcloud.sequence.loader.js"></script>
     <script type="text/javascript" src="js/<?php echo $pano; ?>.js"></script>
+    <link rel="stylesheet" type="text/css" media="all" href="../font-awesome-4.3.0/css/font-awesome.css">
     <link rel="stylesheet" type="text/css" media="all" href="../lib/freepano/js/thirdparty/jquery-toastmessage/css/jquery.toastmessage.css" />
     <link rel="stylesheet" type="text/css" media="all" href="../lib/freepano/js/thirdparty/leaflet/leaflet.css" />
     <link rel="stylesheet" type="text/css" media="all" href="../lib/freepano/example/css/main.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="css/dav.css" />
 </head>
 
 <body>
