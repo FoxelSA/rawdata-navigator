@@ -38,10 +38,10 @@
  *      Attribution" section of <http://foxel.ch/license>.
  */
 
-if (!isset($_GET['json']) || empty($_GET['json']) || !file_exists($_GET['json'].'/segment.json'))
+if (!isset($_GET['path']) || empty($_GET['path']) || !file_exists($_GET['path'].'/info/rawdata-autoseg/segment.json'))
     exit();
 
-$json = explode('/',$_GET['json']);
+$json = explode('/',$_GET['path']);
 $len = count($json);
 
 // output
@@ -49,9 +49,9 @@ header('Content-Type: application/json');
 header('Cache-Control: no-cache, must-revalidate');
 
 // back to old format
-if ((int)($json[$len-4]) == 1423492626 || (int)($json[$len-4]) == 1412953590) {
+if ((int)($json[$len-1]) == 1423492626 || (int)($json[$len-1]) == 1412953590) {
 
-    $data = json_decode(file_get_contents($_GET['json'].'/segment.json'));
+    $data = json_decode(file_get_contents($_GET['path'].'/info/rawdata-autoseg/segment.json'));
 
     $data->gps = true;
 
@@ -91,9 +91,29 @@ if ((int)($json[$len-4]) == 1423492626 || (int)($json[$len-4]) == 1412953590) {
 
     $data->pose = $keep;
 
-    echo json_encode($data);
-
 // normal output
 } else {
-    echo file_get_contents($_GET['json'].'/segment.json');
+
+    $data = json_decode(file_get_contents($_GET['path'].'/info/rawdata-autoseg/segment.json'));
+
 }
+
+$utcdiff = 7200;
+if ($json[$len-1] == '1423492626' || $json[$len-1] == '1412953590')
+    $utcdiff = 0;
+
+// check filesystem
+foreach ($data->pose as $pose) {
+
+    $pose->filesystem = (object)array(/*'preview'=>false,*/'panorama'=>false);
+
+    if ($pose->status=='validated') { // && $data->preview == 'debayer' || $data->preview == 'no-debayer') {
+        //if (file_exists($_GET['path'].'/preview/'.$data->preview.'/'.((int)$pose->folder).'/'.($pose->sec).'_'.str_pad($pose->usc,6,'0',STR_PAD_LEFT).'.jpeg'))
+        //    $pose->filesystem->preview = true;
+        if (file_exists($_GET['mnt'].'/footage/demodav/'.$json[$len-1].'/result_'.($pose->sec-$utcdiff).'_'.str_pad($pose->usc,6,'0',STR_PAD_LEFT).'-0-25-1.jpeg'))
+            $pose->filesystem->panorama = true;
+    }
+
+}
+
+echo json_encode($data);

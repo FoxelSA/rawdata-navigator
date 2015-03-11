@@ -908,7 +908,7 @@ var DAV = new function() {
                 this._remaining = allocation.current.segments().length;
                 vignettes.clear();
                 $.each(allocation.current.segments(), function(index,segment) {
-                    $.getJSON('php/csps-json.php?mnt='+storage.mountpoint+'&json='+allocation.current.path+'/'+segment+'/info/rawdata-autoseg/',function(data) {
+                    $.getJSON('php/csps-json.php?mnt='+storage.mountpoint+'&path='+allocation.current.path+'/'+segment,function(data) {
                         segmentation.json.success(index,segment,data);
                     }).fail(segmentation.json.fail);
                 });
@@ -1065,7 +1065,8 @@ var DAV = new function() {
                         latlng: latlng,
                         alt: pose.alt,
                         guess: pose.guess,
-                        status: pose.status
+                        status: pose.status,
+                        filesystem: pose.filesystem
                     };
 
                     if (pose.status=="validated") {
@@ -2482,6 +2483,7 @@ var DAV = new function() {
                 $(information._dom+' .view_panorama').data('href',view_panorama_link);
 
                 // test panorama
+                /*
                 $.ajax({
                     url:test_download_panorama_link,
                     type:'HEAD',
@@ -2496,6 +2498,15 @@ var DAV = new function() {
                         information.show_poiPanel(view_panorama_link,segment);
                     }
                 });
+                */
+                if (pose.filesystem.panorama) {
+                    $('#usages .usage.posepanorama img').attr('src',thumb_panorama_src);
+                    $('#usages .usage.posepanorama').css('display','block');
+                    information.show_poiPanel(view_panorama_link,segment);
+                } else {
+                    $('#usages .usage.posepanorama').css('display','none');
+                    $('#usages .usage.posepoi').css('display','none');
+                }
 
                 // download pointcloud
                 var download_pointcloud_link = 'php/download.php?file='+storage.mountpoint+'/footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.ply';
@@ -3076,6 +3087,7 @@ var DAV = new function() {
             if (allocation.type() == 'panorama') {
                 var testpanoimg = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
                 // test panorama
+                /*
                 $.ajax({
                     url:testpanoimg,
                     type:'HEAD',
@@ -3087,11 +3099,16 @@ var DAV = new function() {
                         $('#vignettes div.wrap.vignette'+index).css('display','block');
                     }
                 });
-                html+='<div class="wrap vignette'+index+'" style="display:none;">';
-                html+='<div class="timestamp">'+date.getSimpleUTCDate()+'</div>';
-                html+='<img class="thumb" alt="n/a"></img>';
-                html+='<div class="info">';
-                html+='<div class="what">Panorama</div></div></div>';
+                */
+                if (vignette.pose.filesystem.panorama) {
+                    html+='<div class="wrap vignette'+index+'" style="display:block;">';
+                    html+='<div class="timestamp">'+date.getSimpleUTCDate()+'</div>';
+                    html+='<img class="thumb" src="'+testpanoimg+'" />';
+                    html+='<div class="info"><div class="what">Panorama</div></div></div>';
+                } else {
+                    html+='<div class="wrap vignette'+index+'" style="display:none;"><div class="info"></div></div>';
+                }
+
             } else if (allocation.type() == 'poi') {
                 var testpanoimg = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
 
@@ -3140,15 +3157,19 @@ var DAV = new function() {
             } else if (allocation.type() == 'pointcloud') {
                 if ($('#vignettes div.wrap.segment'+vignette.segment).length == 0) {
                     html+='<div class="wrap vignette'+index+' segment'+vignette.segment+'">';
+                    html+='<div class="timestamp">&nbsp;</div>';
+                    html+='<img class="thumb" alt="" src="'+document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/pointcloud/pointcloud-'+vignette.segment+'.jpg"></img>';
+                    html+='<div class="info">';
+                    html+='<div class="what">Point Cloud</div></div></div>';
                 } else {
-                    html+='<div class="wrap vignette'+index+' segment'+vignette.segment+'" style="display:none;">';
+                    html+='<div class="wrap vignette'+index+'" style="display:none;"><div class="info"></div></div>';
                 }
-                html+='<div class="timestamp">&nbsp;</div>';
-                html+='<img class="thumb" alt="" src="'+document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/pointcloud/pointcloud-'+vignette.segment+'.jpg"></img>';
-                html+='<div class="info">';
-                html+='<div class="what">Point Cloud</div></div></div>';
+                //html+='<div class="timestamp">&nbsp;</div>';
+                //html+='<img class="thumb" alt="" src="'+document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/pointcloud/pointcloud-'+vignette.segment+'.jpg"></img>';
+                //html+='<div class="info">';
+                //html+='<div class="what">Point Cloud</div></div></div>';
 
-    } else { // allocation.type() == 'raw'
+            } else { // allocation.type() == 'raw'
                 html+='<div class="wrap vignette'+index+'">';
                 html+='<div class="timestamp">'+date.getSimpleUTCDate();
                 //html+='<a class="button fa fa-gear fa-fw"></a></div>';
