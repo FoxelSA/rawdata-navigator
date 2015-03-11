@@ -1,3 +1,6 @@
 [submodule "lib/freepano"]
     path = lib/freepano
     url = https://github.com/FoxelSA/freepano.git
+[submodule "lib/potree"]
+	path = lib/potree
+	url = https://github.com/potree/potree.git
