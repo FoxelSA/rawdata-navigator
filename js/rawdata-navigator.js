@@ -4364,7 +4364,7 @@ console.log('success')
 
             },  // poiPanel_pcl_sequence_save
 
-            // update displayed list of sequences
+            // update sequence button listb
             updateList: function poiPanel_pcl_sequence_updateList() {
 
                 var html=this.info='';
@@ -4394,7 +4394,7 @@ console.log('success')
                        +'</div>';
                 });
 
-                // update or append pcl_sequence_info div to #sequences div
+                // update or append button list container
                 var div=poiPanel.$('#pano');
                 var div2=$('#pcl_sequence_info',div);
                 if (div2.length) {
@@ -4413,79 +4413,153 @@ console.log('success')
                     })
                   );
                 }
-                
-                // sequence buttons
-                $('.seq',div2)
-                .mousedown(function(e){
+
+                // sequence buttons mousedown
+                $('.seq',div2).mousedown(function(e){
 
                     // dont propagate mousedown to panorama
                     e.preventDefault();
 
                     // toggle 'active' class for sequence button instead of using css :active selector
                     // to fix :active conflict between button and embeeded trash/edit icons
-
                     $(e.target).addClass('active');
 
-                    $(document).add(poiPanel.window).off('mouseup.seq').on('mouseup.seq',function(){
+                    // on mouseup anywhere
+                    $(document).add(poiPanel.window).off('mouseup.seq').on('mouseup.seq',function(_e){
+
+                      // remove active class added above
                       $(e.target).removeClass('active');
+
+                      // close color picker
+                      if (!$(_e.target).closest('#colorpicker').length)
+                      poiPanel.$('#colorpicker').hide(0);
+
                     });
 
                     return false;
                 })
-                // sequence button click
+                // sequence buttons click
                 .click(function(e){
+
+                    // with left button
+                    if (!poiPanel.window.isLeftButtonDown(e)) {
+                        return;
+                    }
+
                     // dont mess with embeeded icons click
                     if (!$(e.target).hasClass('seq')) {
                         return;
                     }
-                    e.preventDefault()
+
+                    // dont propagate click to panorama
+                    e.preventDefault();
+
+                    // show sequence
                     poiPanel.pcl_sequence.show(parseInt(this.id.substr(3)));
+
                     return false;
                 });
 
-                // update segment color buttons 
+                // update segment color chooser buttons
                 $('a.colorpicker',div2).each(function(){
+                   var sequence_index=parseInt($(this).closest('div')[0].id.substr(3));
+                   var seq=poiPanel.panorama.pointCloud.instance.sequence[sequence_index];
+                   var color=seq.line.instance.material.color.getHexString();
                    $(this).css({
-                       color: $(this).data('color')||'red',
-                       marginLeft: '12px'
-
+                       color: '#'+color
                    });
                 });
 
-                // click on color picker
-                $(div2).off('click.colorpicker').on('click.colorpicker','a.colorpicker',function(e){
-                   var sequence_id=parseInt($(this).closest('div')[0].id.substr(3));                  
-                   poiPanel.pcl_sequence.show(sequence_id); 
+                // mousedown on sequence button colorpicker button
+                $('a.colorpicker',div2)
+                .off('mousedown.colorpicker')
+                .on('mousedown.colorpicker',function(e){
+
+                   // with left button
+                   if (!poiPanel.window.isLeftButtonDown(e)) {
+                       return;
+                   }
+
+                   // extract sequence id
+                   var sequence_id=parseInt($(this).closest('div')[0].id.substr(3));
+
+                   // show sequence
+          //         poiPanel.pcl_sequence.show(sequence_id,function(){
+           //        });
+
+                   // pick color
+                   poiPanel.pcl_sequence.pickColor(sequence_id,e.target);
 
                 });
-  
+
                 // click on sequence trash button
                 $(div2).off('click.trash').on('click.trash','a.trash',function(e){
-                   var sequence_id=parseInt($(this).closest('div')[0].id.substr(3));                  
-                   poiPanel.pcl_sequence.show(sequence_id, function(){ 
+
+                   // with left button
+                   if (!poiPanel.window.isLeftButtonDown(e)) {
+                       return;
+                   }
+
+                   // extract sequence id
+                   var sequence_id=parseInt($(this).closest('div')[0].id.substr(3));
+
+                   // show first joint
+                   poiPanel.pcl_sequence.show(sequence_id, function(){
+                       // ask deletion confirmation onshow
                        if (confirm('Supprimer ce segment ?')) {
                            poiPanel.pcl_sequence.remove(sequence_id);
                        }
                    });
                 });
-  
+
             }, // poiPanel_pcl_sequence_updateList
 
-            pickColor: function poiPanel_pcl_sequence_pickColor(index) {
+            // show sequence button color picker
+            pickColor: function poiPanel_pcl_sequence_pickColor(sequence_id,target) {
+               poiPanel.$('#colorpicker').css({
+                  top:  $(target).offset().top-5/*padding-top*/,
+                  left: $(target).offset().left-5/*padding-left*/,
+                  display: 'block'
+
+               }).off('click').on('click','a',function(e){
+                   poiPanel.pcl_sequence.setColor(sequence_id,$(this).text());
+                   poiPanel.panorama.drawScene();
+                   poiPanel.$('#colorpicker').hide(0);
+                   poiPanel.pcl_sequence.updateList();
+               });
 
             }, // poiPanel_pcl_sequence_pickColor
 
+            // set sequence line material color
+            setColor: function poiPanel_pcl_sequence_setColor(sequence_index,color) {
+                var seq=poiPanel.panorama.pointCloud.instance.sequence[sequence_index];
+                seq.line.instance.material.color.set(color);
+                seq.line.instance.material.needsUpdate=true;
+
+
+            }, // poiPanel_pcl_sequence_setColor
+
+            // rotate panorama to center first joint of given sequence index
             show: function poiPanel_pcl_sequence_show(index,callback) {
                 var seq=poiPanel.panorama.pointCloud.instance.sequence[index];
                 poiPanel.panorama.joint.show(seq.particle_list[0].jointId,callback);
 
             }, // poiPanel_pcl_sequence_show
 
+            // remove given sequence index from sequence list
             remove: function poiPanel_pcl_sequence_remove(index) {
+
+                // dispose line segments and joints
                 poiPanel.panorama.pointCloud.instance.sequence[index].dispatch('dispose');
+
+                // remove sequence from list
                 poiPanel.panorama.pointCloud.instance.sequence.splice(index,1);
+
+                // update sequence button list
                 poiPanel.pcl_sequence.updateList();
+
                 poiPanel.panorama.drawScene();
+
             }, // poiPanel_pcl_sequence_remove
 
 /*
