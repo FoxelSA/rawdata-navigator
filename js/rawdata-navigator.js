@@ -1675,7 +1675,7 @@ var DAV = new function() {
       _expand: true,
       _dom: "#pointcloudpanel",
       _background_alpha: 1.0,
-      url: document.location.origin+'/potree'
+      url: document.location.origin+'/pointcloud'
   });
 
   var freepanel = this.freepanel = new Panel({
@@ -2502,7 +2502,7 @@ var DAV = new function() {
                 var thumb_pointclound_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.jpg';
                 $(information._dom+' .download_pointcloud').attr('href',download_pointcloud_link);
                 $('#usages .usage.posepointcloud img').attr('src',thumb_pointclound_src);
-                var view_pointcloud_link = document.location.origin+'/dav/potree/examples/potree.php?pano=';
+                var view_pointcloud_link = document.location.origin+'/dav/pointcloud/index.php?ply=';
                 if (segment == '1404381299') {
                     view_pointcloud_link += 'mur-des-reformateurs';
                 } else if (segment == '1404383663') {
@@ -3353,7 +3353,7 @@ var DAV = new function() {
             // download pointcloud
             var thumb_pointclound_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.jpg';
             $('#poipanel_pointcloud img').attr('src',thumb_pointclound_src);
-            var view_pointcloud_link = document.location.origin+'/dav/potree/examples/potree.php?pano=';
+            var view_pointcloud_link = document.location.origin+'/dav/pointcloud/index.php?ply=';
             if (segment == '1404381299') {
                 view_pointcloud_link += 'mur-des-reformateurs';
             } else if (segment == '1404383663') {
