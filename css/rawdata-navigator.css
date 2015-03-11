@@ -1252,6 +1252,7 @@ ul.poi li .buttons {
   right: -1.3em;
   font-size: 5em;
   top: 1.2em;
+  cursor: pointer;
 }
 
 #poipanel .content2 #trash_measure {
@@ -1262,6 +1263,7 @@ ul.poi li .buttons {
   font-size: 5em;
   top: 2.4em;
 
+  cursor: pointer;
 }
 
 #poipanel .content2 #toggle_pointcloud {
@@ -1272,6 +1274,7 @@ ul.poi li .buttons {
   font-size: 4.5em;
   top: 4.0em;
 
+  cursor: pointer;
 }
 
 #poipanel .content2 #trash_measure a {

@@ -3501,13 +3501,24 @@ var DAV = new function() {
           $('#poipanel_inventory').off('click.inventory').on('click.inventory','a.button',function(e){
             panel.inventory_click(e);
           });
+
+          // toggle 'active' class for invetory list item instead of using css :active selector
+          // to fix :active conflict between inventory list item and trash/edit icons
           $('#poipanel_inventory').on('mousedown.inventory','li',function(e){
+            if (e.target.nodeName.toLowerCase()!='li') {
+                console.log('fixme');
+                return;
+            }
             $(e.target).addClass('active');
             $(document).add(panel.window).off('mouseup.inventory').on('mouseup.inventory',function(){
               $(e.target).removeClass('active');
             });
           });
           $('#poipanel_inventory').on('click.inventory','li',function(e){
+            if (e.target.nodeName.toLowerCase()!='li') {
+                console.log('fixme');
+                return;
+            }
             panel.inventory_click(e);
           });
 
@@ -4361,6 +4372,11 @@ console.log('success')
                 // get the number of sequences
                 var count=poiPanel.panorama.pointCloud.instance.sequence.length;
 
+                // @TODO: unique numbers for sequences
+                if (poiPanel.panorama.pointCloud.instance.nextSequenceIndex==undefined) {
+                    poiPanel.panorama.pointCloud.instance.nextSequenceIndex=1;
+                }
+
                 // loop over sequences
                 $.each(poiPanel.panorama.pointCloud.instance.sequence,function(index){
 
@@ -4374,14 +4390,12 @@ console.log('success')
                         '<div class="seq" id="seq'+index+'">'
                        +'Sequence '+(index+1)
                        +'<a class="colorpicker fa fa-square fa-fw"></a>'
+                       +'<a class="trash fa fa-trash fa-fw"></a>'
                        +'</div>';
                 });
 
-                // do nothing if particleinfo is hidden
-                var div=poiPanel.$('#info');
-                if (!div.length) return;
-
-                // update or append pcl_sequence_info div to particleinfo div
+                // update or append pcl_sequence_info div to #sequences div
+                var div=poiPanel.$('#pano');
                 var div2=$('#pcl_sequence_info',div);
                 if (div2.length) {
                     // update list
@@ -4389,31 +4403,96 @@ console.log('success')
 
                 } else {
                   // append list
-                  div.append('<div id="pcl_sequence_info">'+this.info+'</div>');
-
+                  div.append(
+                    div2=$('<div id="pcl_sequence_info">'+this.info+'</div>')
+                    .css({
+                      position: 'absolute',
+                      top: '120px',
+                      left: '0px',
+                      zindex: 999999
+                    })
+                  );
                 }
+                
+                // sequence buttons
+                $('.seq',div2)
+                .mousedown(function(e){
 
+                    // dont propagate mousedown to panorama
+                    e.preventDefault();
+
+                    // toggle 'active' class for sequence button instead of using css :active selector
+                    // to fix :active conflict between button and embeeded trash/edit icons
+
+                    $(e.target).addClass('active');
+
+                    $(document).add(poiPanel.window).off('mouseup.seq').on('mouseup.seq',function(){
+                      $(e.target).removeClass('active');
+                    });
+
+                    return false;
+                })
+                // sequence button click
+                .click(function(e){
+                    // dont mess with embeeded icons click
+                    if (!$(e.target).hasClass('seq')) {
+                        return;
+                    }
+                    e.preventDefault()
+                    poiPanel.pcl_sequence.show(parseInt(this.id.substr(3)));
+                    return false;
+                });
+
+                // update segment color buttons 
+                $('a.colorpicker',div2).each(function(){
+                   $(this).css({
+                       color: $(this).data('color')||'red',
+                       marginLeft: '12px'
+
+                   });
+                });
+
+                // click on color picker
+                $(div2).off('click.colorpicker').on('click.colorpicker','a.colorpicker',function(e){
+                   var sequence_id=parseInt($(this).closest('div')[0].id.substr(3));                  
+                   poiPanel.pcl_sequence.show(sequence_id); 
+
+                });
+  
+                // click on sequence trash button
+                $(div2).off('click.trash').on('click.trash','a.trash',function(e){
+                   var sequence_id=parseInt($(this).closest('div')[0].id.substr(3));                  
+                   poiPanel.pcl_sequence.show(sequence_id, function(){ 
+                       if (confirm('Supprimer ce segment ?')) {
+                           poiPanel.pcl_sequence.remove(sequence_id);
+                       }
+                   });
+                });
+  
             }, // poiPanel_pcl_sequence_updateList
 
-            // initialize #sequences div in pointcloud info div
-            on_pointcloud_updateinfo: function poiPanel_pcl_sequence_on_pointcloud_updateinfo(e) {
-return;
-                // create sequences div if not existing
-                var div=$('#sequences',e.div);
-                if (!div.length) {
-                    div=$('<div id="sequences"></div>').appendTo(e.div).css({
-                    });
-                    if (poi)
-                    // append pcl_sequence.info to div
-                    div.html('<div id="pcl_sequence_list">'+poiPanel.pcl_sequence.info+'</div>');
-                }
+            pickColor: function poiPanel_pcl_sequence_pickColor(index) {
 
-            }, // poiPanel_pcl_sequence_on_pointcloud_updateinfo
+            }, // poiPanel_pcl_sequence_pickColor
 
+            show: function poiPanel_pcl_sequence_show(index,callback) {
+                var seq=poiPanel.panorama.pointCloud.instance.sequence[index];
+                poiPanel.panorama.joint.show(seq.particle_list[0].jointId,callback);
+
+            }, // poiPanel_pcl_sequence_show
+
+            remove: function poiPanel_pcl_sequence_remove(index) {
+                poiPanel.panorama.pointCloud.instance.sequence[index].dispatch('dispose');
+                poiPanel.panorama.pointCloud.instance.sequence.splice(index,1);
+                poiPanel.pcl_sequence.updateList();
+                poiPanel.panorama.drawScene();
+            }, // poiPanel_pcl_sequence_remove
+
+/*
             clearAll: function poiPanel_pcl_sequence_clearAll() {
 
             }, // poiPanel_pcl_sequence_clearAll
-
+*/
             on_pointcloud_particleclick: function poiPanel_pcl_sequence_on_pointcloud_particleclick(e) {
 
               var pointCloud=this;
@@ -4541,14 +4620,17 @@ return;
 
             on_pointcloud_ready: function pcl_sequence_on_pointcloud_ready() {
                 poiPanel.updateButtons();
+                poiPanel.pcl_sequence.updateList();
             }, // poiPanel_pcl_sequence_on_pointcloud_ready
 
             on_pointcloud_sequenceload: function pcl_sequence_on_pointcloud_sequenceload() {
                 poiPanel.updateButtons();
+                poiPanel.pcl_sequence.updateList();
             }, // poiPanel_pcl_sequence_on_pointcloud_sequenceload
 
             on_pointcloud_loaderror: function pcl_sequence_on_pointcloud_loaderror() {
                 poiPanel.updateButtons();
+                poiPanel.pcl_sequence.updateList();
             } // pcl_sequence_on_pointcloud_loaderror
 
         }, // pcl_sequence
