@@ -314,7 +314,10 @@ a.fa.disabled, a.fa.disabled:hover, a.fa.disabled:active {
         display:block;
         padding:10px;
         color:#fff;
+
         background-color:#222;
+
+
         margin-bottom:5px;
     }
 
@@ -324,9 +327,12 @@ a.fa.disabled, a.fa.disabled:hover, a.fa.disabled:active {
         }
 
         #allocation a.quick:active {
+            transform: scale(0.99);
             background-color:#333;
             color:#ecb100;
-            transform: scale(0.98);
+            background: -webkit-gradient(linear, left top, left bottom, from(#111), to(#333));
+            background: -moz-linear-gradient(top, #111, #333);
+            background: -o-linear-gradient(#111111, #333333);
         }
 
     .allocation {
@@ -773,7 +779,20 @@ a.fa.disabled, a.fa.disabled:hover, a.fa.disabled:active {
 }
 
 #vignettes .wrap.current, ul.poi li.current {
-  box-shadow: 0 0 1.5em #ecb100;
+  box-shadow: 0 0 1.0em #ecb100;
+}
+#vignettes .wrap.current:hover {
+  box-shadow: 0 0 0.75em #ecb100;
+}
+#vignettes .wrap.current:active {
+  box-shadow: 0 0 0.5em #ecb100;
+}
+
+#vignettes .wrap:hover {
+  box-shadow: 0 0 0.75em rgba(255,255,255,0.5);
+}
+#vignettes .wrap:active {
+  box-shadow: 0 0 0.25em #fff;
 }
 
 
@@ -883,9 +902,18 @@ a.fa.disabled, a.fa.disabled:hover, a.fa.disabled:active {
         padding:10px;
         font-weight:bold;
     }
-
+    #usages .title.fa-caret-down::before {
+      padding-right: 10px;
+    }
+    #usages .title.fa-caret-right::before {
+      padding-right: 12px;
+    }
         #usages .usage .title.pointer {
             cursor:pointer;
+        }
+
+        #usages .usage .title.pointer.down {
+
         }
 
             #usages .usage .title.pointer:hover {
@@ -893,8 +921,11 @@ a.fa.disabled, a.fa.disabled:hover, a.fa.disabled:active {
             }
 
             #usages .usage .title.pointer:active {
-                transform: scale(0.98);
                 color:#ecb100;
+/*                background: -webkit-gradient(linear, left top, left bottom, from(#000), to(#222));
+                background: -moz-linear-gradient(top, #000, #222);
+                background: -o-linear-gradient(#000000, #222222);
+                */
             }
 
     #usages .usage .closeable {
@@ -916,16 +947,28 @@ a.fa.disabled, a.fa.disabled:hover, a.fa.disabled:active {
         padding:10px;
         background-color:#222;
         margin-top:5px;
+        color:#fff;
+        background: -webkit-gradient(linear, left top, left bottom, from(#222), to(#111));
+        background: -moz-linear-gradient(top, #333, #222);
+        background: -o-linear-gradient(#333333, #222222);
+        border-radius: 4px;
+
     }
 
-        #usages .usage .actions .action {
-            color:#fff;
+        #usages .usage .actions .action:hover {
+            background-color:#333;
+            background: -webkit-gradient(linear, left top, left bottom, from(#333), to(#222));
+            background: -moz-linear-gradient(top, #333, #222);
+            background: -o-linear-gradient(#333333, #222222);
         }
 
-        #usages .usage .actions .action:active,
-        #usages .usage .actions .action:hover {
+        #usages .usage .actions .action:active {
             transform: scale(0.99);
-            background-color:#333;
+            background-color:#444;
+            background: -webkit-gradient(linear, left top, left bottom, from(#222), to(#333));
+            background: -moz-linear-gradient(top, #222, #333);
+            background: -o-linear-gradient(#222222, #333333);
+
             color:#ecb100;
         }
 

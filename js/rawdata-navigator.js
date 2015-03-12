@@ -152,10 +152,32 @@ var DAV = new function() {
         // allocation
         allocation.init();
 
+        function updateCaret(title,sibling) {
+            if ($(sibling).is(':visible')) {
+                 $(title)
+                .removeClass('fa-caret-right')
+                .addClass('fa-caret-down');
+
+            } else {
+                $(title)
+                .removeClass('fa-caret-down')
+                .addClass('fa-caret-right');
+            }
+        }
+
         // slidetoggle
         $('#usages .usage .title').on('click',function() {
-            $(this).siblings('.closeable').slideToggle();
+            var title=this;
+            $(title).siblings('.closeable').slideToggle({
+                complete: function slideToggle_start(e) {
+                    updateCaret(title,this);
+                }
+            });
+        }).each(function(){
+            var title=this;
+            updateCaret(title,$(title).siblings('.closeable'));
         });
+
         // info scroll
         $('#pose_info #usages').height($('#leftpanel').height()-100);
         $('#pose_info #usages').mCustomScrollbar({
