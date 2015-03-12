@@ -152,7 +152,7 @@ var DAV = new function() {
         // allocation
         allocation.init();
 
-        function updateCaret(title,sibling) {
+        DAV.updateCaret=function updateCaret(title,sibling) {
             if ($(sibling).is(':visible')) {
                  $(title)
                 .removeClass('fa-caret-right')
@@ -165,17 +165,24 @@ var DAV = new function() {
             }
         }
 
+        DAV.updateAllCarets=function updateAllCarets(){
+            $('#usages .usage .title').each(function(){
+                var title=this;
+                DAV.updateCaret(title,$(title).siblings('.closeable'));
+            });
+        }
+
         // slidetoggle
         $('#usages .usage .title').on('click',function() {
             var title=this;
             $(title).siblings('.closeable').slideToggle({
                 complete: function slideToggle_start(e) {
-                    updateCaret(title,this);
+                    DAV.updateCaret(title,this);
                 }
             });
         }).each(function(){
             var title=this;
-            updateCaret(title,$(title).siblings('.closeable'));
+            DAV.updateCaret(title,$(title).siblings('.closeable'));
         });
 
         // info scroll
@@ -2562,31 +2569,51 @@ var DAV = new function() {
                 if (allocation.type() == 'pointcloud') {
                     if ($('#usages .usage.posepointcloud').length > 0) {
                         $('#usages .usage.posepointcloud').parent().prepend($('#usages .usage.posepointcloud'));
-                        $('#usages .usage:not(.posepointcloud) .closeable').slideUp();
-                        $('#usages .usage.posepointcloud .closeable').slideDown();
+                        $('#usages .usage:not(.posepointcloud) .closeable').slideUp({
+                            complete: DAV.updateAllCarets
+                        });
+                        $('#usages .usage.posepointcloud .closeable').slideDown({
+                            complete: DAV.updateAllCarets
+                        });
                     }
                 } else if (allocation.type() == 'panorama') {
                     if ($('#usages .usage.posepanorama').length > 0) {
                         $('#usages .usage.posepanorama').parent().prepend($('#usages .usage.posepanorama'));
-                        $('#usages .usage:not(.posepanorama) .closeable').slideUp();
-                        $('#usages .usage.posepanorama .closeable').slideDown();
+                        $('#usages .usage:not(.posepanorama) .closeable').slideUp({
+                            complete: DAV.updateAllCarets
+                        });
+                        $('#usages .usage.posepanorama .closeable').slideDown({
+                            complete: DAV.updateAllCarets
+                        });
                     }
                 } else if (allocation.type() == 'poi') {
                     if ($('#usages .usage.posepanorama').length > 0) {
                         $('#usages .usage.posepanorama').parent().prepend($('#usages .usage.posepanorama'));
-                        $('#usages .usage:not(.posepanorama):not(.posepoi) .closeable').slideUp();
-                        $('#usages .usage.posepanorama .closeable').slideDown();
+                        $('#usages .usage:not(.posepanorama):not(.posepoi) .closeable').slideUp({
+                            complete: DAV.updateAllCarets
+                        });
+                        $('#usages .usage.posepanorama .closeable').slideDown({
+                            complete: DAV.updateAllCarets
+                        });
                     }
                     if ($('#usages .usage.posepoi').length > 0) {
                         $('#usages .usage.posepoi').parent().prepend($('#usages .usage.posepoi'));
-                        $('#usages .usage:not(.posepoi):not(.posepanorama) .closeable').slideUp();
-                        $('#usages .usage.posepoi .closeable').slideDown();
+                        $('#usages .usage:not(.posepoi):not(.posepanorama) .closeable').slideUp({
+                            complete: DAV.updateAllCarets
+                        });
+                        $('#usages .usage.posepoi .closeable').slideDown({
+                            complete: DAV.updateAllCarets
+                        });
                     }
                 // raw
                 } else {
                     $('#usages .usage.posepreview').parent().prepend($('#usages .usage.posepreview'));
-                    $('#usages .usage:not(.posepreview) .closeable').slideUp();
-                    $('#usages .usage.posepreview .closeable').slideDown();
+                    $('#usages .usage:not(.posepreview) .closeable').slideUp({
+                        complete: DAV.updateAllCarets
+                    });
+                    $('#usages .usage.posepreview .closeable').slideDown({
+                        complete: DAV.updateAllCarets
+                    });
                 }
 
             });
@@ -4351,12 +4378,16 @@ console.log('save1')
                 var seq_list=[];
                 console.log('ajax')
                 $.each(pointCloud.sequence,function(){
-                    if (this.particle_list.length) {
+                    var seq=this;
+                    if (seq.particle_list.length) {
                       var index_list=[];
-                      $.each(this.particle_list,function(){
+                      $.each(seq.particle_list,function(){
                           index_list.push(this.index);
                       });
-                      seq_list.push(index_list)
+                      seq_list.push({
+                          color: seq.line.instance.material.color.getHexString(),
+                          particle_list: index_list
+                      });
                     }
                 });
 
@@ -4569,6 +4600,7 @@ console.log('success')
                    poiPanel.panorama.drawScene();
                    poiPanel.$('#colorpicker').hide(0);
                    poiPanel.pcl_sequence.updateList();
+                   poiPanel.pcl_sequence.save();
                });
 
             }, // poiPanel_pcl_sequence_pickColor
