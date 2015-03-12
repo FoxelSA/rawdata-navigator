@@ -180,7 +180,6 @@ if (isset($_GET['initial']) && isset($_GET['action'])) {
     <script type="text/javascript" src="../lib/freepano/js/thirdparty/three.js/shaders/EdgeShader2.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/thirdparty/howler.js/howler.core.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/thirdparty/howler.js/howler.effects.js"></script>
-    <script type="text/javascript" src="js/thirdparty/jquery.colourPicker.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/notify.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/eventDispatcher.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.js"></script>
@@ -202,7 +201,6 @@ if (isset($_GET['initial']) && isset($_GET['action'])) {
     <link rel="stylesheet" type="text/css" media="all" href="../lib/freepano/js/thirdparty/jquery-toastmessage/css/jquery.toastmessage.css" />
     <link rel="stylesheet" type="text/css" media="all" href="../lib/freepano/js/thirdparty/leaflet/leaflet.css" />
     <link rel="stylesheet" type="text/css" media="all" href="../lib/freepano/example/css/main.css" />
-    <link rel="stylesheet" type="text/css" media="all" href="css/jquery.colourPicker.css" />
     <link rel="stylesheet" type="text/css" media="all" href="css/dav.css" />
 </head>
 
