@@ -4139,7 +4139,7 @@ var DAV = new function() {
         editCancel: function poiPanel_editCancel() {
           var panel=this;
 
-          if (!panel.panorama) {
+          if (!panel.panorama || !panel.panorama.poi || !panel.panorama.poi.list) {
               return;
           }
 
