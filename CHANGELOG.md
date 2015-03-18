@@ -2,6 +2,11 @@
 ## Changelog
 
 
+### 1.3.3 (March 18, 2015)
+
+- `ADDED` Pose unknown flag in case the associated MOV has not been splitted.
+
+
 ### 1.3.2 (March 6, 2015)
 
 - `ADDED` Poses can be filtered by their status.
