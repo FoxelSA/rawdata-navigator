@@ -195,6 +195,7 @@ var RawDataNavigator = new function() {
                     trashed: stats.trash,
                     corrupted: stats.corrupt,
                     missed: stats.miss,
+                    unknown: stats.unknown,
                     gps: info.gps,
                     split: info.split,
                     preview: info.preview,
@@ -233,7 +234,7 @@ var RawDataNavigator = new function() {
                 // mouse enter
                 timeline.box(item.id).on('mouseenter',function(e) {
                     $('#statistics div').html(item.segmentation.length+' poses'
-                        + ' ['+item.segmentation.validated+' valid, '+item.segmentation.missed+' missing, '+item.segmentation.trashed+' trashed, '+item.segmentation.corrupted+' corrupted]'
+                        + ' ['+item.segmentation.validated+' valid, '+item.segmentation.missed+' missing, '+item.segmentation.trashed+' trashed, '+item.segmentation.corrupted+' corrupted, '+item.segmentation.unknown+' not splitted]'
                         + ' <span>GPS :&nbsp; '+(item.segmentation.gps?'Yes':'No')+'</span>'
                         + ' <span>Splitted :&nbsp; '+(item.segmentation.split?'Yes':'No')+'</span>'
                         + ' <span>Preview :&nbsp; '+(item.segmentation.preview?'Yes ('+item.segmentation.debayer+')':'No')+'</span>');
@@ -712,6 +713,7 @@ var RawDataNavigator = new function() {
                 var trashed = 0;
                 var corrupted = 0;
                 var missed = 0;
+                var unknown = 0;
 
                 // gui
                 overlay.show('Building layers, please wait...');
@@ -745,6 +747,8 @@ var RawDataNavigator = new function() {
                         corrupted++;
                     else if (pose.raw=='miss')
                         missed++;
+                    else if (pose.raw=='unknown')
+                        unknown++;
                     else
                         validated++;
 
@@ -790,7 +794,8 @@ var RawDataNavigator = new function() {
                     valid: validated,
                     trash: trashed,
                     corrupt: corrupted,
-                    miss: missed
+                    miss: missed,
+                    unknown: unknown
                 });
 
                 // segmentation
@@ -956,7 +961,8 @@ var RawDataNavigator = new function() {
                     valid: false,
                     miss: false,
                     trash: false,
-                    corrupt: false
+                    corrupt: false,
+                    unknown: false
                 },
 
                 /**
@@ -1008,7 +1014,8 @@ var RawDataNavigator = new function() {
                                             .append(this._item('valid','validated',true))
                                             .append(this._item('miss','missing',false))
                                             .append(this._item('trash','trashed',false))
-                                            .append(this._item('corrupt','corrupted',false)
+                                            .append(this._item('corrupt','corrupted',false))
+                                            .append(this._item('unknown','not splitted',false)
                             );
 
                             // add icon to container
