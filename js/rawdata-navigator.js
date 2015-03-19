@@ -3572,7 +3572,7 @@ var DAV = new function() {
             panel.inventory_click(e);
           });
 
-          // toggle 'active' class for invetory list item instead of using css :active selector
+          // toggle 'active' class for inventory list item instead of using css :active selector
           // to fix :active conflict between inventory list item and trash/edit icons
           $('#poipanel_inventory').on('mousedown.inventory','li',function(e){
             if (e.target.nodeName.toLowerCase()!='li') {
@@ -4289,11 +4289,19 @@ var DAV = new function() {
               /* remove non-validated segment */
               var seq=pointCloud.sequence[pointCloud.sequence.length-1];
               var count=seq.particle_list.length;
+
+              if (count>2) {
+                  // remove angle sprite
+                  poiPanel.pcl_sequence.removeAngleSprite(seq.particle_list[count-2].jointId);
+              }
+
               var lastParticle=seq.particle_list[count-1];
               if ((count>1 && lastParticle.index!=seq.lastclicked) || (count==1)) {
                   if (count>2) {
                     // remove last particle
                     seq.pop(lastParticle);
+
+
                   } else {
                     /* remove all particles (count < 2 or second is not validated) */
                     while(count--) {
@@ -4317,7 +4325,6 @@ var DAV = new function() {
               poiPanel.panorama.drawScene();
 
               if (options.continue) {
-console.log('save1')
                  // save and upload
                  poiPanel.pcl_sequence.save(function(){
                     // update sequence list
@@ -4666,10 +4673,6 @@ console.log('success')
                 poiPanel.updateButtons();
               }
 
-              // add a joint if no double click detected
-              if (!seq.doubleClick || !seq.doubleClick.bool) {
-              }
-
               // return if less than 2 particles
               if (seq.particle_list.length<2) {
                   return;
@@ -4702,7 +4705,7 @@ console.log('success')
                 sequence.pointCloud.cursor.sprite.visible=false;
               }
 
-              // ad joint
+              // add joint
               poiPanel.pcl_sequence.addJoint(sequence,particle);
 
             }, // poiPanel_pcl_sequence_on_particlesequence_add
@@ -4753,6 +4756,11 @@ console.log('success')
                   // instantiate joint
                   joint.add(joint_list);
 
+                  // show angle between two last segments
+                  if (seq.particle_list.length>2) {
+                    poiPanel.pcl_sequence.showAngle();
+                  }
+
             }, // poiPanel_pcl_sequence_addJoint
 
             joint_dispose: function poiPanel_pcl_sequence_joint_dispose(seq,particle) {
@@ -4767,6 +4775,146 @@ console.log('success')
 
             }, // poiPanel_pcl_sequence_joint_dispose
 
+            // display angle between the two last particle sequence segments
+            // near the related line joint
+            showAngle: function poiPanel_pcl_sequence_showAngle() {
+
+                var pointCloud=poiPanel.panorama.pointCloud.instance;
+                var v1=new poiPanel.window.THREE.Vector3();
+                var v2=new poiPanel.window.THREE.Vector3();
+
+                // get last sequence
+                var seq=pointCloud.sequence[pointCloud.sequence.length-1];
+                if (!seq || seq.particle_list.length<3) {
+                    return;
+                }
+
+                // compute angle between last two segments
+                var vertices=seq.line.instance.geometry.vertices;
+                v1.subVectors(vertices[vertices.length-1],vertices[vertices.length-2]);
+                v2.subVectors(vertices[vertices.length-3],vertices[vertices.length-2]);
+                var angle=v1.angleTo(v2)*180/Math.PI;
+                console.log(angle);
+
+                // remove previous segment angle
+                if (seq.particle_list.length>3) {
+                    poiPanel.pcl_sequence.removeAngleSprite(seq.particle_list[seq.particle_list.length-3].jointId);
+                }
+
+                // get angle joint id
+                var joint=poiPanel.panorama.joint.list[seq.particle_list[seq.particle_list.length-2].jointId];
+                var action;
+
+                // instantiate canvas if needed
+                if (!joint.angle) {
+                    joint.angle={
+                        canvas: document.createElement('canvas')
+                    }
+                    action='addToScene';
+                }
+
+                // convert angle to text
+                joint.angle.value=angle;
+                var text=(Math.round(angle*1000)/1000)+"\xB0";
+
+                // instantiate or update angle text sprite
+                joint.angle.sprite=poiPanel.pcl_sequence.text2Sprite(text,joint.angle);
+
+                if (action=='addToScene') {
+                    joint.angle.sprite.position.setY(3);
+                    joint.instance.object3D.add(joint.angle.sprite);
+                }
+
+            }, // poiPanel_pcl_sequence_showAngle
+
+            /**
+            * pcl_sequence.text2canvas(text,options)
+            *
+            * Create or update text canvas.
+            * If options.canvas is specified, re-use this canvas
+            *
+            * @param text   the text string
+            * @param options  the options
+            *
+            */
+            text2Canvas: function poiPanel_pcl_sequence_text2Canvas(text,options){
+
+              var options=$.extend(true,{
+                 fontSize: 36,
+                 padding: 12,
+              }, options);
+
+              var canvas=options.canvas||document.createElement('canvas');
+              var ctx=canvas.getContext('2d');
+
+              // measure text
+              ctx.font=options.font||" "+options.fontSize+"px helvetica";
+              ctx.align='left';
+              ctx.textBaseline='middle';
+              var size=ctx.measureText(text);
+
+              // set canvas size according to text width
+              canvas.width=size.width+options.padding;
+              canvas.height=options.padding*2+options.fontSize;
+              ctx=canvas.getContext('2d');
+
+              // draw text
+              ctx.beginPath();
+              ctx.lineWidth=1;
+              ctx.font=options.font||" "+options.fontSize+"px helvetica";
+              ctx.fillStyle=options.fillStyle||"rgba(255,255,255,1)";
+              ctx.strokeStyle=options.strokeStyle||"rgba(0,0,0,1)";
+              ctx.align='left';
+              ctx.textBaseline='middle';
+              ctx.lineWidth=3;
+              ctx.strokeText(text,options.padding,canvas.height/2,(canvas.width-options.padding*2));
+              ctx.lineWidth=1;
+              ctx.fillText(text,options.padding,canvas.height/2,(canvas.width-options.padding*2));
+
+              return canvas;
+
+            }, // poiPanel_pcl_sequence_text2Canvas
+
+            /**
+            * pcl_sequence.text2Sprite(text,options)
+            *
+            * Create or update text sprite
+            *
+            * If options.sprite is specified, re-use this sprite
+            *
+            * @param text   the text string
+            * @param options  the options
+            *
+            */
+            text2Sprite: function poiPanel_pcl_sequence_text2Sprite(text,options) {
+
+                var THREE=poiPanel.window.THREE;
+
+                // instantiate or update text canvas
+                var canvas=poiPanel.pcl_sequence.text2Canvas(text,options);
+
+                // instantiate or re-use texture
+                var texture=(options.sprite)?options.sprite.material.map:new THREE.Texture(canvas);
+                texture.needsUpdate=true;
+
+                // instantiate or re-use sprite
+                var sprite=(options.sprite)?
+                    options.sprite :
+                    new THREE.Sprite(new THREE.SpriteMaterial({
+                       map: texture,
+                       transparent: true,
+                       depthTest: false,
+                       depthWrite: false
+                    }));
+
+                // fixed label scale
+                sprite._scaleFactor=1/20;
+                sprite.scale.set(canvas.width*sprite._scaleFactor,canvas.height*sprite._scaleFactor,1.0);
+
+                return sprite;
+
+            }, // poiPanel_pcl_sequence_angleSprite
+
             on_pointcloud_ready: function pcl_sequence_on_pointcloud_ready() {
                 poiPanel.updateButtons();
                 poiPanel.pcl_sequence.updateList();
@@ -4780,9 +4928,18 @@ console.log('success')
             on_pointcloud_loaderror: function pcl_sequence_on_pointcloud_loaderror() {
                 poiPanel.updateButtons();
                 poiPanel.pcl_sequence.updateList();
-            } // pcl_sequence_on_pointcloud_loaderror
+            }, // pcl_sequence_on_pointcloud_loaderror
+
+            removeAngleSprite: function poiPanel_pcl_sequence_removeAngleSprite(jointId) {
+                var joint=poiPanel.panorama.joint.list[jointId];
+                joint.instance.object3D.remove(joint.angle.sprite);
+                joint.angle.sprite.material.dispose();
+                delete joint.angle.canvas;
+            }, // poiPanel_pcl_sequence_removeAngleSprite
+
 
         }, // pcl_sequence
+
 
         /**
         * poiPanel.updateButtons()
@@ -5022,7 +5179,7 @@ function _tile(col,row) {
            if (i.particles && i.particles.object3D) {
               i.particles.object3D.visible=false;
            }
-        
+
        }
    })
    DAV.poiPanel.panorama.drawScene();
