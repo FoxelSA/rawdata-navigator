@@ -4800,6 +4800,8 @@ console.log('success')
             /* point cloud related buttons */
 
             if (!poiPanel.panorama || !poiPanel.panorama.pointCloud || !poiPanel.panorama.pointCloud.instance) {
+                // no pointcloud, disable all pointcloud related buttons
+                $('.content2 a',poiPanel._domElement).addClass('disabled');
                 return;
             }
 
@@ -4836,12 +4838,16 @@ console.log('success')
               $('#measure',poiPanel._dom).removeClass('active');
             }
 
-            // set toggle pointcloud button active state
-            if (pointCloud.instance && pointCloud.instance.dotMaterial.visible) {
-                $('#toggle_pointcloud').addClass('active');
+            if (pointCloud.instance && pointCloud.instance.object3D && pointCloud.instance.object3D.children.length) {
+              // set toggle pointcloud button active state
+              if (pointCloud.instance && pointCloud.instance.visible) {
+                  $('#toggle_pointcloud').addClass('active');
 
+              } else {
+                  $('#toggle_pointcloud').removeClass('active');
+              }
             } else {
-                $('#toggle_pointcloud').removeClass('active');
+               $('#toggle_pointcloud').removeClass('active').addClass('disabled');
             }
 
         }, // poiPanel_updateButtons
@@ -4902,11 +4908,15 @@ console.log('success')
           // click on pointcloud toggle button
           $('#toggle_pointcloud',panel.dom).off('click').on('click',function(e){
 
-            // inverse pointcloud 'visible'' flag
-            poiPanel.panorama.pointCloud.instance.dotMaterial.visible=!poiPanel.panorama.pointCloud.instance.dotMaterial.visible;
+            if ($(e.target).hasClass('disabled')) {
+              return;
+            }
+
+            // inverse pointcloud 'visible' flag
+            poiPanel.panorama.pointCloud.instance.visible=!poiPanel.panorama.pointCloud.instance.visible;
 
             // update 'toggle_pointcloud' button
-            if (poiPanel.panorama.pointCloud.instance.dotMaterial.visible) {
+            if (poiPanel.panorama.pointCloud.instance.visible) {
                 $(this).addClass('active');
             } else {
                 $(this).removeClass('active');
@@ -4998,4 +5008,24 @@ window.getpanelstate = function getpanelstate() {
 }
 */
 
+function _tile(col,row) {
+
+    DAV.poiPanel.panorama.sphere.object3D.children.forEach(function(i,v){
+        if (i.col==col && i.row==row) {
+            i.material.wireframe=true ;
+            if (i.particles && i.particles.object3D) {
+               i.particles.object3D.visible=true;
+            }
+              console.log(v)
+        } else {
+           i.material.wireframe=false;
+           if (i.particles && i.particles.object3D) {
+              i.particles.object3D.visible=false;
+           }
+        
+       }
+   })
+   DAV.poiPanel.panorama.drawScene();
+
+}
 

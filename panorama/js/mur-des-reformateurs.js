@@ -1228,6 +1228,9 @@ $(document).on('filesloaded', function(){
     },
 
     pointCloud: {
+      testing: false,  // test displaying pointcloud per tile
+      allInOne: false, // display entire pointcloud
+      
       active: true,
 
       showDebugInfo: true,
@@ -1245,11 +1248,10 @@ $(document).on('filesloaded', function(){
           color: 'yellow',
           sizeAttenuation: false,
 //          transparent: true,
-          opacity: 0.8,
-          alphaTest: 0.1,
+//          opacity: 0.8,
+//          alphaTest: 0.1,
           depthTest: false,
-          depthWrite: false,
-          visible: false
+          depthWrite: false
       }), // pointCloud.defaults.dotMaterial
 
       enableParticleEvents: false,
