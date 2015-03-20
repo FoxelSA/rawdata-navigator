@@ -415,6 +415,19 @@ a, a:link, a:visited, a:hover, a:active {
                 background-color:transparent;
             }
 
+    #info .video {
+        display:none;
+        position:absolute;
+        top:92px;
+        left:605px;
+        border:solid 1px #4f4f4f;
+        z-index:1050;
+    }
+
+        #vid * {
+            outline:0;
+        }
+
     #info .data {
         position:relative;
         margin-left:50px;
@@ -496,18 +509,15 @@ a, a:link, a:visited, a:hover, a:active {
         margin-bottom:30px;
     }
 
-        #info .video {
-            position:absolute;
-            top:0;
-            left:0;
-            border:solid 1px #4f4f4f;
-        }
-
         #info .preview {
             position:absolute;
             top:0;
             left:0;
         }
+
+            #info .preview.valid {
+                cursor:pointer;
+            }
 
             #info .preview img {
                 border:solid 1px #4f4f4f;

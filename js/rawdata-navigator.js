@@ -1468,6 +1468,7 @@ var RawDataNavigator = new function() {
 
         _component: null,
         _dom: '#info',
+        _width: 0,
         _scrollbar: null,
 
         _segment: null,
@@ -1480,6 +1481,7 @@ var RawDataNavigator = new function() {
         init: function() {
 
             this._component = $(this._dom+' .data');
+            this._width = $(this._dom).width();
 
             this.scrollbar();
             this.events();
@@ -1555,6 +1557,16 @@ var RawDataNavigator = new function() {
                 });
             });
 
+            // preview
+            $(this._dom+' .preview img').on('click',function(e) {
+                if (information.video._opened) {
+                    information.video.close();
+                } else {
+                    if ($(information._dom+' .preview').hasClass('valid')) // do not open on unavailable preview
+                        information.video.open();
+                }
+            });
+
         },
 
         /**
@@ -1590,7 +1602,7 @@ var RawDataNavigator = new function() {
                 this.video._timing = (videoframe/this.video._fps).toPrecision(6);
 
             // go to timing
-            if (videoframe > -1 && this.video._ready)
+            if (videoframe > -1 && this.video._ready && this.video._opened)
                 this.video._player.currentTime(this.video._timing);
 
             // details
@@ -1685,10 +1697,26 @@ var RawDataNavigator = new function() {
                 information._component.find('.utc').html(date.getSimpleUTCDate());
                 information._component.find('.gmt').html(date.getSimpleLocalDate());
 
-                // html
-                $(information._dom+' .preview').html(
-                    (!info.preview || pose.raw!='valid') ? '<img src="img/def.png" alt="" width="498" height="249" />' : ''
-                );
+                // preview
+                var imgvalid = !(!info.preview || pose.raw!='valid');
+                var imgsrc = !imgvalid ? 'img/def.png'
+                    : allocation.current.path+'/segment/'+segment+'/preview/'+info.debayer+'/img/'+String(pose.sec).substring(0,8)+'/'+pose.sec+'_'+String(pose.usec).zeropad(6)+'.jpeg';
+
+                // video
+                if (!imgvalid && information.video._opened)
+                    information.video.close();
+
+                // preview class
+                if (imgvalid)
+                    $(information._dom+' .preview').addClass('valid');
+                else
+                    $(information._dom+' .preview').removeClass('valid');
+
+                // html preview
+                if (!information.video._playing)
+                    $(information._dom+' .preview img').attr('src',imgsrc);
+
+                // html nav
                 $(information._dom+' .nav > div').html(
                     ((index > 0) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index-1)+'\');return false;"><span class="prev"></span></a>' : '')
                     + ((index+1 < poses.length) ? '<a href="#" onclick="RawDataNavigator.info(\''+segment+'\',\''+(index+1)+'\');return false;"><span class="next"></span></a>' : '')
@@ -1706,6 +1734,8 @@ var RawDataNavigator = new function() {
         close: function() {
 
             this.video.clear();
+            this.video.close();
+
             this.clear();
             timeline.active(null);
 
@@ -1741,11 +1771,13 @@ var RawDataNavigator = new function() {
         video: {
 
             _component: null,
-            _dom: '#video',
+            _dom: 'vid',
             _player: null,
 
             _ready: false,
             _changed: true,
+            _opened: false,
+            _playing: false,
             _fps: 25,
             _timing: 0.0,
 
@@ -1755,7 +1787,7 @@ var RawDataNavigator = new function() {
             init: function() {
 
                 // vis.js
-                this._player = videojs('vid', {
+                this._player = videojs(this._dom, {
                     controls: true,
                     preload: 'auto',
                     loop: true,
@@ -1785,6 +1817,12 @@ var RawDataNavigator = new function() {
              */
             events: function() {
 
+                // resize
+                $(window).on('resize',function() {
+                    information.video.resize();
+                });
+
+                // player can-play
                 this._player.on('canplay',function() {
                     information.video._ready = true;
                     if (information.video._changed)
@@ -1792,11 +1830,55 @@ var RawDataNavigator = new function() {
                     information.video._changed = false;
                 });
 
+                // player time-update
                 this._player.on('timeupdate',function() {
                     var frame = parseInt((information.video._player.currentTime()*information.video._fps).toPrecision(6),10);
                     information.details(information._segment,segmentation.vframe(information._segment,frame));
                 });
 
+                // player play
+                this._player.on('play',function() {
+                    information.video._playing = true;
+                });
+
+                // player play
+                this._player.on('pause',function() {
+                    information.video._playing = false;
+                });
+
+            },
+
+            /**
+             * information.video.resize()
+             */
+            resize: function() {
+                if (information.video._opened)
+                    $(information._dom).width($(window).width()-100);
+                information.video._player.width($(information._dom).width()-parseInt($(information._dom+' .video').css('left'),10)-60);
+                information.video._player.height($(information._dom).height()-parseInt($(information._dom+' .video').css('top'),10)-60);
+            },
+
+            /**
+             * information.video.open()
+             */
+            open: function() {
+                information.video._opened = true;
+                $(information._dom).stop(true,false).animate({width:($(window).width()-100)},250,function() {
+                    information.video.resize();
+                    $(information._dom+' .video').css('display','block');
+                    information.video._player.currentTime(information.video._timing);
+                });
+            },
+
+            /**
+             * information.video.close()
+             */
+            close: function() {
+                information.video._opened = false;
+                $(information._dom+' .video').css('display','none');
+                $(information._dom).stop(true,false).animate({width:information._width},250,function() {
+                    // void
+                });
             },
 
             /**

@@ -88,6 +88,11 @@
 
 <div id="info">
     <div class="close"><span></span></div>
+    <div class="video">
+        <video id="vid" class="video-js vjs-default-skin" width="498" height="249">
+            <p class="vjs-no-js">Please consider using a web browser that supports <a href="http://videojs.com/html5-video-support/" target="_blank">HTML5</a>.</p>
+        </video>
+    </div>
     <div class="scrollable">
         <div class="head">
             <div class="jump">
@@ -97,12 +102,9 @@
             <div style="clear:both;"></div>
         </div>
         <div class="viewer">
-            <div class="video">
-                <video id="vid" class="video-js vjs-default-skin" width="498" height="249">
-                    <p class="vjs-no-js">Please consider using a web browser that supports <a href="http://videojs.com/html5-video-support/" target="_blank">HTML5</a>.</p>
-                </video>
+            <div class="preview">
+                <img src="img/def.png" alt="" width="498" height="249" />
             </div>
-            <div class="preview"></div>
         </div>
         <div class="data">
             <div>
