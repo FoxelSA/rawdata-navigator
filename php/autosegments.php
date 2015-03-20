@@ -62,7 +62,7 @@ foreach ($rawdata_lsdir as $macaddress) {
         continue;
 
     $csps[$macaddress] = array();
-    $rawmaster_lsdir = scandir($rawmaster_path,SCANDIR_SORT_DESCENDING);
+    $rawmaster_lsdir = scandir($rawmaster_path,1);
 
     // loop over raw segment masters
     foreach ($rawmaster_lsdir as $master) {
