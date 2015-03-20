@@ -234,7 +234,7 @@ var RawDataNavigator = new function() {
                 // mouse enter
                 timeline.box(item.id).on('mouseenter',function(e) {
                     $('#statistics div').html(item.segmentation.length+' poses'
-                        + ' ['+item.segmentation.validated+' valid, '+item.segmentation.missed+' missing, '+item.segmentation.trashed+' trashed, '+item.segmentation.corrupted+' corrupted, '+item.segmentation.unknown+' not splitted]'
+                        + ' ['+item.segmentation.validated+' valid, '+item.segmentation.missed+' missing, '+item.segmentation.trashed+' trashed, '+item.segmentation.corrupted+' corrupted, '+item.segmentation.unknown+' unknown]'
                         + ' <span>GPS :&nbsp; '+(item.segmentation.gps?'Yes':'No')+'</span>'
                         + ' <span>Splitted :&nbsp; '+(item.segmentation.split?'Yes':'No')+'</span>'
                         + ' <span>Preview :&nbsp; '+(item.segmentation.preview?'Yes ('+item.segmentation.debayer+')':'No')+'</span>');
@@ -1015,7 +1015,7 @@ var RawDataNavigator = new function() {
                                             .append(this._item('miss','missing',false))
                                             .append(this._item('trash','trashed',false))
                                             .append(this._item('corrupt','corrupted',false))
-                                            .append(this._item('unknown','not splitted',false)
+                                            .append(this._item('unknown','unknown',false)
                             );
 
                             // add icon to container
