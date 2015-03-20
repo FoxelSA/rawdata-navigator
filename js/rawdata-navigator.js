@@ -1700,7 +1700,7 @@ var RawDataNavigator = new function() {
                 // preview
                 var imgvalid = !(!info.preview || pose.raw!='valid');
                 var imgsrc = !imgvalid ? 'img/def.png'
-                    : allocation.current.path+'/segment/'+segment+'/preview/'+info.debayer+'/img/'+String(pose.sec).substring(0,8)+'/'+pose.sec+'_'+String(pose.usec).zeropad(6)+'.jpeg';
+                    : 'php/pose-preview.php?src='+allocation.current.path+'/segment/'+segment+'/preview/'+info.debayer+'/img/'+String(pose.sec).substring(0,8)+'/'+pose.sec+'_'+String(pose.usec).zeropad(6);
 
                 // video
                 if (!imgvalid && information.video._opened)
