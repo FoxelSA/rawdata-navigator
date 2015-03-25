@@ -3530,7 +3530,6 @@ var DAV = new function() {
                           depthTest: false,
                           depthWrite: false,
                           transparent: true
-
                       }));
                   },
                   color: {
@@ -4290,6 +4289,12 @@ var DAV = new function() {
               var seq=pointCloud.sequence[pointCloud.sequence.length-1];
               var count=seq.particle_list.length;
 
+/*              if (count>1) {
+                  // remove angle sprite
+                  poiPanel.pcl_sequence.removeAngleSprite(seq.particle_list[count-1].jointId);
+              }
+*/
+
               if (count>2) {
                   // remove angle sprite
                   poiPanel.pcl_sequence.removeAngleSprite(seq.particle_list[count-2].jointId);
@@ -4794,7 +4799,6 @@ console.log('success')
                 v1.subVectors(vertices[vertices.length-1],vertices[vertices.length-2]);
                 v2.subVectors(vertices[vertices.length-3],vertices[vertices.length-2]);
                 var angle=v1.angleTo(v2)*180/Math.PI;
-                console.log(angle);
 
                 // remove previous segment angle
                 if (seq.particle_list.length>3) {
@@ -4932,9 +4936,13 @@ console.log('success')
 
             removeAngleSprite: function poiPanel_pcl_sequence_removeAngleSprite(jointId) {
                 var joint=poiPanel.panorama.joint.list[jointId];
-                joint.instance.object3D.remove(joint.angle.sprite);
-                joint.angle.sprite.material.dispose();
-                delete joint.angle.canvas;
+                try {
+                    joint.instance.object3D.remove(joint.angle.sprite);
+                    joint.angle.sprite.material.dispose();
+                    delete joint.angle.canvas;
+                } catch(e) {
+                    console.log(e);
+                }
             }, // poiPanel_pcl_sequence_removeAngleSprite
 
 
