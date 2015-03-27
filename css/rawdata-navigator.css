@@ -534,7 +534,8 @@ a.fa.disabled, a.fa.disabled:hover, a.fa.disabled:active {
             font-size: 3.2em;
             font-style:normal;
             font-weight:normal;
-        }
+        
+}
 
              #info .close span, .panel .close span {
                padding-right: 0.25em;
@@ -1216,6 +1217,7 @@ ul.poi li {
   border: 1px solid #222;
   border-radius:7px;
   background-color:#222;
+  cursor: pointer;
 }
 
 ul.poi div.name {
@@ -1230,6 +1232,7 @@ ul.poi div.details {
   display: inline;
   position: absolute;
   margin: 5px;
+  pointer-events: none;
 }
 
 ul.poi > div {
@@ -1239,6 +1242,12 @@ ul.poi > div {
 
 ul.poi div.details div {
   position: relative;
+  cursor: pointer;
+  pointer-events: none;
+}
+
+ul.poi .thumb {
+  pointer-events: none;
 }
 
 ul.poi li > div {
