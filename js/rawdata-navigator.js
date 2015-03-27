@@ -3384,6 +3384,7 @@ var DAV = new function() {
         //console.log("viewPotree is clicked");
         var panel=window._panels['pointcloudpanel'];
         if ($('iframe',panel._dom).attr('src')!=$(item).data('href')) {
+          $('iframe',panel._dom).replaceWith('<iframe frameborder="no" scrolling="no" seamless="seamless"></iframe>'); 
           $('iframe',panel._dom).attr('src',$(item).data('href')).off('load').on('load',function(){panel.toggle()});
         } else {
           panel.toggle();
@@ -3489,6 +3490,15 @@ var DAV = new function() {
             // (re)-initialize panel content
             panel.reset();
 
+            // forget iframe elements
+            panel.window=null;
+            panel.$=null;
+            panel.panorama=null;
+
+            // replace iframe
+            $('iframe',panel._dom).replaceWith('<iframe frameborder="no" scrolling="no" seamless="seamless"></iframe>'); 
+            iframe=panel.iframe=$('iframe',panel._dom);
+
             // (re)-set iframe url and 'load' event handler
             iframe.attr('src',$(elem).data('href'))
             .off('load')
@@ -3518,10 +3528,8 @@ var DAV = new function() {
               $.extend(true,panel.window.Joint.prototype,{
 
                 overlay: true,
-
                 handleTransparency: true,
-
-                handleMouseEvents: false,
+                handleMouseEvents: false, // TODO: implement at widget level
 
                 defaults: {
                   object3D: function() {
@@ -3544,7 +3552,8 @@ var DAV = new function() {
 
               $.extend(true,panel.window.Joint_list.prototype,{
 
-                map: panel.window.THREE.ImageUtils.loadTexture('img/dot.png')
+                map: panel.window.THREE.ImageUtils.loadTexture('img/dot.png'),
+                handleMouseEvents: false, // TODO: implement at widget level
 
               }); // extend Joint list prototype
 
@@ -4289,13 +4298,13 @@ var DAV = new function() {
               var seq=pointCloud.sequence[pointCloud.sequence.length-1];
               var count=seq.particle_list.length;
 
-/*              if (count>1) {
+              if (count>1 && seq.particle_list[count-1].jointId!=undefined) {
                   // remove angle sprite
                   poiPanel.pcl_sequence.removeAngleSprite(seq.particle_list[count-1].jointId);
               }
-*/
 
-              if (count>2) {
+
+              if (count>2 && seq.particle_list[count-2].jointId!=undefined) {
                   // remove angle sprite
                   poiPanel.pcl_sequence.removeAngleSprite(seq.particle_list[count-2].jointId);
               }
@@ -4765,6 +4774,9 @@ console.log('success')
                   if (seq.particle_list.length>2) {
                     poiPanel.pcl_sequence.showAngle();
                   }
+                  if (seq.particle_list.length>1) {
+                    poiPanel.pcl_sequence.showAngleVertical();
+                  }
 
             }, // poiPanel_pcl_sequence_addJoint
 
@@ -4785,14 +4797,15 @@ console.log('success')
             showAngle: function poiPanel_pcl_sequence_showAngle() {
 
                 var pointCloud=poiPanel.panorama.pointCloud.instance;
-                var v1=new poiPanel.window.THREE.Vector3();
-                var v2=new poiPanel.window.THREE.Vector3();
 
                 // get last sequence
                 var seq=pointCloud.sequence[pointCloud.sequence.length-1];
-                if (!seq || seq.particle_list.length<3) {
+                if (!seq || seq.mode.loading || seq.particle_list.length<3) {
                     return;
                 }
+
+                var v1=new poiPanel.window.THREE.Vector3();
+                var v2=new poiPanel.window.THREE.Vector3();
 
                 // compute angle between last two segments
                 var vertices=seq.line.instance.geometry.vertices;
@@ -4830,6 +4843,60 @@ console.log('success')
                 }
 
             }, // poiPanel_pcl_sequence_showAngle
+            
+            // display angle between the last particle sequence segment and the Y axis
+            // near the last joint
+            showAngleVertical: function poiPanel_pcl_sequence_showAngleVertical() {
+
+                var pointCloud=poiPanel.panorama.pointCloud.instance;
+
+                // get last sequence
+                var seq=pointCloud.sequence[pointCloud.sequence.length-1];
+                if (!seq || seq.mode.loading || seq.particle_list.length<2) {
+                    return;
+                }
+
+                var v1=new poiPanel.window.THREE.Vector3();
+                var v2=new poiPanel.window.THREE.Vector3();
+
+                // compute angle between last two segments
+                var vertices=seq.line.instance.geometry.vertices;
+                v1.subVectors(vertices[vertices.length-1],vertices[vertices.length-2]);
+                v2.set(0,1,0);
+                var angle=v1.angleTo(v2)*180/Math.PI;
+
+                // do not 
+/*
+                // remove previous segment angle
+                if (seq.particle_list.length>2) {
+                    poiPanel.pcl_sequence.removeAngleSprite(seq.particle_list[seq.particle_list.length-2].jointId);
+                }
+*/
+                // get angle joint id
+                var joint=poiPanel.panorama.joint.list[seq.particle_list[seq.particle_list.length-1].jointId];
+                var action;
+
+                // instantiate canvas if needed
+                if (!joint.angle) {
+                    joint.angle={
+                        canvas: document.createElement('canvas')
+                    }
+                    action='addToScene';
+                }
+
+                // convert angle to text
+                joint.angle.value=angle;
+                var text=(Math.round(angle*1000)/1000)+"\xB0";
+
+                // instantiate or update angle text sprite
+                joint.angle.sprite=poiPanel.pcl_sequence.text2Sprite(text,joint.angle);
+
+                if (action=='addToScene') {
+                    joint.angle.sprite.position.setY(3);
+                    joint.instance.object3D.add(joint.angle.sprite);
+                }
+
+            }, // poiPanel_pcl_sequence_showAngleVertical
 
             /**
             * pcl_sequence.text2canvas(text,options)
