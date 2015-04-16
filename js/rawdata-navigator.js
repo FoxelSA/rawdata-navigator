@@ -3410,10 +3410,22 @@ var DAV = new function() {
         */
         reset: function poipanel_reset() {
             var panel=this;
+            panel.exitSequenceEditingMode();
             panel.inventory_clear();
             panel.editCancel();
-            panel.updateButtons();
             panel.setPointCloudImage();
+            try {
+                delete panel.panorama.pointCloud.instance.sector.index;
+                delete panel.panorama.pointCloud.instance.sector.data.buffer;
+                delete panel.panorama.pointCloud.instance.sector.data;
+                panel.panorama.pointCloud.visible=false;
+                delete panel.panorama.pointCloud.instance.object3D;
+            } catch(e) {}
+            panel.updateButtons();
+            // forget iframe elements
+            panel.window=null;
+            panel.$=null;
+            panel.panorama=null;
         },
 
         setPointCloudImage: function poipanel_setPointCloudImage() {
@@ -3443,6 +3455,7 @@ var DAV = new function() {
             var panel=this;
             if (panel.mode.edit_sequence) {
               panel.pcl_sequence.stop({abort:false});
+              panel.mode.edit_sequence=false;
               panel.updateButtons();
               panel.panorama.drawScene();
             }
@@ -3489,11 +3502,6 @@ var DAV = new function() {
 
             // (re)-initialize panel content
             panel.reset();
-
-            // forget iframe elements
-            panel.window=null;
-            panel.$=null;
-            panel.panorama=null;
 
             // replace iframe
             $('iframe',panel._dom).replaceWith('<iframe frameborder="no" scrolling="no" seamless="seamless"></iframe>');
@@ -4746,12 +4754,11 @@ console.log('success')
             addJoint: function poiPanel_pcl_sequence_addJoint(seq,particle) {
                   var joint=seq.pointCloud.panorama.joint;
                   var coords=seq.pointCloud.getParticleSphericalCoords(particle.index);
-console.log(coords.lon,coords.lat);
+
+                  // set particle joint id
                   if (!joint.nextIndex) {
                       joint.nextIndex=0;
                   }
-
-                  // set particle joint id
                   particle.jointId='j'+joint.nextIndex++;
 
                   // set joint details
@@ -5032,35 +5039,35 @@ console.log(coords.lon,coords.lat);
 
             /* point cloud related buttons */
 
-            if (!poiPanel.panorama || !poiPanel.panorama.pointCloud || !poiPanel.panorama.pointCloud.instance) {
+            if (
+                !poiPanel.panorama ||
+                !poiPanel.panorama.pointCloud ||
+                !poiPanel.panorama.pointCloud.instance ||
+                !poiPanel.panorama.pointCloud.instance.sector ||
+                !poiPanel.panorama.pointCloud.instance.sector.data ||
+                !poiPanel.panorama.pointCloud.instance.sector.data.length
+            ) {
                 // no pointcloud, disable all pointcloud related buttons
-                $('.content2 a',poiPanel._domElement).addClass('disabled');
+                $('.content2 a',poiPanel._domElement).addClass('disabled').removeClass('active');
                 return;
             }
 
             var pointCloud=poiPanel.panorama.pointCloud.instance;
 
             // pcl_sequence buttons
-            if (!pointCloud.sector || !pointCloud.sector.data.length) {
 
-                // no pointcloud, disable all pointcloud related buttons
-                $('.content2 a',poiPanel._domElement).addClass('disabled');
+            // pointcloud defined, enable measure and toggle pointcloud buttons
+            $('.content2 a#measure, .content2 a#toggle_pointcloud',poiPanel._domElement).removeClass('disabled');
+
+            // disable sequence trash button if nothing to be trashed
+            if (pointCloud.sequence && (pointCloud.sequence.length>1 || (
+                    pointCloud.sequence.length &&
+                    pointCloud.sequence[pointCloud.sequence.length-1].particle_list.length
+            ))) {
+               $('.content2 a#trash_measure',poiPanel._domElement).removeClass('disabled');
 
             } else {
-
-                // pointcloud defined, enable measure and toggle pointcloud buttons
-                $('.content2 a#measure, .content2 a#toggle_pointcloud',poiPanel._domElement).removeClass('disabled');
-
-                // disable sequence trash button if nothing to be trashed
-                if (pointCloud.sequence && (pointCloud.sequence.length>1 || (
-                        pointCloud.sequence.length &&
-                        pointCloud.sequence[pointCloud.sequence.length-1].particle_list.length
-                ))) {
-                   $('.content2 a#trash_measure',poiPanel._domElement).removeClass('disabled');
-
-                } else {
-                   $('.content2 a#trash_measure',poiPanel._domElement).addClass('disabled');
-                }
+               $('.content2 a#trash_measure',poiPanel._domElement).addClass('disabled');
             }
 
             // set measure button active state
@@ -5157,9 +5164,11 @@ console.log(coords.lon,coords.lat);
                 button.addClass('active');
                 if (!pointCloud.object3D.children.length) {
                     if (pointCloud.allInOne) {
+                        pointCloud.progress();
                         pointCloud.add({
                             positions: pointCloud.sector.data
                         });
+                        pointCloud.progressBar.dispose();
                     }
                 }
             } else {
