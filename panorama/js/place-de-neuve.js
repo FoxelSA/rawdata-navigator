@@ -3539,6 +3539,8 @@ coords: { lat: 46.20122913, lon: 6.14258585 }
 
     },
 
+    showMouseInfo: true,
+
     pointCloud: {
       active: true,
 

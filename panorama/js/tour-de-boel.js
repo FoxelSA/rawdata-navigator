@@ -543,7 +543,11 @@ $(document).on('filesloaded', function(){
 
     },
 
+    showMouseInfo: true,
+
     pointCloud: {
+
+      allInOne: true,
       active: true,
 
       showDebugInfo: true,
@@ -564,8 +568,7 @@ $(document).on('filesloaded', function(){
   //        opacity: 0.3,
   //        alphaTest: 0.1,
           depthTest: false,
-          depthWrite: false,
-          visible: false
+          depthWrite: false
       }), // pointCloud.defaults.dotMaterial
 
       enableParticleEvents: false,

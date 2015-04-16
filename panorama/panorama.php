@@ -180,6 +180,7 @@ if (isset($_GET['initial']) && isset($_GET['action'])) {
     <script type="text/javascript" src="../lib/freepano/js/thirdparty/three.js/shaders/EdgeShader2.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/thirdparty/howler.js/howler.core.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/thirdparty/howler.js/howler.effects.js"></script>
+    <script type="text/javascript" src="../lib/freepano/js/thirdparty/multithread.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/notify.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/eventDispatcher.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.js"></script>

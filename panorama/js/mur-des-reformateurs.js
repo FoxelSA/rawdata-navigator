@@ -1227,9 +1227,11 @@ $(document).on('filesloaded', function(){
 
     },
 
+    showMouseInfo: true,
+
     pointCloud: {
       testing: false,  // test displaying pointcloud per tile
-      allInOne: false, // display entire pointcloud
+      allInOne: true, // display entire pointcloud
       
       active: true,
 

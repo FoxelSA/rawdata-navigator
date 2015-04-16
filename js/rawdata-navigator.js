@@ -3384,7 +3384,7 @@ var DAV = new function() {
         //console.log("viewPotree is clicked");
         var panel=window._panels['pointcloudpanel'];
         if ($('iframe',panel._dom).attr('src')!=$(item).data('href')) {
-          $('iframe',panel._dom).replaceWith('<iframe frameborder="no" scrolling="no" seamless="seamless"></iframe>'); 
+          $('iframe',panel._dom).replaceWith('<iframe frameborder="no" scrolling="no" seamless="seamless"></iframe>');
           $('iframe',panel._dom).attr('src',$(item).data('href')).off('load').on('load',function(){panel.toggle()});
         } else {
           panel.toggle();
@@ -3496,7 +3496,7 @@ var DAV = new function() {
             panel.panorama=null;
 
             // replace iframe
-            $('iframe',panel._dom).replaceWith('<iframe frameborder="no" scrolling="no" seamless="seamless"></iframe>'); 
+            $('iframe',panel._dom).replaceWith('<iframe frameborder="no" scrolling="no" seamless="seamless"></iframe>');
             iframe=panel.iframe=$('iframe',panel._dom);
 
             // (re)-set iframe url and 'load' event handler
@@ -4462,21 +4462,22 @@ console.log('success')
             // update sequence button listb
             updateList: function poiPanel_pcl_sequence_updateList() {
 
-                var html=this.info='';
+                if (!poiPanel.panorama.pointCloud.instance.sequence) {
+                    return;
+                }
 
-                // get the number of sequences
-                var count=poiPanel.panorama.pointCloud.instance.sequence.length;
+                var html=this.info='';
 
                 // @TODO: unique numbers for sequences
                 if (poiPanel.panorama.pointCloud.instance.nextSequenceIndex==undefined) {
                     poiPanel.panorama.pointCloud.instance.nextSequenceIndex=1;
                 }
 
-                // loop over sequences
+                // generate sequence buttons html code
                 $.each(poiPanel.panorama.pointCloud.instance.sequence,function(index){
 
                     // skip last sequence (empty or in edit mode)
-                    if (index+1==count) {
+                    if (index+1==poiPanel.panorama.pointCloud.instance.sequence.length) {
                         return false;
                     }
 
@@ -4745,7 +4746,7 @@ console.log('success')
             addJoint: function poiPanel_pcl_sequence_addJoint(seq,particle) {
                   var joint=seq.pointCloud.panorama.joint;
                   var coords=seq.pointCloud.getParticleSphericalCoords(particle.index);
-
+console.log(coords.lon,coords.lat);
                   if (!joint.nextIndex) {
                       joint.nextIndex=0;
                   }
@@ -4843,7 +4844,7 @@ console.log('success')
                 }
 
             }, // poiPanel_pcl_sequence_showAngle
-            
+
             // display angle between the last particle sequence segment and the Y axis
             // near the last joint
             showAngleVertical: function poiPanel_pcl_sequence_showAngleVertical() {
@@ -4865,7 +4866,7 @@ console.log('success')
                 v2.set(0,1,0);
                 var angle=v1.angleTo(v2)*180/Math.PI;
 
-                // do not 
+                // do not
 /*
                 // remove previous segment angle
                 if (seq.particle_list.length>2) {
@@ -5040,7 +5041,7 @@ console.log('success')
             var pointCloud=poiPanel.panorama.pointCloud.instance;
 
             // pcl_sequence buttons
-            if (!pointCloud.json || !pointCloud.json.points || !pointCloud.json.points.length) {
+            if (!pointCloud.sector || !pointCloud.sector.data.length) {
 
                 // no pointcloud, disable all pointcloud related buttons
                 $('.content2 a',poiPanel._domElement).addClass('disabled');
@@ -5070,9 +5071,9 @@ console.log('success')
               $('#measure',poiPanel._dom).removeClass('active');
             }
 
-            if (pointCloud.instance && pointCloud.instance.object3D && pointCloud.instance.object3D.children.length) {
+            if (pointCloud && pointCloud.object3D) {
               // set toggle pointcloud button active state
-              if (pointCloud.instance && pointCloud.instance.visible) {
+              if (pointCloud.visible) {
                   $('#toggle_pointcloud').addClass('active');
 
               } else {
@@ -5140,18 +5141,29 @@ console.log('success')
           // click on pointcloud toggle button
           $('#toggle_pointcloud',panel.dom).off('click').on('click',function(e){
 
-            if ($(e.target).hasClass('disabled')) {
+            var button=$(this);
+
+            if (button.hasClass('disabled')) {
               return;
             }
 
+            var pointCloud=poiPanel.panorama.pointCloud.instance;
+
             // inverse pointcloud 'visible' flag
-            poiPanel.panorama.pointCloud.instance.visible=!poiPanel.panorama.pointCloud.instance.visible;
+            pointCloud.visible=!pointCloud.visible;
 
             // update 'toggle_pointcloud' button
-            if (poiPanel.panorama.pointCloud.instance.visible) {
-                $(this).addClass('active');
+            if (pointCloud.visible) {
+                button.addClass('active');
+                if (!pointCloud.object3D.children.length) {
+                    if (pointCloud.allInOne) {
+                        pointCloud.add({
+                            positions: pointCloud.sector.data
+                        });
+                    }
+                }
             } else {
-                $(this).removeClass('active');
+                button.removeClass('active');
             }
 
             poiPanel.panorama.drawScene();
