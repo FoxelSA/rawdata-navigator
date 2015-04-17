@@ -5178,6 +5178,7 @@ console.log('success')
                             });
                             button.addClass('active');
                             pointCloud.progressBar.dispose();
+                            poiPanel.panorama.drawScene();
                         });
                     }
                 } else {
