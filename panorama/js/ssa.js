@@ -511,7 +511,7 @@ $(document).on('filesloaded', function(){
 
     },
 
-    showMouseInfo: true,
+    showMouseInfo: false,
 
     pointCloud: {
       active: true,

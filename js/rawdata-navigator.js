@@ -3420,6 +3420,9 @@ var DAV = new function() {
                 delete panel.panorama.pointCloud.instance.sector.data;
                 panel.panorama.pointCloud.visible=false;
                 delete panel.panorama.pointCloud.instance.object3D;
+                delete panel.panorama.pointCloud.instance;
+                delete panel.panorama;
+
             } catch(e) {}
             panel.updateButtons();
             // forget iframe elements
@@ -3707,8 +3710,7 @@ var DAV = new function() {
 
         on_panorama_ready: function poiPanel_on_panorama_ready() {
            // update button states
-           $('.content2 a',poiPanel._dom).removeClass('disabled');
-
+           $('.content2 a',poiPanel._dom).addClass('disabled');
         }, // poiPanel_on_panorama_ready
 
         on_poi_dispose: function poiPanel_on_poi_dispose(e) {
@@ -5057,37 +5059,38 @@ console.log('success')
             // pcl_sequence buttons
 
             // pointcloud defined, enable measure and toggle pointcloud buttons
-            $('.content2 a#measure, .content2 a#toggle_pointcloud',poiPanel._domElement).removeClass('disabled');
+            if (pointCloud && pointCloud.object3D && (pointCloud.object3D.children.length || pointCloud.sector)) {
+                $('.content2 a#measure, .content2 a#toggle_pointcloud',poiPanel._domElement).removeClass('disabled');
 
-            // disable sequence trash button if nothing to be trashed
-            if (pointCloud.sequence && (pointCloud.sequence.length>1 || (
-                    pointCloud.sequence.length &&
-                    pointCloud.sequence[pointCloud.sequence.length-1].particle_list.length
-            ))) {
-               $('.content2 a#trash_measure',poiPanel._domElement).removeClass('disabled');
+                // disable sequence trash button if nothing to be trashed
+                if (pointCloud.sequence && (pointCloud.sequence.length>1 || (
+                        pointCloud.sequence.length &&
+                        pointCloud.sequence[pointCloud.sequence.length-1].particle_list.length
+                ))) {
+                   $('.content2 a#trash_measure',poiPanel._domElement).removeClass('disabled');
 
-            } else {
-               $('.content2 a#trash_measure',poiPanel._domElement).addClass('disabled');
-            }
+                } else {
+                   $('.content2 a#trash_measure',poiPanel._domElement).addClass('disabled');
+                }
 
-            // set measure button active state
-            if (poiPanel.mode.edit_sequence) {
-              $('#measure',poiPanel._dom).addClass('active');
+                // set measure button active state
+                if (poiPanel.mode.edit_sequence) {
+                  $('#measure',poiPanel._dom).addClass('active');
 
-            } else {
-              $('#measure',poiPanel._dom).removeClass('active');
-            }
+                } else {
+                  $('#measure',poiPanel._dom).removeClass('active');
+                }
 
-            if (pointCloud && pointCloud.object3D) {
-              // set toggle pointcloud button active state
-              if (pointCloud.visible) {
+                // set toggle pointcloud button active state
+                if (pointCloud.visible) {
                   $('#toggle_pointcloud').addClass('active');
 
-              } else {
-                  $('#toggle_pointcloud').removeClass('active');
-              }
+                } else {
+                    $('#toggle_pointcloud').removeClass('active');
+                }
+
             } else {
-               $('#toggle_pointcloud').removeClass('active').addClass('disabled');
+               $('.content2 a',poiPanel._domElement).removeClass('active').removeClass('active').addClass('disabled');
             }
 
         }, // poiPanel_updateButtons
@@ -5148,6 +5151,7 @@ console.log('success')
           // click on pointcloud toggle button
           $('#toggle_pointcloud',panel.dom).off('click').on('click',function(e){
 
+            // pointcloud toggle button
             var button=$(this);
 
             if (button.hasClass('disabled')) {
@@ -5161,19 +5165,55 @@ console.log('success')
 
             // update 'toggle_pointcloud' button
             if (pointCloud.visible) {
-                button.addClass('active');
+
+                // point cloud not instantiated ?
                 if (!pointCloud.object3D.children.length) {
+
                     if (pointCloud.allInOne) {
+                        // instantiate point cloud
                         pointCloud.progress();
-                        pointCloud.add({
-                            positions: pointCloud.sector.data
+                        setTimeout(function(){
+                            pointCloud.add({
+                              positions: pointCloud.sector.data
+                            });
+                            button.addClass('active');
+                            pointCloud.progressBar.dispose();
                         });
-                        pointCloud.progressBar.dispose();
                     }
+                } else {
+                  button.addClass('active');
                 }
+
             } else {
                 button.removeClass('active');
             }
+
+            poiPanel.panorama.drawScene();
+
+          });
+
+          // click on pointcloud toggle button
+          $('#toggle_pointcloud',panel.dom).off('mousewheel').on('mousewheel',function(e){
+
+            // pointcloud toggle button
+            var button=$(this);
+
+            if (!poiPanel.panorama.pointCloud.instance.visible) {
+              return;
+            }
+
+            var pointCloud=poiPanel.panorama.pointCloud.instance;
+
+            $.each(pointCloud.object3D.children,function(){
+                if (!this.type=="PointCloudMaterial") {
+                    return;
+                }
+                var pointCloud=this;
+                pointCloud.material.transparent=true;
+                console.log(e.deltaY)
+                pointCloud.material.opacity=Math.max(0,Math.min(1,pointCloud.material.opacity+e.deltaY*0.001));
+                
+            });
 
             poiPanel.panorama.drawScene();
 

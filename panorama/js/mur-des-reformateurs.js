@@ -1227,7 +1227,7 @@ $(document).on('filesloaded', function(){
 
     },
 
-    showMouseInfo: true,
+    showMouseInfo: false,
 
     pointCloud: {
       testing: false,  // test displaying pointcloud per tile
