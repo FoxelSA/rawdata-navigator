@@ -5212,7 +5212,7 @@ console.log('success')
                 var pointCloud=this;
                 pointCloud.material.transparent=true;
                 console.log(e.deltaY)
-                pointCloud.material.opacity=Math.max(0,Math.min(1,pointCloud.material.opacity+e.deltaY*0.001));
+                pointCloud.material.opacity=Math.max(0,Math.min(1,pointCloud.material.opacity+e.deltaY*0.01));
                 
             });
 
