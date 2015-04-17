@@ -4614,6 +4614,7 @@ console.log('success')
                        // ask deletion confirmation onshow
                        if (confirm('Supprimer ce segment ?')) {
                            poiPanel.pcl_sequence.remove(sequence_id);
+                           poiPanel.updateButtons();
                        }
                    });
                 });
@@ -5160,6 +5161,28 @@ console.log('success')
 
             var pointCloud=poiPanel.panorama.pointCloud.instance;
 
+            function setOpacity(_i) {
+              $.each(pointCloud.object3D.children,function(){
+                if (this.type=="PointCloud") {
+                  this.material.transparent=true;
+                  this.material.opacity=_i;
+                }
+              });
+            }
+
+            function fadeIn(_i) {
+              _i=_i||0;
+              setOpacity(_i);
+              poiPanel.panorama.drawScene(function(){
+                _i+=0.1;
+                if (_i<=1 && pointCloud.visible) {
+//                  setTimeout(function(){
+                    fadeIn(_i);
+  //                },0);
+                } else setOpacity(1);
+              });
+            }
+
             // inverse pointcloud 'visible' flag
             pointCloud.visible=!pointCloud.visible;
 
@@ -5178,15 +5201,18 @@ console.log('success')
                             });
                             button.addClass('active');
                             pointCloud.progressBar.dispose();
-                            poiPanel.panorama.drawScene();
+
                         });
                     }
                 } else {
                   button.addClass('active');
                 }
 
+//                setTimeout(fadeIn,0);
+
             } else {
                 button.removeClass('active');
+//                setOpacity(0);
             }
 
             poiPanel.panorama.drawScene();
