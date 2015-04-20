@@ -4498,7 +4498,7 @@ console.log('success')
                     // list sequence
                     html+=
                         '<div class="seq" id="seq'+index+'">'
-                       +(seq.name||('Sequence '+(index+1)))
+                       +'<span class="seq">'+(seq.name||('Sequence '+(index+1)))+'</span>'
                        +'<a class="lock fa fa-'+(seq.lock?'':'un')+'lock fa-fw"></a>'
                        +'<a class="edit fa fa-pencil fa-fw"></a>'
                        +'<a class="trash fa fa-trash fa-fw"></a>'
@@ -4529,18 +4529,36 @@ console.log('success')
                 // sequence buttons mousedown
                 $('.seq',div2).mousedown(function(e){
 
+                    var elem=e.target;
+
+                    var tagName=elem.tagName.toLowerCase();
+
+                    switch (tagName) {
+
+                      // redirect click on span to parent div
+                      case 'span':
+                        elem=$(elem).closest('div.seq');
+                        break;
+
+                      // click on input
+                      case 'input':
+                        $(elem).focus();
+                        return;
+                        break;
+                    }
+
                     // dont propagate mousedown to panorama
                     e.preventDefault();
 
                     // toggle 'active' class for sequence button instead of using css :active selector
                     // to fix :active conflict between button and embeeded trash/edit icons
-                    $(e.target).addClass('active');
+                    $(elem).addClass('active');
 
                     // on mouseup anywhere
                     $(document).add(poiPanel.window).off('mouseup.seq').on('mouseup.seq',function(_e){
 
                       // remove active class added above
-                      $(e.target).removeClass('active');
+                      $(elem).removeClass('active');
 
                       // close color picker
                       if (!$(_e.target).closest('#colorpicker').length)
@@ -4567,7 +4585,7 @@ console.log('success')
                     e.preventDefault();
 
                     // show sequence
-                    poiPanel.pcl_sequence.show(parseInt(this.id.substr(3)));
+                    poiPanel.pcl_sequence.show(parseInt($(e.target).closest('div.seq')[0].id.substr(3)));
 
                     return false;
                 });
@@ -4582,7 +4600,7 @@ console.log('success')
                    });
                 });
 
-                // mousedown on sequence button colorpicker button
+                // mousedown on sequence colorpicker button
                 $('a.colorpicker',div2)
                 .off('mousedown.colorpicker')
                 .on('mousedown.colorpicker',function(e){
@@ -4625,10 +4643,10 @@ console.log('success')
                    });
                 });
 
-                // mousedown on sequence button colorpicker button
+                // click on sequence lock button
                 $('a.lock',div2)
-                .off('mousedown.lock')
-                .on('mousedown.lock',function(e){
+                .off('click.lock')
+                .on('click.lock',function(e){
 
                    // with left button
                    if (!poiPanel.window.isLeftButtonDown(e)) {
@@ -4642,9 +4660,56 @@ console.log('success')
 
                 });
 
+                // click on sequence rename button
+                $('a.edit',div2)
+                .off('click.edit')
+                .on('click.edit',function(e){
+
+                   // with left button
+                   if (!poiPanel.window.isLeftButtonDown(e)) {
+                       return;
+                   }
+
+                   // extract sequence id
+                   var sequence_id=parseInt($(this).closest('div')[0].id.substr(3));
+
+                   // replace span with input
+                   var seq=poiPanel.panorama.pointCloud.instance.sequence[sequence_id];
+                   var input=$('<input type="text">');
+                   var oldname=seq.name;
+                   input.val(oldname);
+                   $('span.seq',$(this).closest('div.seq')).replaceWith(input);
+
+                   // setup input
+                   $(input,$(this).closest('div.seq'))
+                   .focus()
+                   .select()
+                   .on('keydown',function(e){
+                       // dont mess with other keydown handlers
+                       e.stopPropagation();
+                       switch(e.keyCode) {
+                           case 13: // enter
+                              var name=$(e.target).val().trim();
+                              if (name.length) {
+                                seq.name=name;
+                                poiPanel.pcl_sequence.save();
+                              }
+                              // continue
+                           case 27: // escape or enter on empty input
+                              poiPanel.pcl_sequence.updateList();
+                              return false;
+                              break;
+                       }
+                   })
+                   .on('mousedown',function(e){
+                       e.stopPropagation();
+                   });
+
+                });
 
             }, // poiPanel_pcl_sequence_updateList
 
+            // toggle point cloud sequence lock flag
             lock_toggle: function poiPanel_pcl_sequence_lock_toggle(sequence_index) {
 
                var seq=poiPanel.panorama.pointCloud.instance.sequence[sequence_index];

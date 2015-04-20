@@ -1,7 +1,7 @@
 
 /* sequence buttons */
 
-.seq {
+div.seq {
    margin-left: 10px;
    margin-top: 10px;
    background-color: rgba(0,0,0,0.5);
@@ -12,29 +12,32 @@
    cursor: pointer;
 }
 
-.seq:hover {
+div.seq:hover {
    background-color: rgba(0,0,0,0.6);
 }
 
-.seq.active {
+div.seq.active {
   background-color: rgba(0,0,0,0.75);
   box-shadow: 2px 2px 8px #000;
 }
 
-.seq a {
+div.seq a {
+  float: right;
   position: relative;
+  margin-top: 3px;
   text-align: center;
   margin-left: 4px;
 }
 
-.seq a.colorpicker {
+div.seq a.colorpicker {
   margin-left: 12px
 }
-.seq a:hover {
+
+div.seq a:hover {
   transform: scale(0.95);
 }
 
-.seq a:active {
+div.seq a:active {
   transform: scale(0.85);
 }
 
