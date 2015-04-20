@@ -204,7 +204,7 @@
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>SITG</td>
-                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['both','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
+                <td><a onclick="DAV.allocation.quicksearchmulti(['both','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
@@ -214,7 +214,7 @@
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>3D</td>
-                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['both','pointcloud']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
+                <td><a onclick="DAV.allocation.quicksearchmulti(['both','pointcloud']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
@@ -224,7 +224,7 @@
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>POI</td>
-                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['both','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
+                <td><a onclick="DAV.allocation.quicksearchmulti(['both','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
@@ -234,7 +234,7 @@
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>Statue Dufour</td>
-                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['dufour','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
+                <td><a onclick="DAV.allocation.quicksearchmulti(['dufour','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
@@ -244,7 +244,7 @@
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>Street View</td>
-                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['both','panorama']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
+                <td><a onclick="DAV.allocation.quicksearchmulti(['both','panorama']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
@@ -267,7 +267,7 @@
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>Genève</td>
-                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['both','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
+                <td><a onclick="DAV.allocation.quicksearchmulti(['both','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
@@ -277,7 +277,7 @@
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>Mur des Réformateurs</td>
-                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['reformateurs','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
+                <td><a onclick="DAV.allocation.quicksearchmulti(['reformateurs','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
@@ -287,7 +287,7 @@
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>Parc des Bastions</td>
-                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['reformateurs','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
+                <td><a onclick="DAV.allocation.quicksearchmulti(['reformateurs','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
@@ -297,7 +297,7 @@
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>Place de Neuve</td>
-                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['dufour','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
+                <td><a onclick="DAV.allocation.quicksearchmulti(['dufour','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
@@ -320,7 +320,7 @@
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>RAW</td>
-                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['both','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
+                <td><a onclick="DAV.allocation.quicksearchmulti(['both','raw']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
@@ -330,7 +330,7 @@
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>Panorama</td>
-                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['both','panorama']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
+                <td><a onclick="DAV.allocation.quicksearchmulti(['both','panorama']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
@@ -340,7 +340,7 @@
             <tr>
                 <td><i class="fa fa-sort" /></td>
                 <td>Point Cloud</td>
-                <td><a href="#" onclick="DAV.allocation.quicksearchmulti(['both','pointcloud']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
+                <td><a onclick="DAV.allocation.quicksearchmulti(['both','pointcloud']);return false;" style="color:#fff;"><i class="fa fa-search" /></a></td>
                 <td><i class="fa fa-cog" /></td>
                 <td><i class="fa fa-minus-circle" /></td>
             </tr>
@@ -354,7 +354,7 @@
   <div class="content">
     <h1>Acquisition des données</h1>
     <div style="position:relative;top:-50px;text-align:right;font-size:16px;margin-right:200px;">
-        <a href="#" onclick="DAV.goToDigitizing();return false;"><i class="fa fa-plus-square" style="position:relative;top:4px;left:-10px;font-size:28px;"></i> Commander </a>
+        <a onclick="DAV.goToDigitizing();return false;"><i class="fa fa-plus-square" style="position:relative;top:4px;left:-10px;font-size:28px;"></i> Commander </a>
     </div>
     <table>
         <thead>
@@ -542,14 +542,14 @@
         <h2>Recherche de données</h2>
         <select multiple="multiple"></select>
         <h3>Recherche rapide</h3>
-        <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['both','raw']);return false;">Projet SITG (RAW)</a>
-        <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['both','panorama']);return false;">Projet SITG (Panoramas)</a>
-        <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['both','pointcloud']);return false;">Projet SITG (Point Clouds)</a>
-        <a style="margin-top:20px;" href="#" class="quick" onclick="DAV.allocation.quicksearch(['reformateurs','raw']);return false;">Mur des Réformateurs (RAW)</a>
-        <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['reformateurs','panorama']);return false;">Mur des Réformateurs (Panoramas)</a>
-        <a style="margin-top:20px;" href="#" class="quick" onclick="DAV.allocation.quicksearch(['boelle','raw']);return false;">Rue de la Tour-de-Boël (RAW)</a>
-        <a href="#" class="quick" onclick="DAV.allocation.quicksearch(['boelle','panorama']);return false;">Rue de la Tour-de-Boël (Panoramas)</a>
-        <!--<a style="margin-top:20px;" href="#" class="quick" onclick="DAV.allocation.quicksearch(['ssa','panorama']);return false;">Exemple SSA (Panoramas)</a>-->
+        <a class="quick" onclick="DAV.allocation.quicksearch(['both','raw']);return false;">Projet SITG (RAW)</a>
+        <a class="quick" onclick="DAV.allocation.quicksearch(['both','panorama']);return false;">Projet SITG (Panoramas)</a>
+        <a class="quick" onclick="DAV.allocation.quicksearch(['both','pointcloud']);return false;">Projet SITG (Point Clouds)</a>
+        <a style="margin-top:20px;" class="quick" onclick="DAV.allocation.quicksearch(['reformateurs','raw']);return false;">Mur des Réformateurs (RAW)</a>
+        <a class="quick" onclick="DAV.allocation.quicksearch(['reformateurs','panorama']);return false;">Mur des Réformateurs (Panoramas)</a>
+        <a style="margin-top:20px;" class="quick" onclick="DAV.allocation.quicksearch(['boelle','raw']);return false;">Rue de la Tour-de-Boël (RAW)</a>
+        <a class="quick" onclick="DAV.allocation.quicksearch(['boelle','panorama']);return false;">Rue de la Tour-de-Boël (Panoramas)</a>
+        <!--<a style="margin-top:20px;" class="quick" onclick="DAV.allocation.quicksearch(['ssa','panorama']);return false;">Exemple SSA (Panoramas)</a>-->
   </div>
 
   <!--div id="search">

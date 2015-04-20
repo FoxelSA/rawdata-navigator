@@ -319,7 +319,9 @@ a.fa.disabled, a.fa.disabled:hover, a.fa.disabled:active {
 
 
         margin-bottom:5px;
-    }
+    
+        cursor: pointer;
+}
 
         #allocation a.quick:hover {
             background-color:#333;
