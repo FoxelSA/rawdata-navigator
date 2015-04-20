@@ -4416,6 +4416,8 @@ var DAV = new function() {
                           index_list.push(this.index);
                       });
                       seq_list.push({
+                          name: seq.name,
+                          lock: seq.lock,
                           color: seq.line.instance.material.color.getHexString(),
                           particle_list: index_list
                       });
@@ -4469,7 +4471,7 @@ console.log('success')
 
             },  // poiPanel_pcl_sequence_save
 
-            // update sequence button listb
+            // update sequence button list
             updateList: function poiPanel_pcl_sequence_updateList() {
 
                 if (!poiPanel.panorama.pointCloud.instance.sequence) {
@@ -4486,6 +4488,8 @@ console.log('success')
                 // generate sequence buttons html code
                 $.each(poiPanel.panorama.pointCloud.instance.sequence,function(index){
 
+                    var seq=this;
+
                     // skip last sequence (empty or in edit mode)
                     if (index+1==poiPanel.panorama.pointCloud.instance.sequence.length) {
                         return false;
@@ -4494,9 +4498,11 @@ console.log('success')
                     // list sequence
                     html+=
                         '<div class="seq" id="seq'+index+'">'
-                       +'Sequence '+(index+1)
-                       +'<a class="colorpicker fa fa-square fa-fw"></a>'
+                       +(seq.name||('Sequence '+(index+1)))
+                       +'<a class="lock fa fa-'+(seq.lock?'':'un')+'lock fa-fw"></a>'
+                       +'<a class="edit fa fa-pencil fa-fw"></a>'
                        +'<a class="trash fa fa-trash fa-fw"></a>'
+                       +'<a class="colorpicker fa fa-square fa-fw"></a>'
                        +'</div>';
                 });
 
@@ -4619,7 +4625,46 @@ console.log('success')
                    });
                 });
 
+                // mousedown on sequence button colorpicker button
+                $('a.lock',div2)
+                .off('mousedown.lock')
+                .on('mousedown.lock',function(e){
+
+                   // with left button
+                   if (!poiPanel.window.isLeftButtonDown(e)) {
+                       return;
+                   }
+
+                   // extract sequence id
+                   var sequence_id=parseInt($(this).closest('div')[0].id.substr(3));
+
+                   poiPanel.pcl_sequence.lock_toggle(sequence_id);
+
+                });
+
+
             }, // poiPanel_pcl_sequence_updateList
+
+            lock_toggle: function poiPanel_pcl_sequence_lock_toggle(sequence_index) {
+
+               var seq=poiPanel.panorama.pointCloud.instance.sequence[sequence_index];
+
+               var div=poiPanel.$('#pano');
+               var div2=$('#pcl_sequence_info',div);
+               var button=$('div#seq'+sequence_index,div2);
+
+               var a=$('a.lock',button);
+               if (a.hasClass('fa-lock')) {
+                   a.addClass('fa-unlock').removeClass('fa-lock');
+                   seq.lock=false;
+               } else {
+                   seq.lock=true;
+                   a.addClass('fa-lock').removeClass('fa-unlock');
+               }
+
+               poiPanel.pcl_sequence.save();
+
+            }, // poiPanel_pcl_sequence_lock_toggle
 
             // show sequence button color picker
             pickColor: function poiPanel_pcl_sequence_pickColor(sequence_id,target) {
@@ -5132,13 +5177,23 @@ console.log('success')
                   panel.pcl_sequence.stop({abort:true});
               }
 
-              // trash all joints
-              panel.panorama.joint.dispatch('dispose');
+
+              var sequence_list=[];
+
+              $.each(panel.panorama.pointCloud.instance.sequence,function(index,seq){
+                  if (!seq || seq.lock) {
+                      sequence_list.push(seq);
+                      return;
+                  }
+                  seq.dispatch('dispose');
+              });
+
+              panel.panorama.pointCloud.instance.sequence=sequence_list;
 
               // initialize an empty sequence list
-              panel.panorama.pointCloud.instance.sequence=[new panel.panorama.pointCloud.instance.Sequence({
+              panel.panorama.pointCloud.instance.sequence.push(new panel.panorama.pointCloud.instance.Sequence({
                 pointCloud: panel.panorama.pointCloud.instance
-              })];
+              }));
 
               // save empty sequence list
               panel.pcl_sequence.save();
@@ -5239,7 +5294,7 @@ console.log('success')
                 pointCloud.material.transparent=true;
                 console.log(e.deltaY)
                 pointCloud.material.opacity=Math.max(0,Math.min(1,pointCloud.material.opacity+e.deltaY*0.01));
-                
+
             });
 
             poiPanel.panorama.drawScene();
