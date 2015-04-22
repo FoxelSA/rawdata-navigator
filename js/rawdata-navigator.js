@@ -2549,7 +2549,7 @@ var DAV = new function() {
                 var thumb_panorama_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/small/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
                 var download_panorama_link = 'php/download.php?file='+storage.mountpoint+'/footage/demodav/'+segment+'/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
                 $(information._dom+' .download_panorama').attr('href',download_panorama_link);
-                var view_panorama_link = document.location.origin+'/dav/panorama/panorama.php?pano=';
+                var view_panorama_link = document.location.origin+document.location.pathname+'/panorama/panorama.php?pano=';
                 if (segment == '1404381299') {
                     view_panorama_link += 'mur-des-reformateurs';
                 } else if (segment == '1404383663') {
@@ -2599,7 +2599,7 @@ var DAV = new function() {
                 var thumb_pointclound_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.jpg';
                 $(information._dom+' .download_pointcloud').attr('href',download_pointcloud_link);
                 $('#usages .usage.posepointcloud img').attr('src',thumb_pointclound_src);
-                var view_pointcloud_link = document.location.origin+'/dav/pointcloud/index.php?ply=';
+                var view_pointcloud_link = document.location.origin+document.location.pathname+'/pointcloud/index.php?ply=';
                 if (segment == '1404381299') {
                     view_pointcloud_link += 'mur-des-reformateurs';
                 } else if (segment == '1404383663') {
@@ -3219,7 +3219,7 @@ var DAV = new function() {
             } else if (allocation.type() == 'poi') {
                 var testpanoimg = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
 
-                var view_panorama_link_listpoi = document.location.origin+'/dav/panorama/panorama.php?pano=';
+                var view_panorama_link_listpoi = document.location.origin+document.location.pathname'/panorama/panorama.php?pano=';
                 if (vignette.segment == '1404381299') {
                     view_panorama_link_listpoi += 'mur-des-reformateurs';
                 } else if (vignette.segment == '1404383663') {
@@ -3501,7 +3501,7 @@ var DAV = new function() {
             // download pointcloud
             var thumb_pointclound_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.jpg';
             $('#poipanel_pointcloud img').attr('src',thumb_pointclound_src);
-            var view_pointcloud_link = document.location.origin+'/dav/pointcloud/index.php?ply=';
+            var view_pointcloud_link = document.location.origin+document.location.pathname+'/pointcloud/index.php?ply=';
             if (segment == '1404381299') {
                 view_pointcloud_link += 'mur-des-reformateurs';
             } else if (segment == '1404383663') {
