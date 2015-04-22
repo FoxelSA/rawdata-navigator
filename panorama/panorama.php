@@ -16,7 +16,7 @@ elseif ($pano == 'cathedrale-st-pierre')
 elseif ($pano == 'epfl')
     $panots = '1426679568';
 
-$poi_path="/data/footage/demodav/".$panots."/poi/";
+$poi_path=$_GET['mountpoint']."/footage/demodav/".$panots."/poi/";
 
 if (isset($_POST['cmd'])) {
 
