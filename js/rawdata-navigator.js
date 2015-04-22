@@ -3219,7 +3219,7 @@ var DAV = new function() {
             } else if (allocation.type() == 'poi') {
                 var testpanoimg = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
 
-                var view_panorama_link_listpoi = document.location.origin+document.location.pathname'/panorama/panorama.php?pano=';
+                var view_panorama_link_listpoi = document.location.origin+document.location.pathname+'/panorama/panorama.php?pano=';
                 if (vignette.segment == '1404381299') {
                     view_panorama_link_listpoi += 'mur-des-reformateurs';
                 } else if (vignette.segment == '1404383663') {
