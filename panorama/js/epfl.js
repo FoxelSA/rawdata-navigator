@@ -55,7 +55,7 @@ $(document).ready(function(){
 
   // load image with alpha channel to use as POI cursor
   window.poicursor_texture=new THREE.ImageUtils.loadTexture(
-    '/dav/img/dav-cursor.png',
+    '../img/dav-cursor.png',
     THREE.UVMapping,
     file_onload,
     function onloaderror() {
@@ -65,7 +65,7 @@ $(document).ready(function(){
 
   // load image with alpha channel to use as POI
   window.poi_texture=new THREE.ImageUtils.loadTexture(
-    '/dav/img/dav-cursor-blank.png',
+    '../img/dav-cursor-blank.png',
     THREE.UVMapping,
     file_onload,
     function onloaderror() {
@@ -454,43 +454,43 @@ $(document).on('filesloaded', function(){
           // 2. with the object below
 
           '1426686625_904877': {
-            dirName: '/data/footage/demodav/1426679568/pyramid/result_1426686625_904877-0-25-1/512/3',
+            dirName: '../data/footage/demodav/1426679568/pyramid/result_1426686625_904877-0-25-1/512/3',
             coords: { lat: 6.5651454806652, lon:46.520436372271384 }
           },
           '1426686626_904877': {
-            dirName: '/data/footage/demodav/1426679568/pyramid/result_1426686626_904877-0-25-1/512/3',
+            dirName: '../data/footage/demodav/1426679568/pyramid/result_1426686626_904877-0-25-1/512/3',
             coords: { lat: 6.5651172847499994, lon:46.52046787655452 }
           },
           '1426686627_904877': {
-            dirName: '/data/footage/demodav/1426679568/pyramid/result_1426686627_904877-0-25-1/512/3',
+            dirName: '../data/footage/demodav/1426679568/pyramid/result_1426686627_904877-0-25-1/512/3',
             coords: { lat: 6.56509911236858, lon:46.5205044333249 }
           },
           '1426686628_904877': {
-            dirName: '/data/footage/demodav/1426679568/pyramid/result_1426686628_904877-0-25-1/512/3',
+            dirName: '../data/footage/demodav/1426679568/pyramid/result_1426686628_904877-0-25-1/512/3',
             coords: { lat: 6.565083128006787, lon:46.52055028664999 }
           },
           '1426686629_904877': {
-            dirName: '/data/footage/demodav/1426679568/pyramid/result_1426686629_904877-0-25-1/512/3',
+            dirName: '../data/footage/demodav/1426679568/pyramid/result_1426686629_904877-0-25-1/512/3',
             coords: { lat: 6.565075011850859, lon:46.52060028535 }
           },
           '1426686630_904877': {
-            dirName: '/data/footage/demodav/1426679568/pyramid/result_1426686630_904877-0-25-1/512/3',
+            dirName: '../data/footage/demodav/1426679568/pyramid/result_1426686630_904877-0-25-1/512/3',
             coords: { lat: 6.565075, lon:46.520654623766674 }
           },
           '1426686631_904877': {
-            dirName: '/data/footage/demodav/1426679568/pyramid/result_1426686631_904877-0-25-1/512/3',
+            dirName: '../data/footage/demodav/1426679568/pyramid/result_1426686631_904877-0-25-1/512/3',
             coords: { lat: 6.565073126852995, lon:46.520713050141666 }
           },
           '1426686632_904877': {
-            dirName: '/data/footage/demodav/1426679568/pyramid/result_1426686632_904877-0-25-1/512/3',
+            dirName: '../data/footage/demodav/1426679568/pyramid/result_1426686632_904877-0-25-1/512/3',
             coords: { lat: 6.565075314788891, lon:46.52077390265448 }
           },
           '1426686633_904877': {
-            dirName: '/data/footage/demodav/1426679568/pyramid/result_1426686633_904877-0-25-1/512/3',
+            dirName: '../data/footage/demodav/1426679568/pyramid/result_1426686633_904877-0-25-1/512/3',
             coords: { lat: 6.565075934740248, lon:46.520837225489565 }
           },
           '1426686634_904877': {
-            dirName: '/data/footage/demodav/1426679568/pyramid/result_1426686634_904877-0-25-1/512/3',
+            dirName: '../data/footage/demodav/1426679568/pyramid/result_1426686634_904877-0-25-1/512/3',
             coords: { lat: 6.565076557038825, lon:46.52090059475976 }
           }
 
