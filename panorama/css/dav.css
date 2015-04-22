@@ -81,3 +81,17 @@ div.seq a:active {
 #colorpicker ul li a:hover {
  border-color: #000;
 }
+
+.seq input {
+  background-color: rgba(0,0,0,0.1);
+  color: white;
+  border-color: rgba(255,255,255,0.5);
+  padding: 2px 4px;
+  border-radius: 5px
+
+  
+}
+
+.seq input::selection {
+  background: #cab;
+}

@@ -60,6 +60,24 @@ L.Map.prototype.panToOffset = function (latlng, offset, options) {
  */
 var DAV = new function() {
 
+    // uglything
+    function getutcdiff(segment) {
+ /*     if (allocation_type=='pano') {
+          return (
+            segment == '1423492626' ||
+            segment == '1412953590'
+          ) ? 0 : 7200;
+      
+      } else {
+  */        return (
+            segment == '1423492626' ||
+            segment == '1412953590' ||
+            segment == '1418211239' || 
+            segment == '1426679568'
+          ) ? 0 : 7200;
+    //  }
+    }
+
     /**
      * [public] DAV.init()
      */
@@ -586,6 +604,8 @@ var DAV = new function() {
             group2.append($('<option>',{'value':'both'}).text('Street View'));
             group2.append($('<option>',{'value':'ssa'}).text('SSA'));
             group2.append($('<option>',{'value':'boelle'}).text('Rue de la Tour-de-Boël'));
+            group2.append($('<option>',{'value':'cathe'}).text('Cathédrale Saint-Pierre'));
+            group2.append($('<option>',{'value':'epfl'}).text('EPFL'));
 
             group3.append($('<option>',{'value':'raw'}).text('RAW'));
             group3.append($('<option>',{'value':'panorama'}).text('Panorama'));
@@ -965,7 +985,14 @@ var DAV = new function() {
 
                 if (allocation.current.master == '1403185204') {
 
-                    if (segment != '1404383663' && segment != '1404381299' && segment != '1423492626' && segment != '1412953590') {
+                    if (
+                        segment != '1404383663' &&
+                        segment != '1404381299' &&
+                        segment != '1423492626' && 
+                        segment != '1412953590' && 
+                        segment != '1418211239' &&
+                        segment != '1426679568'
+                    ) {
                         this._remaining--;
                         if (this._remaining == 0)
                             this.done();
@@ -976,12 +1003,15 @@ var DAV = new function() {
                     var hasReformateurs = false;
                     var hasSSA = false;
                     var hasBoelle = false;
+                    var hasCathe = false;
+                    var hasEPFL = false;
 
                     if (allocation.current.val.indexOf('both') > -1) {
                         hasDufour = true;
                         hasReformateurs = true;
                         //hasSSA = false;
                         hasBoelle = true;
+                        hasCathe = true;
                     }
 
                     if (allocation.current.val.indexOf('dufour') > -1) {
@@ -1000,15 +1030,26 @@ var DAV = new function() {
                         hasBoelle = true;
                     }
 
+                    if (allocation.current.val.indexOf('cathe') > -1) {
+                        hasCathe = true;
+                    }
+
+                    if (allocation.current.val.indexOf('epfl') > -1) {
+                        hasEPFL = true;
+                    }
+
                     if ((allocation.current.val.indexOf('raw') > -1 || allocation.current.val.indexOf('panorama') > -1 || allocation.current.val.indexOf('poi') > -1 || allocation.current.val.indexOf('pointcloud') > -1)
                         && allocation.current.val.indexOf('dufour') == -1
                         && allocation.current.val.indexOf('reformateurs') == -1
                         && allocation.current.val.indexOf('ssa') == -1
-                        && allocation.current.val.indexOf('boelle') == -1) {
+                        && allocation.current.val.indexOf('boelle') == -1 
+                        && allocation.current.val.indexOf('cathe') == -1
+                        && allocation.current.val.indexOf('epfl') == -1)  {
                         hasDufour = true;
                         hasReformateurs = true;
                         //hasSSA = true;
                         hasBoelle = true;
+                        hasCathe = true;
                     }
 
                     if (segment == '1404383663' && !hasDufour) {
@@ -1038,6 +1079,21 @@ var DAV = new function() {
                             this.done();
                         return;
                     }
+
+                    if (segment == '1418211239' && !hasCathe) {
+                        this._remaining--;
+                        if (this._remaining == 0)
+                            this.done();
+                        return;
+                    }
+
+                    if (segment == '1426679568' && !hasEPFL) {
+                        this._remaining--;
+                        if (this._remaining == 0)
+                            this.done();
+                        return;
+                    }
+
 
                 }
 
@@ -2487,10 +2543,7 @@ var DAV = new function() {
 
                 // download panorama
 
-                var utcdiff = 7200;
-                if (segment == '1423492626' || segment == '1412953590') {
-                    utcdiff = 0;
-                }
+                var utcdiff = getutcdiff(segment,'pano');
 
                 var test_download_panorama_link = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
                 var thumb_panorama_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/small/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
@@ -2505,6 +2558,10 @@ var DAV = new function() {
                     view_panorama_link += 'ssa';
                 } else if (segment == '1412953590') {
                     view_panorama_link += 'tour-de-boel';
+                } else if (segment == '1418211239') {
+                    view_panorama_link += 'cathedrale-st-pierre';
+                 } else if (segment == '1426679568') {
+                    view_panorama_link += 'epfl';
                 }
 
                 view_panorama_link += '&initial='+(pose.sec-utcdiff)+'_'+pose.usc;
@@ -2551,6 +2608,10 @@ var DAV = new function() {
                     view_pointcloud_link += 'ssa';
                 } else if (segment == '1412953590') {
                     view_pointcloud_link += 'tour-de-boel';
+                } else if (segment == '1418211239') {
+                    view_pointcloud_link += 'cathedrale-st-pierre';
+                } else if (segment == '1426679568') {
+                    view_pointcloud_link += 'epfl';
                 }
 
                 $(information._dom+' .view_pointcloud').data('href',view_pointcloud_link);
@@ -3122,11 +3183,8 @@ var DAV = new function() {
           var vignettes=this;
           var vignette=vignettes.list[index];
 
-          var utcdiff = 7200;
-          if (vignette.segment == '1423492626' || vignette.segment == '1412953590') {
-            utcdiff = 0;
-          }
-
+          var utcdiff = getutcdiff(vignette.segment);
+          
           switch(vignette.type){
           case 'raw': // raw
 
@@ -3170,6 +3228,10 @@ var DAV = new function() {
                     view_panorama_link_listpoi += 'ssa';
                 } else if (vignette.segment == '1412953590') {
                     view_panorama_link_listpoi += 'tour-de-boel';
+                } else if (vignette.segment == '1418211239') {
+                    view_panorama_link += 'cathedrale-st-pierre';
+                } else if (vignette.segment == '1426679568') {
+                    view_panorama_link += 'epfl';
                 }
 
                 view_panorama_link_listpoi += '&initial='+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc;
@@ -3448,6 +3510,10 @@ var DAV = new function() {
                 view_pointcloud_link += 'ssa';
             } else if (segment == '1412953590') {
                 view_pointcloud_link += 'tour-de-boel';
+            } else if (segment == '1418211239') {
+                view_pointcloud_link += 'cathedrale-st-pierre';
+            } else if (segment == '1426679568') {
+                view_pointcloud_link += 'epfl';
             }
             //console.log("set pointcloud view link = "+view_pointcloud_link);
             $('#poipanel_pointcloud .view_pointcloud').data('href',view_pointcloud_link);

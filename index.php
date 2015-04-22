@@ -549,6 +549,10 @@
         <a class="quick" onclick="DAV.allocation.quicksearch(['reformateurs','panorama']);return false;">Mur des Réformateurs (Panoramas)</a>
         <a style="margin-top:20px;" class="quick" onclick="DAV.allocation.quicksearch(['boelle','raw']);return false;">Rue de la Tour-de-Boël (RAW)</a>
         <a class="quick" onclick="DAV.allocation.quicksearch(['boelle','panorama']);return false;">Rue de la Tour-de-Boël (Panoramas)</a>
+        <a style="margin-top:20px;" class="quick" onclick="DAV.allocation.quicksearch(['cathe','raw']);return false;">Cathédrale Saint-Pierre (RAW)</a>
+        <a class="quick" onclick="DAV.allocation.quicksearch(['cathe','panorama']);return false;">Cathédrale Saint-Pierre (Panoramas)</a>
+        <a style="margin-top:20px;" class="quick" onclick="DAV.allocation.quicksearch(['epfl','raw']);return false;">EPFL (RAW)</a>
+        <a class="quick" onclick="DAV.allocation.quicksearch(['epfl','panorama']);return false;">EPFL (Panoramas)</a>
         <!--<a style="margin-top:20px;" class="quick" onclick="DAV.allocation.quicksearch(['ssa','panorama']);return false;">Exemple SSA (Panoramas)</a>-->
   </div>
 

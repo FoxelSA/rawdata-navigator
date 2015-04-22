@@ -11,6 +11,10 @@ elseif ($pano == 'tour-de-boel')
     $panots = '1412953590';
 elseif ($pano == 'ssa')
     $panots = '1423492626';
+elseif ($pano == 'cathedrale-st-pierre')
+    $panots = '1418211239';
+elseif ($pano == 'epfl')
+    $panots = '1426679568';
 
 $poi_path="/data/footage/demodav/".$panots."/poi/";
 

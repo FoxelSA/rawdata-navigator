@@ -49,7 +49,7 @@ header('Content-Type: application/json');
 header('Cache-Control: no-cache, must-revalidate');
 
 // back to old format
-if ((int)($json[$len-1]) == 1423492626 || (int)($json[$len-1]) == 1412953590) {
+if ((int)($json[$len-1]) == 1423492626 || (int)($json[$len-1]) == 1412953590 || (int)($json[$len-1]) == 1418211239 || (int)($json[$len-1]) == 1426679568) {
 
     $data = json_decode(file_get_contents($_GET['path'].'/info/rawdata-autoseg/segment.json'));
 
@@ -99,7 +99,7 @@ if ((int)($json[$len-1]) == 1423492626 || (int)($json[$len-1]) == 1412953590) {
 }
 
 $utcdiff = 7200;
-if ($json[$len-1] == '1423492626' || $json[$len-1] == '1412953590')
+if ($json[$len-1] == '1423492626' || $json[$len-1] == '1412953590'  || $json[$len-1] == '1418211239' || $json[$len-1] == '1426679568')
     $utcdiff = 0;
 
 // check filesystem
