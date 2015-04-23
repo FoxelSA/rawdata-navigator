@@ -187,6 +187,7 @@ if (isset($_GET['initial']) && isset($_GET['action'])) {
     <script type="text/javascript" src="../lib/freepano/js/thirdparty/multithread.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/notify.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/eventDispatcher.js"></script>
+    <script type="text/javascript" src="../lib/freepano/js/progressBar.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/loader.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.widget.js"></script>
