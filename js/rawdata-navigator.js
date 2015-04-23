@@ -282,7 +282,7 @@ var DAV = new function() {
      */
     var storage = this.storage = {
 
-        mountpoint: '/data',
+        mountpoint: 'data',
 
         /**
          * storage.init()
@@ -953,7 +953,7 @@ var DAV = new function() {
              * segmentation.json.load()
              */
             load: function() {
-                overlay.show('Loading segments from<br />'+allocation.current.path+'/');
+                overlay.show('Loading segments from<br />'+(allocation.current.path[0]=='/'?allocation.current.path:document.location.pathname+allocation.current.path)+'/');
                 this._remaining = allocation.current.segments().length;
                 vignettes.clear();
                 $.each(allocation.current.segments(), function(index,segment) {
@@ -975,7 +975,7 @@ var DAV = new function() {
              * segmentation.json.fail()
              */
             fail: function() {
-                overlay.show('Failed to load segments from<br />'+allocation.current.path+'/');
+                overlay.show('Failed to load segments from<br />'+(allocation.current.path[0]=='/'?allocation.current.path:document.location.pathname+allocation.current.path)+'/');
             },
 
             /**
@@ -2397,7 +2397,7 @@ var DAV = new function() {
             if (this._segment != segment && videoframe > -1) {
                 this.video.clear();
                 if (info.preview)
-                    this.video._player.src({type:'video/webm',src:'php/segment-video.php?src='+allocation.current.path+'/'+segment+'/preview/'+info.debayer+'/segment'});
+                    this.video._player.src({type:'video/webm',src:'php/segment-video.php?src='+(allocation.current.path[0]=='/'?allocation.current.path:document.location.pathname+allocation.current.path)+'/'+segment+'/preview/'+info.debayer+'/segment'});
             }
 
             // change track
@@ -2483,7 +2483,7 @@ var DAV = new function() {
             information.overview.marker(segment,pose);
 
             // show preview
-            var framepreview=(!info.preview || pose.status!='validated')?'img/nopreview.png':document.location.origin+allocation.current.path+'/'+segment+'/preview/'+info.debayer+'/0/'+pose.sec+'_'+pose.usc+'.jpeg';
+            var framepreview=(!info.preview || pose.status!='validated')?'img/nopreview.png':document.location.origin+(allocation.current.path[0]=='/'?allocation.current.path:document.location.pathname+allocation.current.path)+'/'+segment+'/preview/'+info.debayer+'/0/'+pose.sec+'_'+pose.usc+'.jpeg';
             $('div.preview img').attr('src',framepreview);
 
             // show
@@ -2524,7 +2524,7 @@ var DAV = new function() {
                 information._component.find('.gmt').html(date.getSimpleLocalDate());
 
                 // download raw tiles
-                var download_tiles_link = 'php/raw.php?file='+allocation.current.path+'/'+segment+'/jp4/0/'+pose.sec+'_'+pose.usc;
+                var download_tiles_link = 'php/raw.php?file='+(allocation.current.path[0]=='/'?allocation.current.path:document.location.pathname+allocation.current.path)+'/'+segment+'/jp4/0/'+pose.sec+'_'+pose.usc;
                 $(information._dom+' .download_tiles').attr('href',download_tiles_link);
 
                 // hide item if pose is invalid...
@@ -2545,9 +2545,9 @@ var DAV = new function() {
 
                 var utcdiff = getutcdiff(segment,'pano');
 
-                var test_download_panorama_link = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
-                var thumb_panorama_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/small/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
-                var download_panorama_link = 'php/download.php?file='+storage.mountpoint+'/footage/demodav/'+segment+'/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
+                var test_download_panorama_link = document.location.origin+(allocation.current.path[0]=='/'?allocation.current.path:document.location.pathname+allocation.current.path)+'/../../../../../footage/demodav/'+segment+'/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
+                var thumb_panorama_src = document.location.origin+(allocation.current.path[0]=='/'?allocation.current.path:document.location.pathname+allocation.current.path)+'/../../../../../footage/demodav/'+segment+'/small/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
+                var download_panorama_link = 'php/download.php?file='+storage.mountpoint+'/../../../../../footage/demodav/'+segment+'/result_'+(pose.sec-utcdiff)+'_'+pose.usc+'-0-25-1.jpeg';
                 $(information._dom+' .download_panorama').attr('href',download_panorama_link);
                 var view_panorama_link = document.location.origin+document.location.pathname+'/panorama/panorama.php?mountpoint='+storage.mountpoint+'&pano=';
                 if (segment == '1404381299') {
@@ -2595,8 +2595,8 @@ var DAV = new function() {
                 }
 
                 // download pointcloud
-                var download_pointcloud_link = 'php/download.php?file='+storage.mountpoint+'/footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.ply';
-                var thumb_pointclound_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.jpg';
+                var download_pointcloud_link = 'php/download.php?file='+storage.mountpoint+'/../../../../../footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.ply';
+                var thumb_pointclound_src = document.location.origin+(allocation.current.path[0]=='/'?allocation.current.path:document.location.pathname+allocation.current.path)+'/../../../../../footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.jpg';
                 $(information._dom+' .download_pointcloud').attr('href',download_pointcloud_link);
                 $('#usages .usage.posepointcloud img').attr('src',thumb_pointclound_src);
                 var view_pointcloud_link = document.location.origin+document.location.pathname+'/pointcloud/index.php?ply=';
@@ -3192,7 +3192,7 @@ var DAV = new function() {
             var html='';
 
             if (allocation.type() == 'panorama') {
-                var testpanoimg = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
+                var testpanoimg = document.location.origin+(allocation.current.path[0]=='/'?allocation.current.path:document.location.pathname+allocation.current.path)+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
                 // test panorama
                 /*
                 $.ajax({
@@ -3217,7 +3217,7 @@ var DAV = new function() {
                 }
 
             } else if (allocation.type() == 'poi') {
-                var testpanoimg = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
+                var testpanoimg = document.location.origin+(allocation.current.path[0]=='/'?allocation.current.path:document.location.pathname+allocation.current.path)+'/../../../../../footage/demodav/'+vignette.segment+'/small/result_'+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc+'-0-25-1.jpeg';
 
                 var view_panorama_link_listpoi = document.location.origin+document.location.pathname+'/panorama/panorama.php?mountpoint='+storage.mountpoint+'&pano=';
                 if (vignette.segment == '1404381299') {
@@ -3269,7 +3269,7 @@ var DAV = new function() {
                 if ($('#vignettes div.wrap.segment'+vignette.segment).length == 0) {
                     html+='<div class="wrap vignette'+index+' segment'+vignette.segment+'">';
                     html+='<div class="timestamp">&nbsp;</div>';
-                    html+='<img class="thumb" alt="" src="'+document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+vignette.segment+'/pointcloud/pointcloud-'+vignette.segment+'.jpg"></img>';
+                    html+='<img class="thumb" alt="" src="'+document.location.origin+(allocation.current.path[0]=='/'?allocation.current.path:document.location.pathname+allocation.current.path)+'/../../../../../footage/demodav/'+vignette.segment+'/pointcloud/pointcloud-'+vignette.segment+'.jpg"></img>';
                     html+='<div class="info">';
                     html+='<div class="what">Point Cloud</div></div></div>';
                 } else {
@@ -3285,7 +3285,7 @@ var DAV = new function() {
                 html+='<div class="timestamp">'+date.getSimpleUTCDate();
                 //html+='<a class="button fa fa-gear fa-fw"></a></div>';
                 html+='</div>';
-                html+='<img class="thumb" alt="n/a" onerror="nopreview(this);" src="'+document.location.origin+allocation.current.path+'/'+vignette.segment+'/preview/'+vignette.segment_info.debayer+'/0/'+vignette.pose.sec+'_'+vignette.pose.usc+'.jpeg"></img>';
+                html+='<img class="thumb" alt="n/a" onerror="nopreview(this);" src="'+document.location.origin+(allocation.current.path[0]=='/'?allocation.current.path:document.location.pathname+allocation.current.path)+'/'+vignette.segment+'/preview/'+vignette.segment_info.debayer+'/0/'+vignette.pose.sec+'_'+vignette.pose.usc+'.jpeg"></img>';
                 html+='<div class="info">';
                 html+='<div class="what">Pose (RAW)</div>';
                 html+='</div>';
@@ -3499,7 +3499,7 @@ var DAV = new function() {
             //console.log("segment is "+segment);
 
             // download pointcloud
-            var thumb_pointclound_src = document.location.origin+allocation.current.path+'/../../../../../footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.jpg';
+            var thumb_pointclound_src = document.location.origin+(allocation.current.path[0]=='/'?allocation.current.path:document.location.pathname+allocation.current.path)+'/../../../../../footage/demodav/'+segment+'/pointcloud/pointcloud-'+segment+'.jpg';
             $('#poipanel_pointcloud img').attr('src',thumb_pointclound_src);
             var view_pointcloud_link = document.location.origin+document.location.pathname+'/pointcloud/index.php?ply=';
             if (segment == '1404381299') {
