@@ -200,9 +200,11 @@ if (isset($_GET['initial']) && isset($_GET['action'])) {
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.controls.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.pyramid.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.map.js"></script>
+<?php if (isset($_GET['action']) && $_GET['action']=='poi_edit') : ?>
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.pointcloud.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.pointcloud.sequence.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.pointcloud.sequence.loader.js"></script>
+<?php endif; ?>
     <script type="text/javascript" src="js/<?php echo $pano; ?>.js"></script>
     <link rel="stylesheet" type="text/css" media="all" href="../font-awesome-4.3.0/css/font-awesome.css">
     <link rel="stylesheet" type="text/css" media="all" href="../lib/freepano/js/thirdparty/jquery-toastmessage/css/jquery.toastmessage.css" />

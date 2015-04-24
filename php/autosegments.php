@@ -63,11 +63,10 @@ foreach ($camera_lsdir as $macaddress) {
         continue;
 
     $csps[$macaddress] = array();
-    $rawsegment_lsdir = scandir($rawsegment_path,SCANDIR_SORT_DESCENDING);
+    $rawsegment_lsdir = scandir($rawsegment_path);
 
     // loop over raw segment masters
     foreach ($rawsegment_lsdir as $master) {
-
         $master_path = $rawsegment_path.'/'.$master;
         $sync_path = $rawmaster_path.'/'.$master;
         if (!is_dir($master_path) || substr($master,0,1)=='.')
