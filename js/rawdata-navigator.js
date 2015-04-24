@@ -3781,7 +3781,14 @@ var DAV = new function() {
 
         on_poi_dispose: function poiPanel_on_poi_dispose(e) {
            var poi=this;
-           $('#poipanel_inventory ul li#'+poi.name,poiPanel._domElement).remove();
+           poiPanel.save_poi_list({
+             success: function(json) {
+               if (json.status!='ok') {
+                 return;
+               }
+               $('#poipanel_inventory ul li#'+poi.name,poiPanel._domElement).remove();
+             }
+           });
         }, // poiPanel_on_poi_dispose
 
         on_poi_thumb_ready: function poiPanel_on_poi_thumb_ready(e) {
@@ -3805,6 +3812,53 @@ var DAV = new function() {
           panel.poicursor.init(panel);
         }, // poiPanel_addPOI
 
+        save_poi_list: function poiPanel_save_poi_list(options) {
+
+          // build poi list to be saved
+          var poi={list:{}};
+          $.each(poiPanel.panorama.poi.list,function(id){
+            // dont save poi cursor
+            if (id=='cursor') return;
+
+            poi.list[id]={
+              coords: this.coords,
+              zoom: this.zoom,
+              metadata: this.metadata
+            };
+
+          });
+
+          // send poi list to server
+          $.ajax({
+              url: poiPanel.panorama_link,
+              method: 'POST',
+              data: {
+                cmd: 'poi_save',
+                json: JSON.stringify(poi)
+              },
+
+              // network or server error
+              error: function() {
+                poiPanel.window.$.notify('Error: Save failed !');
+                if (options.error) {
+                  options.error.apply(this,Array.prototype.slice.call(arguments));
+                }
+              },
+
+              // server replied
+              success: function(json) {
+                if (json.status!='ok') {
+                  poiPanel.window.$.notify('Error: Save failed !');
+                }
+
+                if (options.success) {
+                  options.success.apply(this,Array.prototype.slice.call(arguments));
+                }
+              }
+
+          });
+
+        }, // save_poi_list
 
         /*
          * poiPanel_poicursor
@@ -4149,37 +4203,12 @@ var DAV = new function() {
           panel.panorama.poi.list[panel.currentPOI].metadata=data;
           panel.panorama.drawScene();
 
-          // build poi list to be saved
-          var poi={list:{}};
-          $.each(panel.panorama.poi.list,function(id){
-            // dont save poi cursor as a poi
-            if (id=='cursor') return;
-
-            poi.list[id]={
-              coords: this.coords,
-              zoom: this.zoom,
-              metadata: this.metadata
-            };
-          });
-
-          // send poi list to server
-          $.ajax({
-              url: panel.panorama_link,
-              method: 'POST',
-              data: {
-                cmd: 'poi_save',
-                json: JSON.stringify(poi)
-              },
-
-              // network or server error
-              error: function() {
-                panel.window.$.notify('Error: Save failed !');
-              },
+          panel.save_poi_list({
 
               // server replied
               success: function(json) {
+
                 if (json.status!='ok') {
-                  panel.window.$.notify('Error: Save failed !');
                   return;
                 }
 
