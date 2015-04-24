@@ -5415,9 +5415,12 @@ console.log('success')
                               positions: pointCloud.sector.data
                             });
                             button.addClass('active');
-                            pointCloud.progressBar.dispose();
+                            poiPanel.panorama.drawScene();
+                            setTimeout(function(){
+                                pointCloud.progressBar.dispose();
+                            },50);
 
-                        });
+                        },50);
                     }
                 } else {
                   button.addClass('active');
