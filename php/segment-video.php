@@ -38,8 +38,10 @@
  *      Attribution" section of <http://foxel.ch/license>.
  */
 
-if (!isset($_GET['src']) || empty($_GET['src']) || !file_exists($_GET['src'].'.webm'))
-    exit();
+if (!isset($_GET['src']) || empty($_GET['src']) || !file_exists($_GET['src'].'.webm')) {
+  echo "file not found: ".$_GET['src'].'.webm';
+  exit();
+}
 
 // output
 $file = $_GET['src'].'.webm';
