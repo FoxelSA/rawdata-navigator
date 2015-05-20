@@ -15,6 +15,8 @@ elseif ($pano == 'cathedrale-st-pierre')
     $panots = '1418211239';
 elseif ($pano == 'epfl')
     $panots = '1426679568';
+elseif ($pano == 'tranchee')
+    $panots = '1428107987';
 
 $poi_path=$_GET['mountpoint']."/footage/demodav/".$panots."/poi/";
 

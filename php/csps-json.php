@@ -38,8 +38,10 @@
  *      Attribution" section of <http://foxel.ch/license>.
  */
 
-if (!isset($_GET['path']) || empty($_GET['path']) || !file_exists($_GET['path'].'/info/rawdata-autoseg/segment.json'))
-    exit();
+if (!isset($_GET['path']) || empty($_GET['path']) || !file_exists($_GET['path'].'/info/rawdata-autoseg/segment.json')) {
+    echo "path unspecified or \${path}/info/rawdata-autoseg/segment.json not found !";
+    exit(1);
+}
 
 $json = explode('/',$_GET['path']);
 $len = count($json);
@@ -49,7 +51,7 @@ header('Content-Type: application/json');
 header('Cache-Control: no-cache, must-revalidate');
 
 // back to old format
-if ((int)($json[$len-1]) == 1423492626 || (int)($json[$len-1]) == 1412953590 || (int)($json[$len-1]) == 1418211239 || (int)($json[$len-1]) == 1426679568) {
+if ((int)($json[$len-1]) == 1423492626 || (int)($json[$len-1]) == 1412953590 || (int)($json[$len-1]) == 1418211239 || (int)($json[$len-1]) == 1426679568 || (int)($json[$len-1]) == 1428107987) {
 
     $data = json_decode(file_get_contents($_GET['path'].'/info/rawdata-autoseg/segment.json'));
 
@@ -99,7 +101,7 @@ if ((int)($json[$len-1]) == 1423492626 || (int)($json[$len-1]) == 1412953590 || 
 }
 
 $utcdiff = 7200;
-if ($json[$len-1] == '1423492626' || $json[$len-1] == '1412953590'  || $json[$len-1] == '1418211239' || $json[$len-1] == '1426679568')
+if ($json[$len-1] == '1423492626' || $json[$len-1] == '1412953590'  || $json[$len-1] == '1418211239' || $json[$len-1] == '1426679568' || $json[$len-1] == '1428107987')
     $utcdiff = 0;
 
 // check filesystem

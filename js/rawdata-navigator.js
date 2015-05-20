@@ -73,7 +73,8 @@ var DAV = new function() {
             segment == '1423492626' ||
             segment == '1412953590' ||
             segment == '1418211239' || 
-            segment == '1426679568'
+            segment == '1426679568' ||
+            segment == '1428107987'
           ) ? 0 : 7200;
     //  }
     }
@@ -606,6 +607,7 @@ var DAV = new function() {
             group2.append($('<option>',{'value':'boelle'}).text('Rue de la Tour-de-Boël'));
             group2.append($('<option>',{'value':'cathe'}).text('Cathédrale Saint-Pierre'));
             group2.append($('<option>',{'value':'epfl'}).text('EPFL'));
+            group2.append($('<option>',{'value':'sig'}).text('SIG'));
 
             group3.append($('<option>',{'value':'raw'}).text('RAW'));
             group3.append($('<option>',{'value':'panorama'}).text('Panorama'));
@@ -991,7 +993,8 @@ var DAV = new function() {
                         segment != '1423492626' && 
                         segment != '1412953590' && 
                         segment != '1418211239' &&
-                        segment != '1426679568'
+                        segment != '1426679568' &&
+                        segment != '1428107987'
                     ) {
                         this._remaining--;
                         if (this._remaining == 0)
@@ -1005,6 +1008,7 @@ var DAV = new function() {
                     var hasBoelle = false;
                     var hasCathe = false;
                     var hasEPFL = false;
+                    var hasSIG = false;
 
                     if (allocation.current.val.indexOf('both') > -1) {
                         hasDufour = true;
@@ -1038,18 +1042,25 @@ var DAV = new function() {
                         hasEPFL = true;
                     }
 
+                    if (allocation.current.val.indexOf('sig') > -1) {
+                        hasSIG = true;
+                    }
+
                     if ((allocation.current.val.indexOf('raw') > -1 || allocation.current.val.indexOf('panorama') > -1 || allocation.current.val.indexOf('poi') > -1 || allocation.current.val.indexOf('pointcloud') > -1)
                         && allocation.current.val.indexOf('dufour') == -1
                         && allocation.current.val.indexOf('reformateurs') == -1
                         && allocation.current.val.indexOf('ssa') == -1
                         && allocation.current.val.indexOf('boelle') == -1 
                         && allocation.current.val.indexOf('cathe') == -1
-                        && allocation.current.val.indexOf('epfl') == -1)  {
+                        && allocation.current.val.indexOf('epfl') == -1
+                        && allocation.current.val.indexOf('sig') == -1)  {
                         hasDufour = true;
                         hasReformateurs = true;
                         //hasSSA = true;
                         hasBoelle = true;
                         hasCathe = true;
+                        hasEPFL = true;
+                        hasSIG = true;
                     }
 
                     if (segment == '1404383663' && !hasDufour) {
@@ -1088,6 +1099,13 @@ var DAV = new function() {
                     }
 
                     if (segment == '1426679568' && !hasEPFL) {
+                        this._remaining--;
+                        if (this._remaining == 0)
+                            this.done();
+                        return;
+                    }
+
+                    if (segment == '1428107987' && !hasSIG) {
                         this._remaining--;
                         if (this._remaining == 0)
                             this.done();
@@ -2560,8 +2578,10 @@ var DAV = new function() {
                     view_panorama_link += 'tour-de-boel';
                 } else if (segment == '1418211239') {
                     view_panorama_link += 'cathedrale-st-pierre';
-                 } else if (segment == '1426679568') {
+                } else if (segment == '1426679568') {
                     view_panorama_link += 'epfl';
+                } else if (segment == '1428107987') {
+                    view_panorama_link += 'tranchee';
                 }
 
                 view_panorama_link += '&initial='+(pose.sec-utcdiff)+'_'+pose.usc;
@@ -2612,6 +2632,8 @@ var DAV = new function() {
                     view_pointcloud_link += 'cathedrale-st-pierre';
                 } else if (segment == '1426679568') {
                     view_pointcloud_link += 'epfl';
+                } else if (segment == '1428107987') {
+                    view_panorama_link += 'tranchee';
                 }
 
                 $(information._dom+' .view_pointcloud').data('href',view_pointcloud_link);
@@ -3232,6 +3254,8 @@ var DAV = new function() {
                     view_panorama_link += 'cathedrale-st-pierre';
                 } else if (vignette.segment == '1426679568') {
                     view_panorama_link += 'epfl';
+                } else if (vignette.segment == '1428107987') {
+                    view_panorama_link += 'tranchee';
                 }
 
                 view_panorama_link_listpoi += '&initial='+(vignette.pose.sec-utcdiff)+'_'+vignette.pose.usc;
@@ -3514,6 +3538,8 @@ var DAV = new function() {
                 view_pointcloud_link += 'cathedrale-st-pierre';
             } else if (segment == '1426679568') {
                 view_pointcloud_link += 'epfl';
+            } else if (segment == '1428107987') {
+                view_pointcloud_link += 'tranchee';
             }
             //console.log("set pointcloud view link = "+view_pointcloud_link);
             $('#poipanel_pointcloud .view_pointcloud').data('href',view_pointcloud_link);

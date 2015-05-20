@@ -553,6 +553,8 @@
         <a class="quick" onclick="DAV.allocation.quicksearch(['cathe','panorama']);return false;">Cathédrale Saint-Pierre (Panoramas)</a>
         <a style="margin-top:20px;" class="quick" onclick="DAV.allocation.quicksearch(['epfl','raw']);return false;">EPFL (RAW)</a>
         <a class="quick" onclick="DAV.allocation.quicksearch(['epfl','panorama']);return false;">EPFL (Panoramas)</a>
+        <a style="margin-top:20px;" class="quick" onclick="DAV.allocation.quicksearch(['sig','raw']);return false;">SIG (RAW)</a>
+        <a class="quick" onclick="DAV.allocation.quicksearch(['sig','panorama']);return false;">SIG (Panoramas)</a>
         <!--<a style="margin-top:20px;" class="quick" onclick="DAV.allocation.quicksearch(['ssa','panorama']);return false;">Exemple SSA (Panoramas)</a>-->
   </div>
 

@@ -42,13 +42,17 @@
 $csps = array();
 
 // storage
-if (!isset($_GET['storage']) || empty($_GET['storage']) || !is_dir($_GET['storage']))
+if (!isset($_GET['storage']) || empty($_GET['storage']) || !is_dir($_GET['storage'])) {
+    echo "Error: 'storage' is not set";
     exit();
+}
 
 // path
 $camera_path = $_GET['storage'].'/camera';
-if (!is_dir($camera_path))
-    exit();
+if (!is_dir($camera_path)) {
+  echo "Error: directory not found ".$_GET['storage']."/camera";
+  exit();
+}
 
 // scan
 $camera_lsdir = scandir($camera_path);
@@ -80,7 +84,7 @@ foreach ($camera_lsdir as $macaddress) {
 
             $segment_path = $master_path.'/'.$segment;
 
-            if ((int)$segment != 1404381299 && (int)$segment != 1404383663 && (int)$segment != 1423492626 && (int)$segment != 1412953590 && (int)$segment != 1418211239 && (int)$segment != 1426679568)
+            if ((int)$segment != 1404381299 && (int)$segment != 1404383663 && (int)$segment != 1423492626 && (int)$segment != 1412953590 && (int)$segment != 1418211239 && (int)$segment != 1426679568 && (int)$segment != 1428107987 )
                 continue;
 
             // not processed
