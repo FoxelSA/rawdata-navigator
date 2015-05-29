@@ -2633,7 +2633,7 @@ var DAV = new function() {
                 } else if (segment == '1426679568') {
                     view_pointcloud_link += 'epfl';
                 } else if (segment == '1428107987') {
-                    view_panorama_link += 'tranchee';
+                    view_pointcloud_link += 'tranchee';
                 }
 
                 $(information._dom+' .view_pointcloud').data('href',view_pointcloud_link);
@@ -5515,25 +5515,29 @@ console.log('success')
                   if (panel.mode.edit_sequence) {
                      panel.pcl_sequence.stop({abort:(e.keyCode==27)});
                      panel.panorama.drawScene();
+                     return;
                   }
-                  return;
                 }
 
                 // forward key event to panorama viewer
                 panel.$(panel.window.document).trigger(e);
+                return;
+              }
 
-              } else {
+              if  ($('#poipanel_edit',panel._dom).is(':visible') || $('#addpoi',panel._dom).hasClass('cancel')) {
                 // POI edit dialog is open or "add" button has been pressed, watch for escape keydown
                 switch(e.keyCode) {
-                case 27: // escape
-                   // cancel poi edition on escape
-                  if ($('#addpoi',panel._dom).hasClass('cancel') || $('#poipanel_edit',panel._dom).is(':visible')) {
-                    panel.editCancel();
-                  }
-                  break;
+                  case 27: // escape
+                    // cancel poi edition on escape
+                    if ($('#addpoi',panel._dom).hasClass('cancel') || $('#poipanel_edit',panel._dom).is(':visible')) {
+                      panel.editCancel();
+                    }
+                    break;
                 }
+                return;
               }
             }
+
           });
 
         } // poiPanel_init

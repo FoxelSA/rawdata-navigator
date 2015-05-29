@@ -621,6 +621,10 @@ $(document).on('filesloaded', function(){
 
     },
 
+    snapshot: {
+      active: true
+    },
+
     postProcessing: {
       enabled: false,
 
@@ -678,6 +682,27 @@ $(document).on('filesloaded', function(){
           map.instance.active = !map.instance.active;
       }
       break;
+      case 13: // enter
+        if (panorama.ias) {
+          // save snapshot
+          panorama.snapshot.toggleEdit({
+            save: true,
+            keepThumb: true
+          });
+          break;
+        }
+        // continue
+
+      case 27: // escape
+        if (panorama.ias) {
+          // cancel snapshot
+          panorama.snapshot.toggleEdit({
+            keepThumb:false
+          });
+        } else if ($(panorama.gallery.overlay).is(':visible')) {
+            // hide gallery
+            panorama.gallery.hide();
+        }   
     }
 
     if (panorama.postProcessing) panorama.postProcessing.enabled=panorama.postProcessing.edge.pass.enabled||panorama.postProcessing.edge2.pass.enabled||panorama.postProcessing.green.pass.enabled;

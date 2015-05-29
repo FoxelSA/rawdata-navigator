@@ -161,6 +161,13 @@ if (isset($_GET['initial']) && isset($_GET['action'])) {
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <title>Freepano Example - https://github.com/FoxelSA/freepano</title>
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimum-scale=1,maximum-scale=1,user-scalable=0">
+    <link rel="stylesheet" type="text/css" media="all" href="../js/thirdparty/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css" /> 
+    <link rel="stylesheet" type="text/css" media="all" href="../lib/freepano/js/thirdparty/imgareaselect/distfiles/css/imgareaselect-default.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="../font-awesome-4.3.0/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" media="all" href="../lib/freepano/js/thirdparty/jquery-toastmessage/css/jquery.toastmessage.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="../lib/freepano/js/thirdparty/leaflet/leaflet.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="../lib/freepano/example/css/main.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="css/dav.css" />
     <script type="text/javascript">
             var poi_path='<?php print($poi_path); ?>';
         <?php if (isset($_GET['initial'])): ?>
@@ -187,6 +194,10 @@ if (isset($_GET['initial']) && isset($_GET['action'])) {
     <script type="text/javascript" src="../lib/freepano/js/thirdparty/howler.js/howler.core.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/thirdparty/howler.js/howler.effects.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/thirdparty/multithread.js"></script>
+    <script type="text/javascript" src="../lib/freepano/js/thirdparty/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js"></script>
+    <script type="text/javascript" src="../lib/freepano/js/thirdparty/imgareaselect/jquery.imgareaselect.js"></script>             
+    <script type="text/javascript" src="../lib/freepano/js/thirdparty/glfx.js"></script>                   
+    <script type="text/javascript" src="../lib/freepano/js/imageFilterWidget.js"></script> 
     <script type="text/javascript" src="../lib/freepano/js/notify.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/eventDispatcher.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/progressBar.js"></script>
@@ -206,18 +217,23 @@ if (isset($_GET['initial']) && isset($_GET['action'])) {
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.pointcloud.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.pointcloud.sequence.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.pointcloud.sequence.loader.js"></script>
+    <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.gallery.js"></script>
+    <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.snapshot.js"></script>
 <?php endif; ?>
     <script type="text/javascript" src="js/<?php echo $pano; ?>.js"></script>
-    <link rel="stylesheet" type="text/css" media="all" href="../font-awesome-4.3.0/css/font-awesome.css">
-    <link rel="stylesheet" type="text/css" media="all" href="../lib/freepano/js/thirdparty/jquery-toastmessage/css/jquery.toastmessage.css" />
-    <link rel="stylesheet" type="text/css" media="all" href="../lib/freepano/js/thirdparty/leaflet/leaflet.css" />
-    <link rel="stylesheet" type="text/css" media="all" href="../lib/freepano/example/css/main.css" />
-    <link rel="stylesheet" type="text/css" media="all" href="css/dav.css" />
 </head>
 
 <body>
 
 <div id="pano" class="freepano"></div>
+
+<div id="snapshot_bar">
+    <a id="snapshot_close"><div class="fa fa-close"></div></a>
+</div>           
+                 
+<a id="snapshot_toggle" class="button">                                                                               
+    <div class="fa fa-camera-retro"></div>
+</a>             
 
 <div id="colorpicker">
   <ul>
