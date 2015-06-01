@@ -55,7 +55,8 @@
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/video.js/video-js.min.css" />
     <link rel="stylesheet" type="text/css" media="all" href="js/thirdparty/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css" />
     <link rel="stylesheet" type="text/css" media="all" href="css/rawdata-navigator.css" />
-    <script type="text/javascript" src="js/thirdparty/jquery-2.1.3.js"></script>
+    <script type="text/javascript" src="js/thirdparty/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="js/jquery.style.js"></script>
     <script type="text/javascript" src="js/thirdparty/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
     <script type="text/javascript" src="js/thirdparty/jquery.fullscreen-min.js"></script>
     <script type="text/javascript" src="js/thirdparty/jquery.cookie-1.4.1.js"></script>
@@ -477,6 +478,17 @@
        <a id="toggle_pointcloud" title="Points" class="disabled fa fa-eye fa-fw"></a>
      </div>
     <iframe frameborder="no" scrolling="no" seamless="seamless"></iframe>
+  </div>
+</div>
+
+
+<div id="snapshotpanel" class="panel secondary">
+  <div class="close"><a class="fa fa-angle-double-left fa-fw"></a></div>
+  <div class="content">
+    <div class="title">
+      <div>Gestion des instantanés</div>
+    </div>
+    <div class="sliders_container"></div> 
   </div>
 </div>
 

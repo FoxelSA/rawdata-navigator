@@ -17,7 +17,7 @@ div.seq:hover {
    background-color: rgba(0,0,0,0.6);
 }
 
-div.seq.active {
+div.seq.active {  
   background-color: rgba(0,0,0,0.75);
   box-shadow: 2px 2px 8px #000;
 }
@@ -179,35 +179,36 @@ canvas.gallery {
 }
 
 a.button {
-  box-shadow: 6px 6px 12px rgba(0,0,0,0.4);
+  box-shadow: 4px 4px 16px rgba(0,0,0,0.5);
   position: absolute;
-  bottom:10px;
-  top: auto;
+  top: 4.8em;
   left: auto;
   right: 0;
   color: black;
   margin: 1em;
-  border: 1px solid black;
+  border: 0px;
   border-radius: 0.5em;
   background-color: rgba(255,255,255,0.6);
   -webkit-user-select: none;
   user-select: none;
   cursor: pointer;
-  transition: all 0.2s ease-in;
+  transition: all 0.04s ease-in-out;
 }
 
 a.button:hover {
-  background-color: rgba(255,255,255,0.7);
+  background-color: gray;
+  transform: scale(0.95);
 }
 
 a.button:active {
-  box-shadow: 3px 3px 6px rgba(0,0,0,0.5);
-  transform: scale(0.98);
+  background-color: #ecb100;
+  transform: scale(0.8);
+
 }
 
 a.button div {
   position: relative;
-  font-size: 3em;
+  font-size: 2.65em;
   margin: 0.2em;
 }
 
@@ -243,3 +244,11 @@ a.button div {
   transform: scale(0.9);
 }
 /* snapshost END */
+
+#imagefilters {
+  top: 10px;
+  left: 10px;
+  position: relative;
+  color: white;
+  width: 340px;
+}

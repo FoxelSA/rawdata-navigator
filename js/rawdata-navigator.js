@@ -3478,7 +3478,7 @@ var DAV = new function() {
     };
 
     /*
-     * poi viewer
+     * poi editor
      */
     var poiPanel = this.poiPanel = new Panel({
 
@@ -3622,6 +3622,10 @@ var DAV = new function() {
               panel.window.PointCloud.prototype.Sequence.prototype.dispatchEventsTo(panel.pcl_sequence);
               panel.window.POI_thumb.prototype.dispatchEventsTo(panel);
               panel.window.POI.prototype.dispatchEventsTo(panel);
+              panel.window.Panorama.prototype.snapshot.dispatchEventsTo(panel);
+
+              // init snapshot panel
+              snapshotPanel.setPanorama(panel.panorama);
 
               // make POI selectable
               panel.window.POI.prototype.defaults.selectable=true;
@@ -3670,6 +3674,24 @@ var DAV = new function() {
           }
 
         }, // poiPanel_open
+
+        on_snapshot_mode: function poiPanel_on_snapshot_mode(e) {
+          switch(e.mode.name) {
+            case 'edit':
+              if (e.mode.value==true) {
+                  // hide sequence buttons
+                  $('.content2 a').hide(0);
+              } else {
+                  // show sequence buttons
+                  $('.content2 a').show(0);
+              }
+              poiPanel.mode.snapshot=e.mode.value;                  
+              poiPanel.updateButtons();
+              break;
+            
+          }
+          snapshotPanel.toggle();
+        }, // poiPanel_on_snapshot_mode
 
         on_poi_click: function poiPanel_on_poi_click(e) {
             console.log(e);
@@ -5541,6 +5563,32 @@ console.log('success')
           });
 
         } // poiPanel_init
+    
+    }); // poiPanel
+    
+   /**
+    * snapshot panel
+    */
+    var snapshotPanel = this.snapshotPanel = new Panel({
+        _expand: false,
+        _dom: "#snapshotpanel",
+        _background_alpha: 1.0,
+        mode: {},
+        
+        setPanorama: function snapshotPanel_setPanorama(panorama) {
+          var panel=this;
+          panel.panorama=panorama;
+
+          // reset mode
+          panel.mode={};
+
+          // clear and set snapshot sliders_container          
+          var sliders_container=$(panel._dom+' .sliders_container');
+          sliders_container.empty();
+          panorama.snapshot.sliders_container=sliders_container;
+
+        }, // snapshotPanel_setPanorama
+       
     });
 
 }; // DAV

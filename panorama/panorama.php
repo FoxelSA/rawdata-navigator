@@ -174,7 +174,7 @@ if (isset($_GET['initial']) && isset($_GET['action'])) {
             var initialImage = '<?php print ($_GET['initial']); ?>';
         <?php endif; ?>
     </script>
-    <script type="text/javascript" src="../lib/freepano/js/thirdparty/jquery-2.1.3.min.js"></script>
+    <script type="text/javascript" src="../lib/freepano/js/thirdparty/jquery-2.1.4.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/thirdparty/jquery.easing-1.3.min.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/thirdparty/jquery.mousewheel-3.1.12.min.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/thirdparty/jquery-toastmessage/jquery.toastmessage.js"></script>
@@ -219,6 +219,7 @@ if (isset($_GET['initial']) && isset($_GET['action'])) {
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.pointcloud.sequence.loader.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.gallery.js"></script>
     <script type="text/javascript" src="../lib/freepano/js/jquery.freepano.snapshot.js"></script>
+    <script type="text/javascript" src="../js/jquery.style.js"></script>
 <?php endif; ?>
     <script type="text/javascript" src="js/<?php echo $pano; ?>.js"></script>
 </head>

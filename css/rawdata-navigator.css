@@ -894,6 +894,7 @@ a.fa.disabled, a.fa.disabled:hover, a.fa.disabled:active {
         color:#fff;
         background-color:#111;
         margin-bottom:10px;
+        cursor: pointer;
     }
 
         #usages .usage img {
@@ -1305,7 +1306,7 @@ ul.poi li .buttons {
   text-shadow: 4px 4px 16px rgba(0,0,0,0.5);
   right: -1.3em;
   font-size: 5em;
-  top: 1.2em;
+  top: 2.4em;
   cursor: pointer;
 }
 
@@ -1315,7 +1316,7 @@ ul.poi li .buttons {
   text-shadow: 4px 4px 16px rgba(0,0,0,0.5);
   right: -1.3em;
   font-size: 5em;
-  top: 2.4em;
+  top: 3.6em;
 
   cursor: pointer;
 }
@@ -1326,7 +1327,7 @@ ul.poi li .buttons {
   text-shadow: 4px 4px 16px rgba(0,0,0,0.5);
   right: -1.4em;
   font-size: 4.5em;
-  top: 4.0em;
+  top: 5.2em;
 
   cursor: pointer;
 }
@@ -1340,3 +1341,41 @@ ul.poi li .buttons {
     padding-left:25px;
 }
 
+
+#imagefilters > fieldset {
+  background-color: rgba(0,0,0,0.8);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.4);
+
+}
+
+#imagefilters {
+  -webkit-user-select: none;
+  user-select: none;
+  top: 4em;
+  left: 10;
+  position: relative;
+  color: white;
+  width: 340px;
+}
+
+
+.parameter_widget {
+  float: left;
+}
+
+.parameter_value {
+  vertical-align: super;
+  margin-left: 16px
+}
+
+.parameter_name {
+  margin-top: 2px;
+  float: left;
+  width: 100px;
+}
+
+.parameter_name:first-letter {
+  text-transform: uppercase;
+}
