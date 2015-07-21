@@ -198,8 +198,7 @@ var RawDataNavigator = new function() {
                     unknown: stats.unknown,
                     gps: info.gps,
                     split: info.split,
-                    preview: info.preview,
-                    debayer: info.debayer
+                    preview: info.preview
                 }
             });
         },
@@ -237,7 +236,7 @@ var RawDataNavigator = new function() {
                         + ' ['+item.segmentation.validated+' valid, '+item.segmentation.missed+' missing, '+item.segmentation.trashed+' trashed, '+item.segmentation.corrupted+' corrupted, '+item.segmentation.unknown+' unknown]'
                         + ' <span>GPS :&nbsp; '+(item.segmentation.gps?'Yes':'No')+'</span>'
                         + ' <span>Splitted :&nbsp; '+(item.segmentation.split?'Yes':'No')+'</span>'
-                        + ' <span>Preview :&nbsp; '+(item.segmentation.preview?'Yes ('+item.segmentation.debayer+')':'No')+'</span>');
+                        + ' <span>Preview :&nbsp; '+(item.segmentation.preview?'Yes':'No')+'</span>');
                     $('#statistics').stop(true,false).slideDown(100);
                 });
 
@@ -700,8 +699,7 @@ var RawDataNavigator = new function() {
                 var info = {
                     gps: data.gps,
                     split: data.split,
-                    preview: !_.isNull(data.preview),
-                    debayer: data.preview,
+                    preview: data.preview,
                     color: segmentation._colors[call % segmentation._colors.length]
                 };
 
