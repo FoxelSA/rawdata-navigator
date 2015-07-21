@@ -1582,7 +1582,7 @@ var RawDataNavigator = new function() {
             if (this._segment != segment && videoframe > -1) {
                 this.video.clear();
                 if (info.preview)
-                    this.video._player.src({type:'video/webm',src:'php/segment-video.php?src='+allocation.current.path+'/segment/'+segment+'/preview/'+info.debayer+'/vid/25fps'});
+                    this.video._player.src({type:'video/webm',src:'php/segment-video.php?src='+allocation.current.path+'/segment/'+segment+'/info/segment'});
             }
 
             // change track
@@ -1700,7 +1700,7 @@ var RawDataNavigator = new function() {
                 // preview
                 var imgvalid = !(!info.preview || pose.raw!='valid');
                 var imgsrc = !imgvalid ? 'img/def.png'
-                    : 'php/pose-preview.php?src='+allocation.current.path+'/segment/'+segment+'/preview/'+info.debayer+'/img/'+String(pose.sec).substring(0,8)+'/'+pose.sec+'_'+String(pose.usec).zeropad(6);
+                    : 'php/pose-preview.php?src='+allocation.current.path+'/segment/'+segment+'/preview/'+String(pose.sec).substring(0,8)+'/'+pose.sec+'_'+String(pose.usec).zeropad(6);
 
                 // video
                 if (!imgvalid && information.video._opened)
