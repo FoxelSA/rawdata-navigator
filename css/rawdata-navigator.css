@@ -9,6 +9,10 @@
  *
  *      Alexandre Kraft <a.kraft@foxel.ch>
  *
+ * Contributor(s):
+ *
+ *      Kevin Velickovic <k.velickovic@foxel.ch>
+ *
  *
  * This file is part of the FOXEL project <http://foxel.ch>.
  *
