@@ -306,8 +306,8 @@ a, a:link, a:visited, a:hover, a:active {
         font-size:10px;
     }
 
-        .allocation .name {
-            padding-bottom:3px;
+        .allocation .address {
+            padding-bottom:6px;
             color:#000;
             font-weight:700;
         }
