@@ -112,7 +112,8 @@
                     <div class="section status control closed"><span></span>Run</div>
                     <div class="closeable closed">
                         <table class="section status">
-                            <tr><td class="attr">JP4</td><td class="jp4"></td></tr>
+                            <tr><td class="attr">Location</td><td class="location"></td></tr>
+                            <tr class="space"><td class="attr">JP4</td><td class="jp4"></td></tr>
                             <tr class="space"><td class="attr">Master</td><td class="master"></td></tr>
                             <tr><td class="attr">Segment</td><td class="segment"></td></tr>
                             <tr class="space"><td class="attr">MAC address</td><td class="camera"></td></tr>

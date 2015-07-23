@@ -743,7 +743,7 @@ var RawDataNavigator = new function() {
                 this._remaining = allocation.current.segments().length;
                 $.each(allocation.current.segments(), function(index,segment) {
                     $.getJSON('php/csps-json.php?json='+allocation.current.path+'/segment/'+segment.id+'/info/',function(data) {
-                        segmentation.json.success(index,segment.id,data);
+                        segmentation.json.success(index,segment,data);
                     }).fail(segmentation.json.fail);
                 });
             },
@@ -773,13 +773,14 @@ var RawDataNavigator = new function() {
 
                 var info = {
                     gps: data.gps,
+                    location: segment.location,
                     split: data.split,
                     preview: data.preview,
                     color: segmentation._colors[call % segmentation._colors.length]
                 };
 
                 var track = [];
-                var layer = map.helpers.layer(segment);
+                var layer = map.helpers.layer(segment.id);
                 var cluster = map.helpers.cluster.group(info);
 
                 var validated = 0;
@@ -827,7 +828,7 @@ var RawDataNavigator = new function() {
 
                     // add on cluster, filtered by status control
                     if (displaymarker && map.controls.status.show(pose.raw))
-                        cluster.addLayer(map.helpers.cluster.marker(segment,pose,latlng,info,index));
+                        cluster.addLayer(map.helpers.cluster.marker(segment.id,pose,latlng,info,index));
 
                     // add on poses
                     poses[index] = {
@@ -859,11 +860,11 @@ var RawDataNavigator = new function() {
                 });
 
                 // add on layer
-                layer.addLayer(map.helpers.polyline(segment,info,track));
+                layer.addLayer(map.helpers.polyline(segment.id,info,track));
                 layer.addLayer(cluster);
 
                 // add on timeline
-                timeline.add(segment,info,data.pose,{
+                timeline.add(segment.id,info,data.pose,{
                     valid: validated,
                     trash: trashed,
                     corrupt: corrupted,
@@ -872,7 +873,7 @@ var RawDataNavigator = new function() {
                 });
 
                 // segmentation
-                segmentation.add(segment,{info:info,layer:layer,poses:poses,vframes:vframes});
+                segmentation.add(segment.id,{info:info,layer:layer,poses:poses,vframes:vframes});
                 this._remaining--;
 
                 // last parsing
@@ -1755,6 +1756,15 @@ var RawDataNavigator = new function() {
                     information._component.find('.section.orientation.known').css('display','none');
                     information._component.find('.section.orientation.unknown').css('display','block');
                 }
+
+                // Location container
+                var location = ( info.location ? info.location.address : null );
+
+                // Location
+                if( location )
+                    information._component.find('.location').html( location );
+                else
+                    information._component.find('.location').html( 'Unknown' );
 
                 // status
                 if (info.split)
