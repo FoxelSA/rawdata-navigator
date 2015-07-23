@@ -9,6 +9,10 @@
  *
  *      Alexandre Kraft <a.kraft@foxel.ch>
  *
+ * Contributor(s):
+ *
+ *      Kevin Velickovic <k.velickovic@foxel.ch>
+ *
  *
  * This file is part of the FOXEL project <http://foxel.ch>.
  *
@@ -306,8 +310,8 @@ a, a:link, a:visited, a:hover, a:active {
         font-size:10px;
     }
 
-        .allocation .name {
-            padding-bottom:3px;
+        .allocation .address {
+            padding-bottom:6px;
             color:#000;
             font-weight:700;
         }

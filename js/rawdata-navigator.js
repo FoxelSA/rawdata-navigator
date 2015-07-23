@@ -9,6 +9,10 @@
  *
  *      Alexandre Kraft <a.kraft@foxel.ch>
  *
+ * Contributor(s):
+ *
+ *      Kevin Velickovic <k.velickovic@foxel.ch>
+ *
  *
  * This file is part of the FOXEL project <http://foxel.ch>.
  *
@@ -198,8 +202,7 @@ var RawDataNavigator = new function() {
                     unknown: stats.unknown,
                     gps: info.gps,
                     split: info.split,
-                    preview: info.preview,
-                    debayer: info.debayer
+                    preview: info.preview
                 }
             });
         },
@@ -231,13 +234,20 @@ var RawDataNavigator = new function() {
             // events hack
             $.each(this._items,function(index,item) {
 
+                var address = null;
+                if( allocation.current.addresses[ item.id ] )
+                {
+                    address = allocation.current.addresses[ item.id ].address;
+                }
+
                 // mouse enter
                 timeline.box(item.id).on('mouseenter',function(e) {
                     $('#statistics div').html(item.segmentation.length+' poses'
                         + ' ['+item.segmentation.validated+' valid, '+item.segmentation.missed+' missing, '+item.segmentation.trashed+' trashed, '+item.segmentation.corrupted+' corrupted, '+item.segmentation.unknown+' unknown]'
                         + ' <span>GPS :&nbsp; '+(item.segmentation.gps?'Yes':'No')+'</span>'
                         + ' <span>Splitted :&nbsp; '+(item.segmentation.split?'Yes':'No')+'</span>'
-                        + ' <span>Preview :&nbsp; '+(item.segmentation.preview?'Yes ('+item.segmentation.debayer+')':'No')+'</span>');
+                        + ' <span>Preview :&nbsp; '+(item.segmentation.preview?'Yes':'No')+'</span>'
+                        + ( address ? ' <span>Location :&nbsp; '+ address +'</span>' : '<span>Location :&nbsp;Unknown</span>' ) );
                     $('#statistics').stop(true,false).slideDown(100);
                 });
 
@@ -394,10 +404,28 @@ var RawDataNavigator = new function() {
             // tree segments
             this._tree[mac][master] = obj.segments;
 
+            // Master addresses container
+            var addresses = [];
+
+            // Iterate over possible segments
+            $.each( obj.segments, function( index, value ){
+
+                // Check if segment have location data
+                if( value.location )
+                {
+                    // Check if address is not already inserted
+                    if( ! ( addresses.indexOf( value.location.address ) > -1 ) )
+                    {
+                        // Insert address
+                        addresses.push( value.location.address );
+                    }
+                }
+            });
+
             // selector
             this._component.append(
                 $('<option>',{'value':mac+'/'+master})
-                    .text(JSON.stringify({master:master,mac:mac,name:obj.name})));
+                    .text(JSON.stringify({master:master,mac:mac,addresses:addresses})));
 
         },
 
@@ -445,6 +473,7 @@ var RawDataNavigator = new function() {
             mac: null,
             master: null,
             path: null,
+            addresses: {},
 
             /**
              * allocation.current.segments()
@@ -473,10 +502,22 @@ var RawDataNavigator = new function() {
              */
             success: function(data) {
 
+                // Initialize addresses container
+                allocation.current.addresses = {};
+
                 // parse json
                 $.each(data, function(mac,masters) {
                     $.each(masters, function(master,obj) {
+
+                        // Add allocation
                         allocation.add(mac,master,obj);
+
+                        // Iterate over segments
+                        $.each( obj.segments, function( index, value ){
+
+                            // Add location data
+                            allocation.current.addresses[ value.id ] = value.location;
+                        });
                     });
                 });
 
@@ -512,10 +553,44 @@ var RawDataNavigator = new function() {
                 // properties
                 var obj = JSON.parse(item.text);
                 var date = new Date(parseInt(obj.master,10)*1000); // milliseconds
-                var name = !_.isNull(obj.name) ? '<div class="name">'+obj.name+'</div>' : '';
+                var address = '';
+                var has_address = false;
+
+                // Check if allocation have addresses
+                if( !_.isNull(obj.addresses) )
+                {
+                    // Init address div
+                    address = '<div class="address">';
+
+                    // Iterate over addreses
+                    $.each( obj.addresses, function( index, value ){
+
+                        // Check if address is valid
+                        if( !_.isNull( value ) )
+                        {
+                            // Append address
+                            address += value;
+
+                            // Check if loop is at the end of the list
+                            if ( ! (index == obj.addresses.length - 1) ) {
+
+                                // Append return
+                                address += "<br>";
+                            }
+
+                            // Flag address as valid
+                            has_address = true;
+                        }
+
+                    });
+
+                    // Close address div
+                    address += "</div>";
+
+                }
 
                 return '<div class="allocation"><span></span>'+obj.master
-                            + '<div class="info">'+name
+                            + '<div class="info">'+( has_address ? address : '')
                             + '<div class="camera">Camera: '+obj.mac+'</div>'
                             + '<div class="date">UTC: '+date.getSimpleUTCDate()
                                 + ' &nbsp; Local: '+date.getSimpleLocalDate()+'</div></div></div>';
@@ -534,8 +609,7 @@ var RawDataNavigator = new function() {
              */
             selection: function(item) {
                 var obj = JSON.parse(item.text);
-                var name = !_.isNull(obj.name) ? ' - '+obj.name : '';
-                return item.id.replace('/',' :: <strong>')+name+'</strong>';
+                return item.id.replace('/',' :: <strong>') + '</strong>';
             },
 
             /**
@@ -668,8 +742,8 @@ var RawDataNavigator = new function() {
                 overlay.show('Loading segments from<br />'+allocation.current.path+'/');
                 this._remaining = allocation.current.segments().length;
                 $.each(allocation.current.segments(), function(index,segment) {
-                    $.getJSON('php/csps-json.php?json='+allocation.current.path+'/segment/'+segment+'/info/',function(data) {
-                        segmentation.json.success(index,segment,data);
+                    $.getJSON('php/csps-json.php?json='+allocation.current.path+'/segment/'+segment.id+'/info/',function(data) {
+                        segmentation.json.success(index,segment.id,data);
                     }).fail(segmentation.json.fail);
                 });
             },
@@ -700,8 +774,7 @@ var RawDataNavigator = new function() {
                 var info = {
                     gps: data.gps,
                     split: data.split,
-                    preview: !_.isNull(data.preview),
-                    debayer: data.preview,
+                    preview: data.preview,
                     color: segmentation._colors[call % segmentation._colors.length]
                 };
 
@@ -1582,7 +1655,7 @@ var RawDataNavigator = new function() {
             if (this._segment != segment && videoframe > -1) {
                 this.video.clear();
                 if (info.preview)
-                    this.video._player.src({type:'video/webm',src:'php/segment-video.php?src='+allocation.current.path+'/segment/'+segment+'/preview/'+info.debayer+'/vid/25fps'});
+                    this.video._player.src({type:'video/webm',src:'php/segment-video.php?src='+allocation.current.path+'/segment/'+segment+'/info/segment'});
             }
 
             // change track
@@ -1700,7 +1773,7 @@ var RawDataNavigator = new function() {
                 // preview
                 var imgvalid = !(!info.preview || pose.raw!='valid');
                 var imgsrc = !imgvalid ? 'img/def.png'
-                    : 'php/pose-preview.php?src='+allocation.current.path+'/segment/'+segment+'/preview/'+info.debayer+'/img/'+String(pose.sec).substring(0,8)+'/'+pose.sec+'_'+String(pose.usec).zeropad(6);
+                    : 'php/pose-preview.php?src='+allocation.current.path+'/segment/'+segment+'/preview/'+String(pose.sec).substring(0,8)+'/'+pose.sec+'_'+String(pose.usec).zeropad(6);
 
                 // video
                 if (!imgvalid && information.video._opened)
