@@ -106,6 +106,27 @@ a, a:link, a:visited, a:hover, a:active {
         text-transform:uppercase;
     }
 
+    #header .permalink{
+        position:absolute;
+        top:26px;
+        left:888px;
+        font-weight:700;
+        font-size:11px;
+        color:#fff;
+        text-transform:uppercase;
+    }
+
+        #header .permalink span {
+            font-family:'FontAwesome';
+            font-size:20px;
+            font-style:normal;
+            font-weight:normal;
+        }
+
+            #header .permalink span:before {
+                content:"\f0c6";
+            }
+
 #map {
     width:100%;
 }

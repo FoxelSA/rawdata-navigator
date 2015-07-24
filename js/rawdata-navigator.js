@@ -83,13 +83,41 @@ var RawDataNavigator = new function() {
     var storage = {
 
         mountpoint: '/data',
+        mac       : null,
+        master    : null,
+        segment   : null,
+        pose      : null,
 
         /**
          * storage.init()
          */
         init: function(args) {
+
+            // Parse arguments
             if (_.has(args,'mountpoint'))
                 this.mountpoint = args.mountpoint;
+
+            if (_.has(args,'mac'))
+                this.mac = args.mac;
+
+            if (_.has(args,'master'))
+                this.master = args.master;
+
+            if (_.has(args,'segment'))
+                this.segment = args.segment.split(',');
+
+            // parse pose argument in two possible formats underscore separated and dot separated
+            if (_.has(args,'pose'))
+            {
+                if( args.pose.indexOf( '.' ) >= 0 )
+                {
+                    this.pose = args.pose.split('.');
+                } else if( args.pose.indexOf( '_' ) >= 0 )
+                {
+                    this.pose = args.pose.split('_');
+                }
+            }
+
         }
 
     };
@@ -156,6 +184,7 @@ var RawDataNavigator = new function() {
         _items: [],
         _component: null,
         _dom: '#timeline',
+        _selected_segments: [],
 
         /**
          * timeline.init()
@@ -313,6 +342,9 @@ var RawDataNavigator = new function() {
             // show segments
             _.isEmpty(items) ? map.segments.show() : map.segments.selection(items);
 
+            // Save selected segment
+            this._selected_segments = items;
+
         },
 
         /**
@@ -320,12 +352,20 @@ var RawDataNavigator = new function() {
          */
         rightclick: function(segment) {
 
-            this.select([segment]);
+            var first_segment = null;
+
+            if(typeof segment === 'string'){
+                this.select([segment]);
+                first_segment = segment;
+            } else {
+                this.select(segment);
+                first_segment = segment[ 0 ];
+            }
 
             // show information on videoframe
             setTimeout(function() {
-                var vframe = segmentation.vframe(segment,0);
-                information.show(segment,_.isUndefined(vframe)?0:vframe);
+                var vframe = segmentation.vframe(first_segment,0);
+                information.show(first_segment,_.isUndefined(vframe)?0:vframe);
             },500);
 
         },
@@ -354,6 +394,11 @@ var RawDataNavigator = new function() {
          */
         init: function() {
 
+            //permalink click event
+            $("#header .permalink").on('click', function(){
+                allocation.generate_permalink();
+            });
+
             // component
             this._component = $(this._dom+' select');
 
@@ -377,6 +422,60 @@ var RawDataNavigator = new function() {
             // load
             this.json.load();
 
+        },
+
+        /**
+         * allocation.generate_permalink()
+         */
+        generate_permalink: function() {
+
+            // Get actial url without paramaters
+            var url = window.location.href.split( '?' )[ 0 ];
+
+            // Parameters container
+            var params = '';
+
+            // Check for mountpoint
+            if( storage.mountpoint )
+            {
+                // Append mountpoint to parameters
+                params += "?mountpoint=" + storage.mountpoint;
+
+                // Check for mac addess
+                if( allocation.current.mac )
+                {
+                    // Append mac address to parameters
+                    params += "&mac=" + allocation.current.mac;
+
+                    // Check for mac master timestamp
+                    if( allocation.current.master )
+                    {
+                        // Append master timestamp to parameters
+                        params += "&master=" + allocation.current.master;
+
+                        // Check for segment timestamp
+                        if( timeline._selected_segments.length > 0 )
+                        {
+                            // Append segment timestamp to parameters
+                            params += "&segment=" + timeline._selected_segments.toString();
+
+                            // Check for pose timestamp
+                            if( information._selected_pose )
+                            {
+
+                                // Append pose timestamp to parameters
+                                params += "&pose=" + ( information._selected_pose.sec + '_' + information._selected_pose.usec );
+                            }
+                        }
+                    }
+                }
+
+                // Check if parameters are present
+                if( params.length > 0 )
+
+                    // Display permalink
+                    prompt("Copy to clipboard: Ctrl+C, Enter", url + params );
+            }
         },
 
         /**
@@ -524,6 +623,14 @@ var RawDataNavigator = new function() {
                 // gui
                 overlay.hide();
                 allocation.show();
+
+                // Check if manual allocation is specified
+                if( storage.mac && storage.master )
+                {
+                    // Select allocation
+                    allocation._component.select2("val", storage.mac+'/'+storage.master);
+                    allocation.select();
+                }
 
             },
 
@@ -889,6 +996,53 @@ var RawDataNavigator = new function() {
                 timeline.update();
                 map.segments.show();
                 overlay.hide();
+
+                // Check if manual storage
+                if( storage.segment && storage.segment.length > 0 )
+                {
+
+                    // Open timeline of segment
+                    timeline.rightclick( storage.segment );
+
+                    // Check if manual pose
+                    if( storage.pose )
+                    {
+
+                        // Pose index container
+                        var pose_index = null;
+
+                        // Iterate over poses
+                        $.each( segmentation.poses( storage.segment[ 0 ] ), function( index, value ){
+
+                            // Match specified pose
+                            if( value.sec ==  storage.pose[ 0 ]
+                                && value.usec == storage.pose[ 1 ])
+                            {
+                                // Assign index
+                                pose_index = index;
+
+                                // Exit loop
+                                return;
+                            }
+                        });
+
+                        // Check if pose exists
+                        if( pose_index )
+                        {
+                            // Delay pose selection by 1s
+                            setTimeout(function(){
+
+                                // Show pose
+                                information.show(storage.segment[ 0 ],pose_index);
+
+                            }, 1000)
+                        }
+
+                    }
+
+                }
+
+
             },
 
             /**
@@ -1549,6 +1703,8 @@ var RawDataNavigator = new function() {
         _index: null,
         _layer: null,
 
+        _selected_pose: null,
+
         /**
          * information.init()
          */
@@ -1650,6 +1806,10 @@ var RawDataNavigator = new function() {
 
             var info = segmentation.info(segment);
             var pose = segmentation.pose(segment,index);
+
+            // Save selected pose
+            this._selected_pose = pose;
+
             var videoframe = segmentation.vframeindex(segment,index);
 
             // change source

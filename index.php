@@ -73,6 +73,22 @@
             <?php if (isset($_GET['mountpoint']) && !empty($_GET['mountpoint'])): ?>
                 mountpoint: <?php echo json_encode(rtrim($_GET['mountpoint'],'/')); ?>,
             <?php endif; ?>
+
+            <?php if (isset($_GET['mac']) && !empty($_GET['mac'])): ?>
+                mac: <?php echo json_encode(rtrim($_GET['mac'],'/')); ?>,
+            <?php endif; ?>
+
+            <?php if (isset($_GET['master']) && !empty($_GET['master'])): ?>
+                master: <?php echo json_encode(rtrim($_GET['master'],'/')); ?>,
+            <?php endif; ?>
+
+            <?php if (isset($_GET['segment']) && !empty($_GET['segment'])): ?>
+                segment: <?php echo json_encode(rtrim($_GET['segment'],'/')); ?>,
+            <?php endif; ?>
+
+            <?php if (isset($_GET['pose']) && !empty($_GET['pose'])): ?>
+                pose: <?php echo json_encode(rtrim($_GET['pose'],'/')); ?>,
+            <?php endif; ?>
             });
         });
     </script>
@@ -86,6 +102,7 @@
     <div id="allocation">
         <select></select>
     </div>
+    <a class="permalink" href="#"><span></span></div>
 </div>
 
 <div id="map"></div>
