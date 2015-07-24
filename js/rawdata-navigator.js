@@ -1679,6 +1679,9 @@ var RawDataNavigator = new function() {
                             iconSize: L.point(30,30)
                         })
                     }).on('click', function() {
+                        timeline._selected_segments = [ segment ];
+                        information._selected_pose = pose;
+
                         information.show(segment,index);
                     });
                 }
