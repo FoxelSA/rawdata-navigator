@@ -376,6 +376,7 @@ var RawDataNavigator = new function() {
         clear: function() {
             this._items = [];
             this._component.clear({items:true});
+            this._selected_segments = null;
         }
 
     };
@@ -454,7 +455,7 @@ var RawDataNavigator = new function() {
                         params += "&master=" + allocation.current.master;
 
                         // Check for segment timestamp
-                        if( timeline._selected_segments.length > 0 )
+                        if( timeline._selected_segments && timeline._selected_segments.length > 0 )
                         {
                             // Append segment timestamp to parameters
                             params += "&segment=" + timeline._selected_segments.toString();
@@ -997,12 +998,15 @@ var RawDataNavigator = new function() {
                 map.segments.show();
                 overlay.hide();
 
+                var segment = storage.segment;
+                storage.segment = null;
+
                 // Check if manual storage
-                if( storage.segment && storage.segment.length > 0 )
+                if( segment && segment.length > 0 )
                 {
 
                     // Open timeline of segment
-                    timeline.rightclick( storage.segment );
+                    timeline.rightclick( segment );
 
                     // Check if manual pose
                     if( storage.pose )
@@ -1012,7 +1016,7 @@ var RawDataNavigator = new function() {
                         var pose_index = null;
 
                         // Iterate over poses
-                        $.each( segmentation.poses( storage.segment[ 0 ] ), function( index, value ){
+                        $.each( segmentation.poses( segment[ 0 ] ), function( index, value ){
 
                             // Match specified pose
                             if( value.sec ==  storage.pose[ 0 ]
@@ -1033,7 +1037,7 @@ var RawDataNavigator = new function() {
                             setTimeout(function(){
 
                                 // Show pose
-                                information.show(storage.segment[ 0 ],pose_index);
+                                information.show(segment[ 0 ],pose_index);
 
                             }, 1000)
                         }
@@ -1681,7 +1685,6 @@ var RawDataNavigator = new function() {
                     }).on('click', function() {
                         timeline._selected_segments = [ segment ];
                         information._selected_pose = pose;
-
                         information.show(segment,index);
                     });
                 }
@@ -2001,6 +2004,7 @@ var RawDataNavigator = new function() {
             this._layer = null;
             this._segment = null;
             this._index = null;
+            this._selected_pose = null;
         },
 
         /**
