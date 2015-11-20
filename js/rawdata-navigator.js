@@ -1888,7 +1888,7 @@ var RawDataNavigator = new function() {
                 information.overview._component.invalidateSize();
 
                 // timestamp
-                information._component.find('.timestamp').html(pose.sec+'.'+pose.usec);
+                information._component.find('.timestamp').html(pose.sec+'_'+pose.usec);
 
                 // geo
                 if (info.gps && pose.position.known) {
